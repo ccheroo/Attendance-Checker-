@@ -1,10 +1,22 @@
 // ================================
 // ATTENDANCE CHECKER
-// APP
-// VERSION 1.1
+// MAIN APPLICATION
+// VERSION 1.2
 // ================================
 
+
 import { loadDashboard } from "./dashboard.js";
+
+import {
+
+    addStudent,
+
+    renderStudents,
+
+    searchStudents
+
+} from "./students.js";
+
 
 
 const mainContent = document.getElementById("mainContent");
@@ -12,23 +24,37 @@ const mainContent = document.getElementById("mainContent");
 const menuButtons = document.querySelectorAll(".menu");
 
 
+
 // ================================
-// MENU CLICK
+// MENU
 // ================================
 
 menuButtons.forEach(button => {
 
-    button.addEventListener("click", () => {
 
-        menuButtons.forEach(b => b.classList.remove("active"));
+    button.addEventListener("click",()=>{
+
+
+        menuButtons.forEach(btn=>{
+
+            btn.classList.remove("active");
+
+        });
+
 
         button.classList.add("active");
 
+
         loadPage(button.dataset.page);
+
+
 
     });
 
+
+
 });
+
 
 
 
@@ -126,106 +152,239 @@ function dashboard(){
 
 
 
+
 // ================================
-// STUDENTS
+// STUDENTS PAGE
 // ================================
 
 function students(){
 
 
-    mainContent.innerHTML = `
-
-
-        <h1 class="page-title">
-
-            Students
-
-        </h1>
+mainContent.innerHTML = `
 
 
 
-        <div class="card">
+<h1 class="page-title">
 
+Students
 
-            <h2>
-
-                Add Student
-
-            </h2>
+</h1>
 
 
 
-            <input 
-            id="fullName"
-            placeholder="Full Name">
+
+<div class="card">
+
+
+<h2>
+
+Register Student
+
+</h2>
 
 
 
-            <input 
-            id="studentID"
-            placeholder="Student ID">
+<input
+
+id="fullName"
+
+placeholder="Full Name"
+
+>
 
 
 
-            <input 
-            id="course"
-            placeholder="Course">
+
+<input
+
+id="studentID"
+
+placeholder="Student ID"
+
+>
 
 
 
-            <input 
-            id="yearLevel"
-            placeholder="Year Level">
+
+<input
+
+id="course"
+
+placeholder="Course"
+
+>
 
 
 
-            <input 
-            id="photo"
-            placeholder="Photo URL">
+
+<input
+
+id="yearLevel"
+
+placeholder="Year Level"
+
+>
 
 
 
-            <button class="button">
 
-                Add Student
+<input
 
-            </button>
+id="photo"
 
+placeholder="Photo URL"
 
-        </div>
-
-
-
-        <div class="card" style="margin-top:25px">
-
-
-            <input
-
-            id="searchStudent"
-
-            placeholder="Search student...">
-
-
-        </div>
+>
 
 
 
-        <div
 
-        id="studentContainer"
+<button
 
-        class="grid"
+class="button"
 
-        style="margin-top:25px">
+id="addStudentBtn"
+
+>
+
+Add Student
+
+</button>
 
 
-        </div>
+
+</div>
 
 
-    `;
+
+
+
+<div class="card"
+
+style="margin-top:25px">
+
+
+<input
+
+id="searchStudent"
+
+placeholder="Search Student"
+
+>
+
+
+</div>
+
+
+
+
+
+<div
+
+id="studentContainer"
+
+class="grid"
+
+style="margin-top:25px">
+
+
+</div>
+
+
+
+`;
+
+
+
+
+
+// ADD BUTTON
+
+document
+.getElementById("addStudentBtn")
+.addEventListener("click",()=>{
+
+
+const student = {
+
+
+fullName:
+
+document.getElementById("fullName").value,
+
+
+studentID:
+
+document.getElementById("studentID").value,
+
+
+course:
+
+document.getElementById("course").value,
+
+
+yearLevel:
+
+document.getElementById("yearLevel").value,
+
+
+photo:
+
+document.getElementById("photo").value
+
+||
+"assets/students/default.png"
+
+
+
+};
+
+
+
+addStudent(student);
+
+
+
+
+document.getElementById("fullName").value="";
+
+document.getElementById("studentID").value="";
+
+document.getElementById("course").value="";
+
+document.getElementById("yearLevel").value="";
+
+document.getElementById("photo").value="";
+
+
+
+});
+
+
+
+
+
+// SEARCH
+
+document
+.getElementById("searchStudent")
+.addEventListener("input",(e)=>{
+
+
+searchStudents(e.target.value);
+
+
+
+});
+
+
+
+renderStudents();
+
 
 
 }
+
 
 
 
@@ -236,47 +395,47 @@ function students(){
 function placeholder(title){
 
 
-    mainContent.innerHTML = `
+mainContent.innerHTML = `
 
 
-        <h1 class="page-title">
+<h1 class="page-title">
 
-            ${title}
+${title}
 
-        </h1>
-
-
-
-        <div class="card">
-
-
-            <h2>
-
-                ${title}
-
-            </h2>
+</h1>
 
 
 
-            <p>
-
-            This module will be built next.
-
-            </p>
+<div class="card">
 
 
-        </div>
+<h2>
+
+${title}
+
+</h2>
 
 
-    `;
+
+<p>
+
+This module will be built next.
+
+</p>
+
+
+
+</div>
+
+
+`;
+
 
 
 }
 
 
 
-// ================================
-// START APPLICATION
-// ================================
+// START
 
 loadPage("dashboard");
