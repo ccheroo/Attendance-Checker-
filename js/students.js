@@ -1,7 +1,7 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // FIREBASE STUDENT MANAGEMENT
-// VERSION 2.4 FINAL STABLE
+// VERSION 2.5 NO PHOTO STABLE
 // ======================================================
 
 
@@ -33,6 +33,7 @@ let students = [];
 
 const studentCollection =
 collection(db,"students");
+
 
 
 
@@ -98,6 +99,12 @@ export async function loadStudents(){
         );
 
 
+        alert(
+            "Cannot load students: "
+            + error.message
+        );
+
+
     }
 
 
@@ -149,10 +156,6 @@ export async function addStudent(student){
 
                 yearLevel:
                 student.yearLevel,
-
-
-                photo:
-                student.photo || "",
 
 
                 createdAt:
@@ -246,6 +249,12 @@ export async function deleteStudent(id){
 
 
         await loadStudents();
+
+
+
+        alert(
+            "Student deleted!"
+        );
 
 
 
@@ -411,42 +420,19 @@ export function renderStudents(data = students){
     data.forEach(student=>{
 
 
-        const image = student.photo
-
-        ?
-
-        student.photo
-
-        :
-
-        "https://via.placeholder.com/120";
-
-
-
-
-
         container.innerHTML += `
 
 
         <div class="card student-card">
 
 
+        <div class="student-avatar">
 
-        <img
+            ${student.fullName
+            .charAt(0)
+            .toUpperCase()}
 
-
-        src="${image}"
-
-
-        onerror="this.src='https://via.placeholder.com/120'"
-
-
-        style="
-        width:120px;
-        height:120px;
-        border-radius:50%;
-        object-fit:cover;
-        ">
+        </div>
 
 
 
