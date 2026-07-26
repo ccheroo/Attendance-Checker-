@@ -1,7 +1,7 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // FIRESTORE STUDENT MANAGEMENT
-// VERSION 3.0 CLEAN STABLE
+// VERSION 3.1 POLISHED STABLE
 // ======================================================
 
 
@@ -24,8 +24,10 @@ import {
 let students = [];
 
 
+
 const studentCollection =
 collection(db,"students");
+
 
 
 
@@ -45,7 +47,7 @@ export async function loadStudents(){
 
 
 
-        students=[];
+        students = [];
 
 
 
@@ -65,6 +67,13 @@ export async function loadStudents(){
 
 
 
+        console.log(
+            "Students loaded:",
+            students.length
+        );
+
+
+
         renderStudents();
 
 
@@ -76,7 +85,7 @@ export async function loadStudents(){
 
 
         console.error(
-            "Load error:",
+            "Load students error:",
             error
         );
 
@@ -85,6 +94,7 @@ export async function loadStudents(){
 
 
 }
+
 
 
 
@@ -107,12 +117,29 @@ export async function addStudent(student){
 
             {
 
-                ...student,
+
+                fullName:
+                student.fullName,
+
+
+                studentID:
+                student.studentID,
+
+
+                course:
+                student.course,
+
+
+                yearLevel:
+                student.yearLevel,
+
 
                 createdAt:
                 serverTimestamp()
 
+
             }
+
 
         );
 
@@ -121,7 +148,9 @@ export async function addStudent(student){
         await loadStudents();
 
 
+
         return true;
+
 
 
     }
@@ -131,16 +160,19 @@ export async function addStudent(student){
 
 
         console.error(
+            "Save error:",
             error
         );
 
 
         alert(
-            error.message
+            "Saving failed: "
+            + error.message
         );
 
 
         return false;
+
 
 
     }
@@ -153,11 +185,25 @@ export async function addStudent(student){
 
 
 
+
 // ================================
-// DELETE
+// DELETE STUDENT
 // ================================
 
 export async function deleteStudent(id){
+
+
+
+    const confirmDelete =
+    confirm(
+        "Are you sure you want to delete this student?"
+    );
+
+
+
+    if(!confirmDelete)
+    return;
+
 
 
     try{
@@ -179,23 +225,38 @@ export async function deleteStudent(id){
 
 
 
+        alert(
+            "Student deleted successfully!"
+        );
+
+
+
     }
+
 
 
     catch(error){
 
 
+        console.error(
+            "Delete error:",
+            error
+        );
+
+
+
         alert(
             "Delete failed: "
-            +
-            error.message
+            + error.message
         );
 
 
     }
 
 
+
 }
+
 
 
 
@@ -209,35 +270,50 @@ export async function deleteStudent(id){
 export function searchStudents(keyword){
 
 
+
     keyword =
-    keyword.toLowerCase();
+    keyword
+    .toLowerCase()
+    .trim();
+
 
 
 
     const result =
+
     students.filter(student=>{
+
+
+        const name =
+        (student.fullName || "")
+        .toLowerCase();
+
+
+
+        const id =
+        (student.studentID || "")
+        .toLowerCase();
+
+
+
+        const course =
+        (student.course || "")
+        .toLowerCase();
+
+
 
 
         return (
 
-            student.fullName
-            .toLowerCase()
-            .includes(keyword)
-
+            name.includes(keyword)
 
             ||
 
-            student.studentID
-            .toLowerCase()
-            .includes(keyword)
-
+            id.includes(keyword)
 
             ||
 
-            student.course
-            .toLowerCase()
-            .includes(keyword)
-
+            course.includes(keyword)
 
         );
 
@@ -249,6 +325,7 @@ export function searchStudents(keyword){
     renderStudents(result);
 
 
+
 }
 
 
@@ -259,122 +336,183 @@ export function searchStudents(keyword){
 
 
 // ================================
-// DISPLAY
+// DISPLAY STUDENTS
 // ================================
 
-export function renderStudents(data=students){
-
-
-const container =
-document.getElementById(
-"studentContainer"
-);
+export function renderStudents(data = students){
 
 
 
-if(!container)
-return;
+    const container =
+    document.getElementById(
+        "studentContainer"
+    );
+
+
+
+    if(!container)
+    return;
+
+
+
+    container.innerHTML="";
 
 
 
 
-container.innerHTML="";
+
+
+    if(data.length===0){
+
+
+
+        container.innerHTML=`
+
+        <div class="empty-card">
+
+            <h2>
+            No Students Yet
+            </h2>
+
+            <p>
+            Register your first student.
+            </p>
+
+        </div>
+
+        `;
+
+
+        return;
+
+
+
+    }
 
 
 
 
 
-if(data.length===0){
 
 
-container.innerHTML=`
 
-<div class="empty-card">
+    data.forEach(student=>{
 
-<h2>No Students Yet</h2>
 
-<p>Add your first student.</p>
+        const name =
+        student.fullName || "Unknown Student";
 
-</div>
 
-`;
 
-return;
+        const initial =
+        name.charAt(0)
+        .toUpperCase();
+
+
+
+
+
+        container.innerHTML += `
+
+
+        <div class="student-card">
+
+
+
+            <div class="student-avatar">
+
+                ${initial}
+
+            </div>
+
+
+
+
+            <div class="student-info">
+
+
+                <h2>
+
+                ${name}
+
+                </h2>
+
+
+
+                <p>
+
+                <strong>
+                ID:
+                </strong>
+
+                ${student.studentID || "N/A"}
+
+                </p>
+
+
+
+
+                <p>
+
+                <strong>
+                Course:
+                </strong>
+
+                ${student.course || "N/A"}
+
+                </p>
+
+
+
+
+                <p>
+
+                <strong>
+                Year:
+                </strong>
+
+                ${student.yearLevel || "N/A"}
+
+                </p>
+
+
+
+
+
+                <button
+
+                class="delete-btn"
+
+                onclick="removeStudent('${student.id}')">
+
+
+                Delete
+
+
+                </button>
+
+
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+        `;
+
+
+
+    });
+
 
 
 }
 
 
-
-
-
-
-data.forEach(student=>{
-
-
-container.innerHTML+=`
-
-
-<div class="student-card">
-
-
-<div class="student-avatar">
-
-${student.fullName.charAt(0)}
-
-</div>
-
-
-<div class="student-info">
-
-
-<h2>
-${student.fullName}
-</h2>
-
-
-<p>
-<strong>ID:</strong>
-${student.studentID}
-</p>
-
-
-<p>
-<strong>Course:</strong>
-${student.course}
-</p>
-
-
-<p>
-<strong>Year:</strong>
-${student.yearLevel}
-</p>
-
-
-<button
-class="delete-btn"
-onclick="removeStudent('${student.id}')">
-
-Delete
-
-</button>
-
-
-</div>
-
-
-</div>
-
-
-`;
-
-
-
-});
-
-
-
-}
 
 
 
