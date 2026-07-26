@@ -1,7 +1,7 @@
 // ================================
 // ATTENDANCE CHECKER
 // MAIN APPLICATION
-// VERSION 2.7 FIRESTORE ONLY STABLE
+// VERSION 2.8 FIRESTORE ONLY FINAL
 // ================================
 
 
@@ -39,7 +39,6 @@ document.querySelectorAll(".menu");
 // MENU
 // ================================
 
-
 menuButtons.forEach(button=>{
 
 
@@ -53,13 +52,10 @@ menuButtons.forEach(button=>{
         });
 
 
-
         button.classList.add("active");
 
 
-
         loadPage(button.dataset.page);
-
 
 
     });
@@ -77,7 +73,6 @@ menuButtons.forEach(button=>{
 // ================================
 // PAGE LOADER
 // ================================
-
 
 function loadPage(page){
 
@@ -148,7 +143,6 @@ function loadPage(page){
             break;
 
 
-
     }
 
 
@@ -165,13 +159,10 @@ function loadPage(page){
 // DASHBOARD
 // ================================
 
-
 function dashboard(){
-
 
     mainContent.innerHTML =
     loadDashboard();
-
 
 }
 
@@ -186,22 +177,15 @@ function dashboard(){
 // STUDENTS
 // ================================
 
-
 function students(){
-
 
 
 mainContent.innerHTML = `
 
 
-
 <h1 class="page-title">
-
 Students
-
 </h1>
-
-
 
 
 
@@ -209,91 +193,51 @@ Students
 
 
 <h2>
-
 Register Student
-
 </h2>
 
 
 
-
-
 <input
-
 id="fullName"
-
 type="text"
-
 placeholder="Full Name"
-
 >
 
 
-
-
-
 <input
-
 id="studentID"
-
 type="text"
-
 placeholder="Student ID"
-
 >
 
 
-
-
-
 <input
-
 id="course"
-
 type="text"
-
 placeholder="Course"
-
 >
-
-
-
 
 
 <input
-
 id="yearLevel"
-
 type="text"
-
 placeholder="Year Level"
-
 >
-
-
 
 
 
 <button
-
 type="button"
-
 class="button"
-
 id="addStudentBtn">
 
-
 Save Student
-
 
 </button>
 
 
-
-
 </div>
-
-
 
 
 
@@ -301,16 +245,12 @@ Save Student
 
 
 <div class="card"
-
 style="margin-top:25px">
 
 
 <input
-
 id="searchStudent"
-
 placeholder="Search Student..."
-
 >
 
 
@@ -320,20 +260,15 @@ placeholder="Search Student..."
 
 
 
-
-
 <div
-
 id="studentContainer"
-
 class="grid">
-
 
 </div>
 
 
-
 `;
+
 
 
 
@@ -354,18 +289,15 @@ document.getElementById(
 
 
 
-
 if(!addButton){
 
 console.error(
-"Save button not found"
+"Save button missing"
 );
 
 return;
 
 }
-
-
 
 
 
@@ -374,9 +306,48 @@ return;
 addButton.onclick = async ()=>{
 
 
-console.log(
-"SAVE CLICKED"
+const fullName =
+document.getElementById("fullName")
+.value.trim();
+
+
+
+const studentID =
+document.getElementById("studentID")
+.value.trim();
+
+
+
+const course =
+document.getElementById("course")
+.value.trim();
+
+
+
+const yearLevel =
+document.getElementById("yearLevel")
+.value.trim();
+
+
+
+
+
+if(
+
+!fullName ||
+!studentID ||
+!course ||
+!yearLevel
+
+){
+
+alert(
+"Please complete all fields."
 );
+
+return;
+
+}
 
 
 
@@ -385,51 +356,13 @@ console.log(
 const student = {
 
 
+    fullName,
 
-fullName:
+    studentID,
 
-document
-.getElementById("fullName")
-.value
-.trim(),
+    course,
 
-
-
-
-studentID:
-
-document
-.getElementById("studentID")
-.value
-.trim(),
-
-
-
-
-course:
-
-document
-.getElementById("course")
-.value
-.trim(),
-
-
-
-
-yearLevel:
-
-document
-.getElementById("yearLevel")
-.value
-.trim(),
-
-
-
-
-photo:
-
-"assets/default-avatar.png"
-
+    yearLevel
 
 
 };
@@ -438,65 +371,31 @@ photo:
 
 
 
-
-
-if(
-
-!student.fullName ||
-
-!student.studentID ||
-
-!student.course ||
-
-!student.yearLevel
-
-){
-
-
-alert(
-"Please complete all fields."
-);
-
-
-return;
-
-
-}
-
-
-
-
-
-
 try{
 
 
+addButton.disabled = true;
 
-addButton.disabled=true;
-
-
-addButton.innerHTML="Saving...";
-
+addButton.innerHTML =
+"Saving...";
 
 
 
 
-const saved =
+
+const result =
 await addStudent(student);
 
 
 
 
 
-if(saved !== false){
-
+if(result){
 
 
 alert(
 "Student saved successfully!"
 );
-
-
 
 
 
@@ -507,7 +406,6 @@ document.getElementById("studentID").value="";
 document.getElementById("course").value="";
 
 document.getElementById("yearLevel").value="";
-
 
 
 }
@@ -522,9 +420,9 @@ catch(error){
 
 
 console.error(
+"SAVE ERROR:",
 error
 );
-
 
 
 alert(
@@ -545,7 +443,8 @@ finally{
 addButton.disabled=false;
 
 
-addButton.innerHTML="Save Student";
+addButton.innerHTML =
+"Save Student";
 
 
 }
@@ -565,7 +464,6 @@ addButton.innerHTML="Save Student";
 // ================================
 // SEARCH
 // ================================
-
 
 const searchBox =
 document.getElementById(
@@ -587,7 +485,6 @@ e.target.value
 );
 
 
-
 });
 
 
@@ -599,10 +496,30 @@ e.target.value
 
 
 
-// LOAD EXISTING STUDENTS
+
+// ================================
+// LOAD FIRESTORE DATA
+// ================================
 
 
-loadStudents();
+try{
+
+
+await loadStudents();
+
+
+}
+
+catch(error){
+
+
+console.error(
+"LOAD STUDENTS ERROR:",
+error
+);
+
+
+}
 
 
 
@@ -620,18 +537,14 @@ loadStudents();
 // PLACEHOLDER
 // ================================
 
-
 function placeholder(title){
 
 
-
-mainContent.innerHTML=`
+mainContent.innerHTML = `
 
 
 <h1 class="page-title">
-
 ${title}
-
 </h1>
 
 
@@ -640,23 +553,17 @@ ${title}
 
 
 <h2>
-
 ${title}
-
 </h2>
 
 
 
 <p>
-
 This module will be built next.
-
 </p>
 
 
-
 </div>
-
 
 
 `;
@@ -673,7 +580,7 @@ This module will be built next.
 
 
 console.log(
-"ATTENDANCE CHECKER READY"
+"🔥 ATTENDANCE CHECKER READY"
 );
 
 
