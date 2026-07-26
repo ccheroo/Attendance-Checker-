@@ -463,29 +463,19 @@ loadStudents();
 
 
 
-
-
-
-
-
 // ================================
 // COURSES MODULE
 // ================================
 
-
 function courses(){
 
 
-
-mainContent.innerHTML=`
+mainContent.innerHTML = `
 
 
 <h1 class="page-title">
-
 Courses
-
 </h1>
-
 
 
 
@@ -494,9 +484,7 @@ Courses
 
 
 <h2>
-
 Add Course
-
 </h2>
 
 
@@ -506,15 +494,20 @@ Add Course
 
 id="courseName"
 
+type="text"
+
 placeholder="Course Name"
 
 >
 
 
 
+
 <input
 
 id="courseCode"
+
+type="text"
 
 placeholder="Course Code"
 
@@ -543,6 +536,15 @@ Save Course
 
 
 
+<div class="card" style="margin-top:25px">
+
+
+<h2>
+Course List
+</h2>
+
+
+
 <div
 
 id="courseContainer"
@@ -552,11 +554,11 @@ class="student-grid">
 </div>
 
 
+</div>
+
+
 
 `;
-
-
-
 
 
 
@@ -570,45 +572,46 @@ document.getElementById(
 
 
 
+if(!button){
+
+console.error(
+"Course button missing"
+);
+
+return;
+
+}
+
+
+
+
+
+
 
 button.onclick = async()=>{
 
 
 
-const course={
-
-
-name:
-
+const name =
 document
 .getElementById("courseName")
 .value
-.trim(),
+.trim();
 
 
 
-code:
-
+const code =
 document
 .getElementById("courseCode")
 .value
-.trim()
-
-
-
-};
+.trim();
 
 
 
 
 
 
-if(
-
-!course.name ||
-!course.code
-
-){
+if(!name || !code){
 
 
 alert(
@@ -626,11 +629,31 @@ return;
 
 
 
+const course = {
+
+
+name:name,
+
+code:code,
+
+createdAt:
+Date.now()
+
+
+};
+
+
+
+
+
+
+try{
+
 
 button.disabled=true;
 
-button.innerText="Saving...";
-
+button.innerText=
+"Saving...";
 
 
 
@@ -643,14 +666,19 @@ await addCourse(course);
 
 
 
-
 if(saved){
 
 
-document.getElementById("courseName").value="";
+
+document
+.getElementById("courseName")
+.value="";
 
 
-document.getElementById("courseCode").value="";
+
+document
+.getElementById("courseCode")
+.value="";
 
 
 
@@ -665,10 +693,43 @@ alert(
 
 
 
+}
+
+
+
+catch(error){
+
+
+console.error(
+"Course save error:",
+error
+);
+
+
+
+alert(
+"Saving failed: "
++
+error.message
+);
+
+
+
+}
+
+
+
+finally{
+
 
 button.disabled=false;
 
-button.innerText="Save Course";
+
+button.innerText=
+"Save Course";
+
+
+}
 
 
 
@@ -678,15 +739,30 @@ button.innerText="Save Course";
 
 
 
+
+try{
+
+
 loadCourses();
 
 
 
 }
 
+catch(error){
+
+
+console.error(
+"Course loading error:",
+error
+);
+
+
+}
 
 
 
+}
 
 
 
