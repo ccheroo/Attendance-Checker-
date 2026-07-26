@@ -1,7 +1,7 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // FIRESTORE ATTENDANCE MANAGEMENT
-// VERSION 3.0 FINAL QR CONNECTED
+// VERSION 3.0 FINAL QR INTEGRATED
 // ======================================================
 
 
@@ -11,11 +11,17 @@ import { db } from "./firebase.js";
 import {
 
     collection,
+
     addDoc,
+
     getDocs,
+
     query,
+
     where,
+
     orderBy,
+
     serverTimestamp
 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -24,8 +30,18 @@ import {
 
 
 
+// ================================
+// COLLECTION
+// ================================
+
+
 const attendanceCollection =
-collection(db,"attendance");
+collection(
+    db,
+    "attendance"
+);
+
+
 
 
 
@@ -34,15 +50,28 @@ collection(db,"attendance");
 
 
 // ================================
-// SAVE ATTENDANCE
+// RECORD ATTENDANCE
 // ================================
 
 
 export async function recordAttendance(student){
 
 
-
     try{
+
+
+        if(!student){
+
+            console.error(
+                "No student data."
+            );
+
+            return false;
+
+        }
+
+
+
 
 
         const today =
@@ -55,7 +84,12 @@ export async function recordAttendance(student){
 
 
 
-        const duplicateCheck =
+
+
+        // CHECK IF ALREADY PRESENT
+
+
+        const checkQuery =
 
         query(
 
@@ -82,10 +116,11 @@ export async function recordAttendance(student){
 
 
 
+
         const existing =
 
         await getDocs(
-            duplicateCheck
+            checkQuery
         );
 
 
@@ -98,7 +133,11 @@ export async function recordAttendance(student){
 
 
             alert(
-                "Student already has attendance today."
+
+                student.fullName
+                +
+                " already checked in today."
+
             );
 
 
@@ -113,55 +152,88 @@ export async function recordAttendance(student){
 
 
 
+
+
+        const attendanceData = {
+
+
+            studentID:
+            student.studentID,
+
+
+
+            fullName:
+            student.fullName,
+
+
+
+            course:
+            student.course || "",
+
+
+
+            yearLevel:
+            student.yearLevel || "",
+
+
+
+            qrCode:
+            student.qrCode || student.studentID,
+
+
+
+            date:
+            today,
+
+
+
+            time:
+
+            new Date()
+            .toLocaleTimeString(),
+
+
+
+            status:
+            "Present",
+
+
+
+            createdAt:
+            serverTimestamp()
+
+
+
+        };
+
+
+
+
+
+
+
+
+
         await addDoc(
 
             attendanceCollection,
 
-            {
+            attendanceData
 
-
-                studentID:
-                student.studentID,
-
-
-                fullName:
-                student.fullName,
-
-
-                course:
-                student.course || "",
-
-
-                yearLevel:
-                student.yearLevel || "",
-
-
-
-                date:
-                today,
-
-
-
-                time:
-
-                new Date()
-                .toLocaleTimeString(),
+        );
 
 
 
 
-                status:
-                "Present",
 
 
 
-                createdAt:
-                serverTimestamp()
 
+        alert(
 
-
-            }
-
+            "Attendance recorded for "
+            +
+            student.fullName
 
         );
 
@@ -180,13 +252,15 @@ export async function recordAttendance(student){
 
 
 
+
     catch(error){
 
 
-
         console.error(
+
             "Attendance save error:",
             error
+
         );
 
 
@@ -200,26 +274,18 @@ export async function recordAttendance(student){
         return false;
 
 
+
     }
 
 
 
 }
-
-
-
-
-
-
-
-
 // ================================
-// LOAD ATTENDANCE
+// LOAD ATTENDANCE RECORDS
 // ================================
 
 
 export async function loadAttendance(){
-
 
 
     try{
@@ -227,23 +293,18 @@ export async function loadAttendance(){
 
         const snapshot =
 
-
         await getDocs(
-
 
             query(
 
                 attendanceCollection,
-
 
                 orderBy(
                     "createdAt",
                     "desc"
                 )
 
-
             )
-
 
         );
 
@@ -251,11 +312,7 @@ export async function loadAttendance(){
 
 
 
-
-
-        let records=[];
-
-
+        let records = [];
 
 
 
@@ -266,12 +323,9 @@ export async function loadAttendance(){
 
             records.push({
 
-
                 id:item.id,
 
-
                 ...item.data()
-
 
             });
 
@@ -284,8 +338,8 @@ export async function loadAttendance(){
 
 
 
-
         renderAttendance(records);
+
 
 
 
@@ -296,10 +350,9 @@ export async function loadAttendance(){
     catch(error){
 
 
-
         console.error(
 
-            "Attendance loading error:",
+            "Load attendance error:",
             error
 
         );
@@ -310,9 +363,19 @@ export async function loadAttendance(){
 
 
 }
-// ======================================================
+
+
+
+
+
+
+
+
+
+// ================================
 // GET TODAY ATTENDANCE
-// ======================================================
+// ================================
+
 
 export async function getTodayAttendance(){
 
@@ -328,24 +391,25 @@ export async function getTodayAttendance(){
 
 
 
-        const q = query(
-
-            attendanceCollection,
-
-            where(
-                "date",
-                "==",
-                today
-            )
-
-        );
-
-
-
 
 
         const snapshot =
-        await getDocs(q);
+
+        await getDocs(
+
+            query(
+
+                attendanceCollection,
+
+                where(
+                    "date",
+                    "==",
+                    today
+                )
+
+            )
+
+        );
 
 
 
@@ -387,12 +451,12 @@ export async function getTodayAttendance(){
 
 
         console.error(
-            "Today attendance error:",
             error
         );
 
 
         return [];
+
 
     }
 
@@ -408,259 +472,250 @@ export async function getTodayAttendance(){
 
 
 
-// ======================================================
+// ================================
+// DISPLAY ATTENDANCE
+// ================================
+
+
+export function renderAttendance(records){
+
+
+
+    const container =
+
+    document.getElementById(
+        "attendanceContainer"
+    );
+
+
+
+
+
+    if(!container)
+    return;
+
+
+
+
+
+
+
+    container.innerHTML="";
+
+
+
+
+
+
+
+    if(records.length === 0){
+
+
+
+        container.innerHTML = `
+
+
+        <div class="empty-card">
+
+
+            <h2>
+            No Attendance Records
+            </h2>
+
+
+            <p>
+            Scan student QR codes to record attendance.
+            </p>
+
+
+        </div>
+
+
+        `;
+
+
+        return;
+
+
+    }
+
+
+
+
+
+
+
+
+
+    records.forEach(record=>{
+
+
+        const initial =
+
+        (
+
+            record.fullName ||
+            "?"
+
+        )
+
+        .charAt(0)
+
+        .toUpperCase();
+
+
+
+
+
+
+
+
+        container.innerHTML += `
+
+
+        <div class="student-card">
+
+
+
+            <div class="student-avatar">
+
+                ${initial}
+
+            </div>
+
+
+
+
+
+            <div class="student-info">
+
+
+
+                <h2>
+
+                ${record.fullName || "Unknown"}
+
+                </h2>
+
+
+
+
+
+                <p>
+
+                <strong>
+                Student ID:
+                </strong>
+
+                ${record.studentID || "N/A"}
+
+                </p>
+
+
+
+
+
+                <p>
+
+                <strong>
+                Course:
+                </strong>
+
+                ${record.course || "N/A"}
+
+                </p>
+
+
+
+
+
+                <p>
+
+                <strong>
+                Year Level:
+                </strong>
+
+                ${record.yearLevel || "N/A"}
+
+                </p>
+
+
+
+
+
+                <p>
+
+                <strong>
+                Date:
+                </strong>
+
+                ${record.date || "N/A"}
+
+                </p>
+
+
+
+
+
+                <p>
+
+                <strong>
+                Time:
+                </strong>
+
+                ${record.time || "N/A"}
+
+                </p>
+
+
+
+
+
+                <span class="status-present">
+
+                ${record.status || "Present"}
+
+                </span>
+
+
+
+            </div>
+
+
+
+        </div>
+
+
+        `;
+
+
+
+    });
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ================================
 // COUNT ATTENDANCE
-// ======================================================
+// ================================
 
 
-export async function getAttendanceCount(){
+export function countAttendance(records){
 
 
-
-    try{
-
-
-        const snapshot =
-        await getDocs(
-            attendanceCollection
-        );
-
-
-
-        return snapshot.size;
-
-
-
-    }
-
-
-
-    catch(error){
-
-
-        console.error(
-            "Attendance count error:",
-            error
-        );
-
-
-        return 0;
-
-
-
-    }
-
+    return records.length;
 
 
 }
-
-
-
-
-
-
-
-
-
-// ======================================================
-// SEARCH ATTENDANCE
-// ======================================================
-
-
-export async function searchAttendance(keyword){
-
-
-
-    try{
-
-
-        const snapshot =
-        await getDocs(
-            attendanceCollection
-        );
-
-
-
-        let results=[];
-
-
-
-        keyword =
-        keyword
-        .toLowerCase()
-        .trim();
-
-
-
-
-
-        snapshot.forEach(item=>{
-
-
-            const data =
-            item.data();
-
-
-
-
-
-            const name =
-
-            (
-                data.fullName ||
-                ""
-            )
-            .toLowerCase();
-
-
-
-
-
-            const id =
-
-            (
-                data.studentID ||
-                ""
-            )
-            .toLowerCase();
-
-
-
-
-
-            if(
-
-                name.includes(keyword)
-
-                ||
-
-                id.includes(keyword)
-
-            ){
-
-
-                results.push({
-
-                    id:item.id,
-
-                    ...data
-
-                });
-
-
-            }
-
-
-
-        });
-
-
-
-
-
-        renderAttendance(results);
-
-
-
-        return results;
-
-
-
-    }
-
-
-
-    catch(error){
-
-
-        console.error(
-            "Search attendance error:",
-            error
-        );
-
-
-        return [];
-
-
-
-    }
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// ======================================================
-// DELETE ATTENDANCE
-// ======================================================
-
-
-export async function deleteAttendance(id){
-
-
-
-    try{
-
-
-        await deleteDoc(
-
-            doc(
-
-                db,
-
-                "attendance",
-
-                id
-
-            )
-
-        );
-
-
-
-        await loadAttendance();
-
-
-
-        alert(
-            "Attendance deleted!"
-        );
-
-
-
-    }
-
-
-
-    catch(error){
-
-
-        console.error(
-            "Delete attendance error:",
-            error
-        );
-
-
-        alert(
-            error.message
-        );
-
-
-
-    }
-
-
-
-}
-
-
 
 
 
