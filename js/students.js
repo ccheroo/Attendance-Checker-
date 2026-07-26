@@ -543,7 +543,10 @@ ${initial}
 
 </div>
 
-
+<div 
+class="qr-box"
+id="qr-${student.id}">
+</div>
 
 <div class="student-info">
 
