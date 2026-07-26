@@ -1,12 +1,19 @@
 // ================================
 // ATTENDANCE CHECKER
 // MAIN APPLICATION
-// VERSION 3.3 CLEAN MODULE SYSTEM
+// VERSION 3.4 SCANNER READY
 // ================================
 
 
-import { 
-    loadDashboard 
+// ================================
+// IMPORTS
+// ================================
+
+
+import {
+
+    loadDashboard
+
 } from "./dashboard.js";
 
 
@@ -43,16 +50,35 @@ import {
 
 
 
+import {
 
+    openScanner
+
+} from "./scanner.js";
+
+
+
+
+
+
+
+// ================================
+// GLOBAL ELEMENTS
+// ================================
 
 
 const mainContent =
-document.getElementById("mainContent");
+document.getElementById(
+"mainContent"
+);
 
 
 
 const menuButtons =
-document.querySelectorAll(".menu");
+document.querySelectorAll(
+".menu"
+);
+
 
 
 
@@ -67,27 +93,37 @@ document.querySelectorAll(".menu");
 menuButtons.forEach(button=>{
 
 
-    button.addEventListener("click",()=>{
+    button.addEventListener(
+        "click",
+        ()=>{
 
 
-        menuButtons.forEach(btn=>{
-
-            btn.classList.remove("active");
-
-        });
+            menuButtons.forEach(btn=>{
 
 
-
-        button.classList.add("active");
-
-
-
-        loadPage(
-            button.dataset.page
-        );
+                btn.classList.remove(
+                    "active"
+                );
 
 
-    });
+            });
+
+
+
+            button.classList.add(
+                "active"
+            );
+
+
+
+            loadPage(
+                button.dataset.page
+            );
+
+
+
+        }
+    );
 
 
 });
@@ -143,7 +179,7 @@ function loadPage(page){
 
         case "scanner":
 
-            placeholder("Scanner");
+            scanner();
 
             break;
 
@@ -151,7 +187,9 @@ function loadPage(page){
 
         case "attendance":
 
-            placeholder("Attendance");
+            placeholder(
+                "Attendance"
+            );
 
             break;
 
@@ -159,7 +197,9 @@ function loadPage(page){
 
         case "reports":
 
-            placeholder("Reports");
+            placeholder(
+                "Reports"
+            );
 
             break;
 
@@ -167,17 +207,25 @@ function loadPage(page){
 
         case "settings":
 
-            placeholder("Settings");
+            placeholder(
+                "Settings"
+            );
 
             break;
 
+
+
+        default:
+
+            dashboard();
+
+            break;
 
 
     }
 
 
 }
-
 
 
 
@@ -199,13 +247,6 @@ function dashboard(){
 
 }
 
-
-
-
-
-
-
-
 // ================================
 // STUDENTS MODULE
 // ================================
@@ -222,6 +263,8 @@ Students
 </h1>
 
 
+
+
 <div class="card">
 
 
@@ -230,10 +273,13 @@ Register Student
 </h2>
 
 
+
+
 <input
 id="fullName"
 placeholder="Full Name"
 >
+
 
 
 <input
@@ -242,16 +288,20 @@ placeholder="Student ID"
 >
 
 
+
 <input
 id="course"
 placeholder="Course"
 >
 
 
+
 <input
 id="yearLevel"
 placeholder="Year Level"
 >
+
+
 
 
 
@@ -264,7 +314,11 @@ Save Student
 </button>
 
 
+
 </div>
+
+
+
 
 
 
@@ -285,14 +339,22 @@ placeholder="Search Student..."
 
 
 
+
+
+
 <div
+
 id="studentContainer"
+
 class="student-grid">
+
 
 </div>
 
 
+
 `;
+
 
 
 
@@ -310,35 +372,43 @@ document.getElementById(
 addButton.onclick = async()=>{
 
 
-const student={
+const student = {
 
 
 fullName:
+
 document
 .getElementById("fullName")
 .value
 .trim(),
 
 
+
 studentID:
+
 document
 .getElementById("studentID")
 .value
 .trim(),
 
 
+
 course:
+
 document
 .getElementById("course")
 .value
 .trim(),
 
 
+
 yearLevel:
+
 document
 .getElementById("yearLevel")
 .value
 .trim()
+
 
 
 };
@@ -347,20 +417,28 @@ document
 
 
 
+
+
 if(
 
 !student.fullName ||
+
 !student.studentID ||
+
 !student.course ||
+
 !student.yearLevel
 
 ){
+
 
 alert(
 "Please complete all fields."
 );
 
+
 return;
+
 
 }
 
@@ -368,9 +446,15 @@ return;
 
 
 
+
+try{
+
+
 addButton.disabled=true;
 
-addButton.innerText="Saving...";
+
+addButton.innerText=
+"Saving...";
 
 
 
@@ -387,9 +471,13 @@ if(saved){
 
 
 document.getElementById("fullName").value="";
+
 document.getElementById("studentID").value="";
+
 document.getElementById("course").value="";
+
 document.getElementById("yearLevel").value="";
+
 
 
 alert(
@@ -401,12 +489,48 @@ alert(
 
 
 
+}
+
+
+
+catch(error){
+
+
+console.error(
+"Student error:",
+error
+);
+
+
+
+alert(
+error.message
+);
+
+
+
+}
+
+
+
+finally{
+
+
 addButton.disabled=false;
 
-addButton.innerText="Save Student";
+
+addButton.innerText=
+"Save Student";
+
+
+}
+
 
 
 };
+
+
+
 
 
 
@@ -417,6 +541,8 @@ const searchBox =
 document.getElementById(
 "searchStudent"
 );
+
+
 
 
 
@@ -433,6 +559,7 @@ e.target.value
 );
 
 
+
 });
 
 
@@ -440,10 +567,22 @@ e.target.value
 
 
 
+
+
+
 loadStudents();
 
 
+
 }
+
+
+
+
+
+
+
+
 
 // ================================
 // COURSES MODULE
@@ -463,12 +602,15 @@ Courses
 
 
 
+
+
 <div class="card">
 
 
 <h2>
 Add Course
 </h2>
+
 
 
 
@@ -480,10 +622,13 @@ placeholder="Course Name"
 
 
 
+
 <input
 id="courseCode"
 placeholder="Course Code"
 >
+
+
 
 
 
@@ -514,9 +659,13 @@ Course List
 
 
 
+
 <div
+
 id="courseContainer"
+
 class="student-grid">
+
 
 </div>
 
@@ -532,6 +681,8 @@ class="student-grid">
 
 
 
+
+
 const button =
 document.getElementById(
 "addCourseBtn"
@@ -541,13 +692,15 @@ document.getElementById(
 
 
 
+
 button.onclick = async()=>{
 
 
-const course={
+const course = {
 
 
 name:
+
 document
 .getElementById("courseName")
 .value
@@ -555,7 +708,9 @@ document
 
 
 
+
 code:
+
 document
 .getElementById("courseCode")
 .value
@@ -569,9 +724,12 @@ document
 
 
 
+
+
 if(
 
 !course.name ||
+
 !course.code
 
 ){
@@ -592,8 +750,11 @@ return;
 
 
 
+try{
+
 
 button.disabled=true;
+
 
 button.innerText=
 "Saving...";
@@ -613,14 +774,11 @@ await addCourse(course);
 if(saved){
 
 
-document
-.getElementById("courseName")
-.value="";
+
+document.getElementById("courseName").value="";
 
 
-document
-.getElementById("courseCode")
-.value="";
+document.getElementById("courseCode").value="";
 
 
 
@@ -629,16 +787,46 @@ alert(
 );
 
 
+
 }
 
 
 
+}
+
+
+
+catch(error){
+
+
+console.error(
+"Course error:",
+error
+);
+
+
+
+alert(
+error.message
+);
+
+
+
+}
+
+
+
+finally{
 
 
 button.disabled=false;
 
+
 button.innerText=
 "Save Course";
+
+
+}
 
 
 
@@ -654,22 +842,12 @@ loadCourses();
 
 
 }
-
-
-
-
-
-
-
-
-
 // ================================
 // SUBJECTS MODULE
 // ================================
 
 
 function subjects(){
-
 
 
 mainContent.innerHTML = `
@@ -685,12 +863,14 @@ Subjects
 
 
 
+
 <div class="card">
 
 
 <h2>
 Add Subject
 </h2>
+
 
 
 
@@ -702,6 +882,7 @@ placeholder="Subject Name"
 
 
 
+
 <input
 id="subjectCode"
 placeholder="Subject Code"
@@ -709,10 +890,13 @@ placeholder="Subject Code"
 
 
 
+
 <input
 id="subjectInstructor"
 placeholder="Instructor Name"
 >
+
+
 
 
 
@@ -743,15 +927,21 @@ Subject List
 
 
 
+
+
 <div
+
 id="subjectContainer"
+
 class="student-grid">
 
-</div>
-
-
 
 </div>
+
+
+
+</div>
+
 
 
 `;
@@ -771,13 +961,16 @@ document.getElementById(
 
 
 
+
+
 button.onclick = async()=>{
 
 
-const subject={
+const subject = {
 
 
 name:
+
 document
 .getElementById("subjectName")
 .value
@@ -785,7 +978,9 @@ document
 
 
 
+
 code:
+
 document
 .getElementById("subjectCode")
 .value
@@ -793,7 +988,9 @@ document
 
 
 
+
 instructor:
+
 document
 .getElementById("subjectInstructor")
 .value
@@ -807,9 +1004,12 @@ document
 
 
 
+
+
 if(
 
 !subject.name ||
+
 !subject.code
 
 ){
@@ -829,7 +1029,13 @@ return;
 
 
 
+
+
+try{
+
+
 button.disabled=true;
+
 
 button.innerText=
 "Saving...";
@@ -840,6 +1046,8 @@ button.innerText=
 
 const saved =
 await addSubject(subject);
+
+
 
 
 
@@ -866,12 +1074,42 @@ alert(
 
 
 
+}
+
+
+
+catch(error){
+
+
+console.error(
+"Subject error:",
+error
+);
+
+
+
+alert(
+error.message
+);
+
+
+
+}
+
+
+
+finally{
 
 
 button.disabled=false;
 
+
 button.innerText=
 "Save Subject";
+
+
+}
+
 
 
 };
@@ -880,7 +1118,113 @@ button.innerText=
 
 
 
+
+
 loadSubjects();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ================================
+// SCANNER MODULE
+// ================================
+
+
+function scanner(){
+
+
+
+mainContent.innerHTML = `
+
+
+<h1 class="page-title">
+
+QR Scanner
+
+</h1>
+
+
+
+
+
+
+
+<div class="card">
+
+
+<h2>
+Attendance Scanner
+</h2>
+
+
+
+
+
+<p>
+Scan student QR code.
+</p>
+
+
+
+
+
+
+<div
+
+id="reader"
+
+style="
+width:100%;
+max-width:500px;
+margin-top:20px;
+">
+
+
+</div>
+
+
+
+
+
+
+<div
+
+id="scanResult"
+
+style="
+margin-top:20px;
+">
+
+
+Waiting for scan...
+
+
+</div>
+
+
+
+</div>
+
+
+
+`;
+
+
+
+
+
+
+
+openScanner();
 
 
 
@@ -914,6 +1258,8 @@ ${title}
 
 
 
+
+
 <div class="card">
 
 
@@ -922,6 +1268,8 @@ ${title}
 ${title}
 
 </h2>
+
+
 
 
 
@@ -951,14 +1299,20 @@ This module will be developed next.
 
 
 // ================================
-// START APPLICATION
+// APPLICATION START
 // ================================
 
 
 console.log(
+
 "🔥 ATTENDANCE CHECKER READY"
+
 );
 
 
 
-loadPage("dashboard");
+
+
+loadPage(
+"dashboard"
+);
