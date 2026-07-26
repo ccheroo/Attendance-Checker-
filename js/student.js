@@ -1,121 +1,232 @@
-// ==========================================
+// ======================================================
 // ATTENDANCE CHECKER
-// STUDENT MANAGEMENT
+// STUDENT MANAGEMENT MODULE
 // VERSION 1.0
-// ==========================================
+// ======================================================
+
 
 let students = [];
 
-const StudentManager = {
 
-    add(student) {
+// =======================================
+// ADD STUDENT
+// =======================================
 
-        students.push(student);
+export function addStudent(student){
 
-        this.render();
 
-    },
+    students.push(student);
 
-    remove(id) {
 
-        students = students.filter(student => student.studentID !== id);
+    renderStudents();
 
-        this.render();
 
-    },
+}
 
-    search(keyword) {
 
-        keyword = keyword.toLowerCase();
 
-        return students.filter(student =>
+// =======================================
+// DELETE STUDENT
+// =======================================
 
-            student.fullName.toLowerCase().includes(keyword) ||
+export function deleteStudent(id){
 
-            student.studentID.toLowerCase().includes(keyword) ||
 
-            student.course.toLowerCase().includes(keyword)
+    students = students.filter(student =>
 
-        );
+        student.studentID !== id
 
-    },
+    );
 
-    render(data = students) {
 
-        const container = document.getElementById("studentContainer");
+    renderStudents();
 
-        if (!container) return;
 
-        container.innerHTML = "";
+}
 
-        if (data.length === 0) {
 
-            container.innerHTML = `
 
-                <div class="card">
+// =======================================
+// SEARCH STUDENT
+// =======================================
 
-                    <h2>No Students Yet</h2>
+export function searchStudents(keyword){
 
-                    <p>Add your first student to begin using Attendance Checker.</p>
 
-                </div>
+    keyword = keyword.toLowerCase();
 
-            `;
 
-            return;
+    const result = students.filter(student =>
 
-        }
+        student.fullName
+        .toLowerCase()
+        .includes(keyword)
 
-        data.forEach(student => {
+        ||
 
-            container.innerHTML += `
+        student.studentID
+        .toLowerCase()
+        .includes(keyword)
 
-            <div class="card student-card">
+        ||
 
-                <img src="${student.photo}" class="student-photo">
+        student.course
+        .toLowerCase()
+        .includes(keyword)
 
-                <h2>${student.fullName}</h2>
 
-                <p>${student.studentID}</p>
+    );
 
-                <p>${student.course}</p>
 
-                <p>${student.yearLevel}</p>
+    renderStudents(result);
 
-                <div class="student-buttons">
 
-                    <button class="button">
+}
 
-                        View
 
-                    </button>
 
-                    <button class="button">
+// =======================================
+// DISPLAY STUDENTS
+// =======================================
 
-                        QR Code
+export function renderStudents(data = students){
 
-                    </button>
 
-                    <button
+    const container = document.getElementById(
+        "studentContainer"
+    );
 
-                        class="button"
 
-                        onclick="StudentManager.remove('${student.studentID}')">
+    if(!container) return;
 
-                        Delete
 
-                    </button>
 
-                </div>
+    container.innerHTML = "";
 
-            </div>
 
-            `;
 
-        });
+    if(data.length === 0){
+
+
+        container.innerHTML = `
+
+
+        <div class="card">
+
+
+            <h2>
+            No Students Added
+            </h2>
+
+
+            <p>
+            Register students to begin creating QR attendance.
+            </p>
+
+
+        </div>
+
+
+        `;
+
+
+        return;
+
 
     }
 
-};
 
-window.StudentManager = StudentManager;
+
+
+    data.forEach(student => {
+
+
+
+        container.innerHTML += `
+
+
+
+        <div class="card student-card">
+
+
+            <img
+
+            src="${student.photo}"
+
+            class="student-photo"
+
+
+            >
+
+
+
+            <h2>
+
+            ${student.fullName}
+
+            </h2>
+
+
+
+            <p>
+
+            Student ID:
+            ${student.studentID}
+
+            </p>
+
+
+
+            <p>
+
+            Course:
+            ${student.course}
+
+            </p>
+
+
+
+            <p>
+
+            Year:
+            ${student.yearLevel}
+
+            </p>
+
+
+
+
+            <button
+
+            class="button"
+
+            onclick="deleteStudent('${student.studentID}')"
+
+            >
+
+            Delete
+
+            </button>
+
+
+
+        </div>
+
+
+
+        `;
+
+
+
+    });
+
+
+}
+
+
+
+// =======================================
+// EXPOSE FUNCTION
+// =======================================
+
+window.deleteStudent = deleteStudent;
