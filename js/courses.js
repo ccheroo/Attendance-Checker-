@@ -1,7 +1,7 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // FIRESTORE COURSE MANAGEMENT
-// VERSION 1.0 CLEAN
+// VERSION 2.0 STABLE
 // ======================================================
 
 
@@ -71,6 +71,14 @@ export async function loadCourses(){
 
 
 
+
+        console.log(
+            "Courses loaded:",
+            courses.length
+        );
+
+
+
         renderCourses();
 
 
@@ -82,7 +90,7 @@ export async function loadCourses(){
 
 
         console.error(
-            "Load courses error:",
+            "LOAD COURSES ERROR:",
             error
         );
 
@@ -107,7 +115,15 @@ export async function loadCourses(){
 export async function addCourse(course){
 
 
+
     try{
+
+
+        console.log(
+            "Saving course:",
+            course
+        );
+
 
 
         await addDoc(
@@ -116,10 +132,20 @@ export async function addCourse(course){
 
             {
 
-                ...course,
+
+                name:
+                course.name || "",
+
+
+
+                code:
+                course.code || "",
+
+
 
                 createdAt:
                 serverTimestamp()
+
 
             }
 
@@ -127,7 +153,9 @@ export async function addCourse(course){
 
 
 
+
         await loadCourses();
+
 
 
 
@@ -138,21 +166,31 @@ export async function addCourse(course){
     }
 
 
+
     catch(error){
 
 
-        console.error(error);
+        console.error(
+            "ADD COURSE ERROR:",
+            error
+        );
+
 
 
         alert(
+            "Course save failed: "
+            +
             error.message
         );
+
 
 
         return false;
 
 
+
     }
+
 
 
 }
@@ -173,31 +211,66 @@ export async function deleteCourse(id){
 
 
 
-    const confirmDelete =
-    confirm(
-        "Delete this course?"
-    );
+    try{
+
+
+        const confirmDelete =
+        confirm(
+            "Delete this course?"
+        );
 
 
 
-    if(!confirmDelete)
-    return;
+        if(!confirmDelete)
+        return;
 
 
 
-    await deleteDoc(
+        await deleteDoc(
 
-        doc(
-            db,
-            "courses",
-            id
-        )
+            doc(
+                db,
+                "courses",
+                id
+            )
 
-    );
+        );
 
 
 
-    await loadCourses();
+
+        await loadCourses();
+
+
+
+
+        alert(
+            "Course deleted!"
+        );
+
+
+
+    }
+
+
+
+    catch(error){
+
+
+
+        console.error(
+            "DELETE COURSE ERROR:",
+            error
+        );
+
+
+
+        alert(
+            error.message
+        );
+
+
+    }
 
 
 
@@ -240,27 +313,38 @@ container.innerHTML="";
 
 
 
-if(courses.length===0){
+if(courses.length === 0){
+
 
 
 container.innerHTML=`
 
+
 <div class="empty-card">
 
-<h2>No Courses Yet</h2>
 
-<p>Add your first course.</p>
+<h2>
+No Courses Yet
+</h2>
+
+
+<p>
+Add your first course.
+</p>
+
 
 </div>
 
+
 `;
+
 
 
 return;
 
 
-}
 
+}
 
 
 
@@ -271,17 +355,30 @@ courses.forEach(course=>{
 
 
 
-container.innerHTML+=`
+const letter =
+(course.name || "C")
+.charAt(0)
+.toUpperCase();
+
+
+
+
+
+container.innerHTML += `
+
 
 
 <div class="student-card">
 
 
+
 <div class="student-avatar">
 
-${course.name.charAt(0)}
+${letter}
 
 </div>
+
+
 
 
 
@@ -290,9 +387,10 @@ ${course.name.charAt(0)}
 
 <h2>
 
-${course.name}
+${course.name || "Unnamed Course"}
 
 </h2>
+
 
 
 
@@ -302,9 +400,11 @@ ${course.name}
 Code:
 </strong>
 
-${course.code}
+${course.code || "N/A"}
 
 </p>
+
+
 
 
 
@@ -314,16 +414,21 @@ class="delete-btn"
 
 onclick="removeCourse('${course.id}')">
 
+
 Delete
+
 
 </button>
 
 
+
+
 </div>
 
 
 
 </div>
+
 
 
 `;
@@ -335,6 +440,8 @@ Delete
 
 
 }
+
+
 
 
 
