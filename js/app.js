@@ -1,7 +1,7 @@
 // ================================
 // ATTENDANCE CHECKER
 // MAIN APPLICATION
-// VERSION 2.0 FIREBASE CONNECTED
+// VERSION 2.1 FIREBASE + PHOTO UPLOAD
 // ================================
 
 
@@ -17,6 +17,23 @@ import {
     loadStudents
 
 } from "./students.js";
+
+
+
+import { storage } from "./firebase.js";
+
+
+import {
+
+    ref,
+
+    uploadBytes,
+
+    getDownloadURL
+
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+
 
 
 
@@ -151,7 +168,6 @@ function dashboard(){
 
 
 
-
 // ================================
 // STUDENTS PAGE
 // ================================
@@ -161,6 +177,7 @@ function students(){
 
 
 mainContent.innerHTML = `
+
 
 
 <h1 class="page-title">
@@ -183,6 +200,7 @@ Register Student
 
 
 
+
 <input
 
 id="fullName"
@@ -190,6 +208,7 @@ id="fullName"
 placeholder="Full Name"
 
 >
+
 
 
 
@@ -203,6 +222,7 @@ placeholder="Student ID"
 
 
 
+
 <input
 
 id="course"
@@ -210,6 +230,7 @@ id="course"
 placeholder="Course"
 
 >
+
 
 
 
@@ -223,13 +244,25 @@ placeholder="Year Level"
 
 
 
+
+<label>
+
+Student Photo
+
+</label>
+
+
+
 <input
 
-id="photo"
+type="file"
 
-placeholder="Photo URL"
+id="studentPhoto"
+
+accept="image/*"
 
 >
+
 
 
 
@@ -246,6 +279,7 @@ Add Student
 
 
 </div>
+
 
 
 
@@ -274,6 +308,7 @@ placeholder="Search Student..."
 
 
 
+
 <div
 
 id="studentContainer"
@@ -287,6 +322,7 @@ style="margin-top:25px">
 
 
 `;
+
 
 
 
@@ -320,8 +356,8 @@ const yearLevel =
 document.getElementById("yearLevel").value.trim();
 
 
-const photo =
-document.getElementById("photo").value.trim();
+const photoFile =
+document.getElementById("studentPhoto").files[0];
 
 
 
@@ -335,17 +371,55 @@ if(
 
 !course ||
 
-!yearLevel
+!yearLevel ||
+
+!photoFile
 
 ){
 
 
-alert("Please complete all student information.");
+alert("Please complete all information and upload a photo.");
 
 return;
 
 
 }
+
+
+
+
+
+
+
+try {
+
+
+
+const imageRef = ref(
+
+storage,
+
+"students/" + studentID + "_" + photoFile.name
+
+);
+
+
+
+
+
+await uploadBytes(
+
+imageRef,
+
+photoFile
+
+);
+
+
+
+
+
+const photoURL = await getDownloadURL(imageRef);
 
 
 
@@ -363,13 +437,11 @@ course,
 
 yearLevel,
 
-
-photo:
-
-photo || "assets/students/default.png"
+photo: photoURL
 
 
 };
+
 
 
 
@@ -381,15 +453,17 @@ await addStudent(student);
 
 
 
-document.getElementById("fullName").value = "";
 
-document.getElementById("studentID").value = "";
+document.getElementById("fullName").value="";
 
-document.getElementById("course").value = "";
+document.getElementById("studentID").value="";
 
-document.getElementById("yearLevel").value = "";
+document.getElementById("course").value="";
 
-document.getElementById("photo").value = "";
+document.getElementById("yearLevel").value="";
+
+document.getElementById("studentPhoto").value="";
+
 
 
 
@@ -398,7 +472,28 @@ alert("Student saved successfully!");
 
 
 
+
+}
+
+catch(error){
+
+
+console.error(error);
+
+
+alert(
+
+"Upload failed: " + error.message
+
+);
+
+
+}
+
+
+
 });
+
 
 
 
@@ -421,7 +516,6 @@ searchBox.addEventListener("input",(event)=>{
 searchStudents(event.target.value);
 
 
-
 });
 
 
@@ -429,14 +523,14 @@ searchStudents(event.target.value);
 
 
 
-// LOAD FIREBASE STUDENTS
+
+// LOAD STUDENTS
 
 loadStudents();
 
 
 
 }
-
 
 
 
@@ -486,8 +580,8 @@ This module will be built next.
 `;
 
 
-}
 
+}
 
 
 
