@@ -534,22 +534,45 @@ table{
 
 }
 
-}
+/* ================================
+   STUDENT PHOTO UPLOAD
+================================ */
+
 .photo-upload{
 
     margin-top:20px;
-    margin-bottom:20px;
     padding:15px;
-    border-radius:15px;
-    background:white;
+    border-radius:18px;
+    background:#ffffff;
     border:1px solid #ddd;
 
 }
 
 
-.photo-upload input{
+.photo-upload h3{
 
-    margin-top:10px;
+    margin-bottom:10px;
+    font-size:18px;
+
+}
+
+
+
+.photo-upload input[type="file"]{
+
     width:100%;
+    padding:10px;
+    font-size:14px;
+    border-radius:10px;
+
+}
+
+
+
+.photo-upload p{
+
+    margin-top:8px;
+    font-size:13px;
+    opacity:0.7;
 
 }
