@@ -1,76 +1,124 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // FIREBASE CONNECTION
-// VERSION 1.1
+// VERSION 1.2 STABLE
 // ======================================================
 
 
-// Firebase Imports
+// ================================
+// FIREBASE IMPORTS
+// ================================
 
-import { initializeApp } 
+import { initializeApp }
+
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 
-import { getFirestore } 
+import { getFirestore }
+
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
-import { getStorage } 
+import { getStorage }
+
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 
 
 
-// Firebase Configuration
+
+// ================================
+// FIREBASE CONFIG
+// ================================
 
 const firebaseConfig = {
 
-    apiKey: "AIzaSyA6gyqdZI5HRRLC4bL56rpWZAUn1O1pK2Q",
 
-    authDomain: "attendance-checker-3f355.firebaseapp.com",
+    apiKey:
+    "AIzaSyA6gyqdZI5HRRLC4bL56rpWZAUn1O1pK2Q",
 
-    projectId: "attendance-checker-3f355",
 
-    storageBucket: "attendance-checker-3f355.appspot.com",
+    authDomain:
+    "attendance-checker-3f355.firebaseapp.com",
 
-    messagingSenderId: "962480612505",
 
-    appId: "1:962480612505:web:62a616104a57e1f9808408"
+    projectId:
+    "attendance-checker-3f355",
+
+
+    storageBucket:
+    "attendance-checker-3f355.appspot.com",
+
+
+    messagingSenderId:
+    "962480612505",
+
+
+    appId:
+    "1:962480612505:web:62a616104a57e1f9808408"
+
 
 };
 
 
 
 
-// Initialize Firebase
+
+
+
+// ================================
+// INITIALIZE FIREBASE
+// ================================
 
 const app = initializeApp(firebaseConfig);
 
 
 
 
-// Firestore Database
+
+
+
+// ================================
+// FIRESTORE
+// ================================
 
 const db = getFirestore(app);
 
 
 
 
-// Firebase Storage
+
+
+
+// ================================
+// STORAGE
+// ================================
 
 const storage = getStorage(app);
 
 
 
 
-// Test Connection
-
-console.log("Firebase connected successfully");
 
 
 
+// ================================
+// CONNECTION TEST
+// ================================
 
-// Export
+console.log(
+    "🔥 Firebase initialized successfully"
+);
+
+
+
+
+
+
+
+// ================================
+// EXPORT
+// ================================
 
 export {
 
