@@ -1,7 +1,7 @@
 // ================================
 // ATTENDANCE CHECKER
 // MAIN APPLICATION
-// VERSION 3.4 SCANNER READY
+// VERSION 4.0 QR ATTENDANCE SYSTEM
 // ================================
 
 
@@ -21,9 +21,7 @@ import {
 import {
 
     addStudent,
-
     searchStudents,
-
     loadStudents
 
 } from "./students.js";
@@ -33,7 +31,6 @@ import {
 import {
 
     addCourse,
-
     loadCourses
 
 } from "./courses.js";
@@ -43,7 +40,6 @@ import {
 import {
 
     addSubject,
-
     loadSubjects
 
 } from "./subjects.js";
@@ -58,6 +54,15 @@ import {
 
 
 
+import {
+
+    loadAttendance
+
+} from "./attendance.js";
+
+
+
+
 
 
 
@@ -69,15 +74,16 @@ import {
 
 const mainContent =
 document.getElementById(
-"mainContent"
+    "mainContent"
 );
 
 
 
 const menuButtons =
 document.querySelectorAll(
-".menu"
+    ".menu"
 );
+
 
 
 
@@ -123,6 +129,7 @@ menuButtons.forEach(button=>{
 
 
         }
+
     );
 
 
@@ -134,8 +141,10 @@ menuButtons.forEach(button=>{
 
 
 
+
+
 // ================================
-// PAGE ROUTER
+// ROUTER
 // ================================
 
 
@@ -145,11 +154,13 @@ function loadPage(page){
     switch(page){
 
 
+
         case "dashboard":
 
             dashboard();
 
             break;
+
 
 
 
@@ -161,11 +172,13 @@ function loadPage(page){
 
 
 
+
         case "courses":
 
             courses();
 
             break;
+
 
 
 
@@ -177,21 +190,22 @@ function loadPage(page){
 
 
 
+
         case "scanner":
 
-            scanner();
+            scannerPage();
 
             break;
+
 
 
 
         case "attendance":
 
-            placeholder(
-                "Attendance"
-            );
+            attendance();
 
             break;
+
 
 
 
@@ -205,6 +219,7 @@ function loadPage(page){
 
 
 
+
         case "settings":
 
             placeholder(
@@ -212,6 +227,7 @@ function loadPage(page){
             );
 
             break;
+
 
 
 
@@ -233,6 +249,7 @@ function loadPage(page){
 
 
 
+
 // ================================
 // DASHBOARD
 // ================================
@@ -246,344 +263,6 @@ function dashboard(){
 
 
 }
-
-// ================================
-// STUDENTS MODULE
-// ================================
-
-
-function students(){
-
-
-mainContent.innerHTML = `
-
-
-<h1 class="page-title">
-Students
-</h1>
-
-
-
-
-<div class="card">
-
-
-<h2>
-Register Student
-</h2>
-
-
-
-
-<input
-id="fullName"
-placeholder="Full Name"
->
-
-
-
-<input
-id="studentID"
-placeholder="Student ID"
->
-
-
-
-<input
-id="course"
-placeholder="Course"
->
-
-
-
-<input
-id="yearLevel"
-placeholder="Year Level"
->
-
-
-
-
-
-<button
-class="button"
-id="addStudentBtn">
-
-Save Student
-
-</button>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-<div class="card">
-
-
-<input
-id="searchStudent"
-placeholder="Search Student..."
->
-
-
-</div>
-
-
-
-
-
-
-
-
-<div
-
-id="studentContainer"
-
-class="student-grid">
-
-
-</div>
-
-
-
-`;
-
-
-
-
-
-
-const addButton =
-document.getElementById(
-"addStudentBtn"
-);
-
-
-
-
-
-addButton.onclick = async()=>{
-
-
-const student = {
-
-
-fullName:
-
-document
-.getElementById("fullName")
-.value
-.trim(),
-
-
-
-studentID:
-
-document
-.getElementById("studentID")
-.value
-.trim(),
-
-
-
-course:
-
-document
-.getElementById("course")
-.value
-.trim(),
-
-
-
-yearLevel:
-
-document
-.getElementById("yearLevel")
-.value
-.trim()
-
-
-
-};
-
-
-
-
-
-
-
-if(
-
-!student.fullName ||
-
-!student.studentID ||
-
-!student.course ||
-
-!student.yearLevel
-
-){
-
-
-alert(
-"Please complete all fields."
-);
-
-
-return;
-
-
-}
-
-
-
-
-
-
-try{
-
-
-addButton.disabled=true;
-
-
-addButton.innerText=
-"Saving...";
-
-
-
-
-
-const saved =
-await addStudent(student);
-
-
-
-
-
-if(saved){
-
-
-document.getElementById("fullName").value="";
-
-document.getElementById("studentID").value="";
-
-document.getElementById("course").value="";
-
-document.getElementById("yearLevel").value="";
-
-
-
-alert(
-"Student saved successfully!"
-);
-
-
-}
-
-
-
-}
-
-
-
-catch(error){
-
-
-console.error(
-"Student error:",
-error
-);
-
-
-
-alert(
-error.message
-);
-
-
-
-}
-
-
-
-finally{
-
-
-addButton.disabled=false;
-
-
-addButton.innerText=
-"Save Student";
-
-
-}
-
-
-
-};
-
-
-
-
-
-
-
-
-
-const searchBox =
-document.getElementById(
-"searchStudent"
-);
-
-
-
-
-
-if(searchBox){
-
-
-searchBox.addEventListener(
-"input",
-(e)=>{
-
-
-searchStudents(
-e.target.value
-);
-
-
-
-});
-
-
-}
-
-
-
-
-
-
-loadStudents();
-
-
-
-}
-
-
-
-
-
-
-
-
-
 // ================================
 // COURSES MODULE
 // ================================
@@ -602,8 +281,6 @@ Courses
 
 
 
-
-
 <div class="card">
 
 
@@ -614,26 +291,36 @@ Add Course
 
 
 
-
 <input
+
 id="courseName"
+
+type="text"
+
 placeholder="Course Name"
+
 >
 
 
 
 
 <input
-id="courseCode"
-placeholder="Course Code"
->
 
+id="courseCode"
+
+type="text"
+
+placeholder="Course Code"
+
+>
 
 
 
 
 <button
+
 class="button"
+
 id="addCourseBtn">
 
 Save Course
@@ -692,8 +379,24 @@ document.getElementById(
 
 
 
+if(!button){
+
+console.error(
+"Course button not found"
+);
+
+return;
+
+}
+
+
+
+
+
+
 
 button.onclick = async()=>{
+
 
 
 const course = {
@@ -750,6 +453,7 @@ return;
 
 
 
+
 try{
 
 
@@ -763,8 +467,10 @@ button.innerText=
 
 
 
+
 const saved =
 await addCourse(course);
+
 
 
 
@@ -775,10 +481,15 @@ if(saved){
 
 
 
-document.getElementById("courseName").value="";
+document
+.getElementById("courseName")
+.value="";
 
 
-document.getElementById("courseCode").value="";
+
+document
+.getElementById("courseCode")
+.value="";
 
 
 
@@ -799,8 +510,9 @@ alert(
 catch(error){
 
 
+
 console.error(
-"Course error:",
+"Course save error:",
 error
 );
 
@@ -837,11 +549,21 @@ button.innerText=
 
 
 
+
 loadCourses();
 
 
 
 }
+
+
+
+
+
+
+
+
+
 // ================================
 // SUBJECTS MODULE
 // ================================
@@ -863,7 +585,6 @@ Subjects
 
 
 
-
 <div class="card">
 
 
@@ -876,32 +597,48 @@ Add Subject
 
 
 <input
+
 id="subjectName"
+
+type="text"
+
 placeholder="Subject Name"
+
 >
 
 
 
 
 <input
+
 id="subjectCode"
+
+type="text"
+
 placeholder="Subject Code"
+
 >
 
 
 
 
 <input
-id="subjectInstructor"
-placeholder="Instructor Name"
->
 
+id="subjectInstructor"
+
+type="text"
+
+placeholder="Instructor Name"
+
+>
 
 
 
 
 <button
+
 class="button"
+
 id="addSubjectBtn">
 
 Save Subject
@@ -924,7 +661,6 @@ Save Subject
 <h2>
 Subject List
 </h2>
-
 
 
 
@@ -952,6 +688,7 @@ class="student-grid">
 
 
 
+
 const button =
 document.getElementById(
 "addSubjectBtn"
@@ -961,9 +698,24 @@ document.getElementById(
 
 
 
+if(!button){
+
+console.error(
+"Subject button missing"
+);
+
+return;
+
+}
+
+
+
+
+
 
 
 button.onclick = async()=>{
+
 
 
 const subject = {
@@ -978,14 +730,12 @@ document
 
 
 
-
 code:
 
 document
 .getElementById("subjectCode")
 .value
 .trim(),
-
 
 
 
@@ -1044,6 +794,7 @@ button.innerText=
 
 
 
+
 const saved =
 await addSubject(subject);
 
@@ -1056,11 +807,22 @@ await addSubject(subject);
 if(saved){
 
 
-document.getElementById("subjectName").value="";
 
-document.getElementById("subjectCode").value="";
+document
+.getElementById("subjectName")
+.value="";
 
-document.getElementById("subjectInstructor").value="";
+
+
+document
+.getElementById("subjectCode")
+.value="";
+
+
+
+document
+.getElementById("subjectInstructor")
+.value="";
 
 
 
@@ -1081,8 +843,9 @@ alert(
 catch(error){
 
 
+
 console.error(
-"Subject error:",
+"Subject save error:",
 error
 );
 
@@ -1125,7 +888,310 @@ loadSubjects();
 
 
 }
+// ================================
+// SUBJECTS MODULE
+// ================================
 
+
+function subjects(){
+
+
+mainContent.innerHTML = `
+
+
+<h1 class="page-title">
+Subjects
+</h1>
+
+
+
+
+
+<div class="card">
+
+
+<h2>
+Add Subject
+</h2>
+
+
+
+
+
+<input
+id="subjectName"
+placeholder="Subject Name"
+>
+
+
+
+<input
+id="subjectCode"
+placeholder="Subject Code"
+>
+
+
+
+<input
+id="subjectInstructor"
+placeholder="Instructor Name"
+>
+
+
+
+
+
+<button
+class="button"
+id="addSubjectBtn">
+
+Save Subject
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="card">
+
+
+<h2>
+Subject List
+</h2>
+
+
+
+
+<div
+
+id="subjectContainer"
+
+class="student-grid">
+
+</div>
+
+
+
+</div>
+
+
+
+`;
+
+
+
+
+
+
+
+
+const button =
+document.getElementById(
+"addSubjectBtn"
+);
+
+
+
+
+
+if(!button){
+
+console.error(
+"Subject button not found"
+);
+
+return;
+
+}
+
+
+
+
+
+
+
+button.onclick = async()=>{
+
+
+
+const subject = {
+
+
+name:
+
+document
+.getElementById("subjectName")
+.value
+.trim(),
+
+
+
+code:
+
+document
+.getElementById("subjectCode")
+.value
+.trim(),
+
+
+
+instructor:
+
+document
+.getElementById("subjectInstructor")
+.value
+.trim()
+
+
+
+};
+
+
+
+
+
+
+
+
+if(
+
+!subject.name ||
+
+!subject.code
+
+){
+
+
+alert(
+"Please complete subject name and code."
+);
+
+
+return;
+
+
+}
+
+
+
+
+
+
+
+try{
+
+
+button.disabled=true;
+
+
+button.innerText=
+"Saving...";
+
+
+
+
+
+
+const saved =
+await addSubject(subject);
+
+
+
+
+
+
+
+if(saved){
+
+
+document
+.getElementById("subjectName")
+.value="";
+
+
+document
+.getElementById("subjectCode")
+.value="";
+
+
+document
+.getElementById("subjectInstructor")
+.value="";
+
+
+
+alert(
+"Subject saved successfully!"
+);
+
+
+
+}
+
+
+
+}
+
+
+
+catch(error){
+
+
+console.error(
+"Subject error:",
+error
+);
+
+
+
+alert(
+"Saving failed: "
++
+error.message
+);
+
+
+
+}
+
+
+
+finally{
+
+
+button.disabled=false;
+
+
+button.innerText=
+"Save Subject";
+
+
+}
+
+
+
+};
+
+
+
+
+
+
+
+
+loadSubjects();
+
+
+
+}
 
 
 
@@ -1147,11 +1213,8 @@ mainContent.innerHTML = `
 
 
 <h1 class="page-title">
-
 QR Scanner
-
 </h1>
-
 
 
 
@@ -1170,9 +1233,8 @@ Attendance Scanner
 
 
 <p>
-Scan student QR code.
+Point the camera to the student's QR code.
 </p>
-
 
 
 
@@ -1185,11 +1247,12 @@ id="reader"
 style="
 width:100%;
 max-width:500px;
+margin:auto;
 margin-top:20px;
 ">
 
-
 </div>
+
 
 
 
@@ -1204,17 +1267,15 @@ style="
 margin-top:20px;
 ">
 
-
-Waiting for scan...
-
+Waiting for QR scan...
 
 </div>
 
 
 
+
+
 </div>
-
-
 
 `;
 
@@ -1237,6 +1298,187 @@ openScanner();
 
 
 
+// ================================
+// ATTENDANCE PAGE
+// ================================
+
+
+function attendance(){
+
+
+
+mainContent.innerHTML = `
+
+
+<h1 class="page-title">
+
+Attendance Records
+
+</h1>
+
+
+
+
+
+
+<div class="card">
+
+
+<h2>
+Attendance History
+</h2>
+
+
+
+
+
+<div
+
+id="attendanceContainer"
+
+class="student-grid">
+
+
+</div>
+
+
+
+</div>
+
+
+
+`;
+
+
+
+
+
+
+// NEXT: connect attendance.js
+
+
+
+}
+
+
+
+
+
+
+
+
+// ================================
+// REPORTS
+// ================================
+
+
+function reports(){
+
+
+mainContent.innerHTML = `
+
+
+<h1 class="page-title">
+
+Reports
+
+</h1>
+
+
+
+
+
+<div class="card">
+
+
+<h2>
+Reports Module
+</h2>
+
+
+
+
+<p>
+
+Attendance reports will appear here.
+
+</p>
+
+
+
+</div>
+
+
+
+`;
+
+
+
+}
+
+
+
+
+
+
+
+
+// ================================
+// SETTINGS
+// ================================
+
+
+function settings(){
+
+
+mainContent.innerHTML = `
+
+
+<h1 class="page-title">
+
+Settings
+
+</h1>
+
+
+
+
+
+
+<div class="card">
+
+
+<h2>
+System Settings
+</h2>
+
+
+
+
+<p>
+
+Configuration module coming soon.
+
+</p>
+
+
+
+</div>
+
+
+
+`;
+
+
+
+}
+
+
+
+
+
+
+
 
 // ================================
 // PLACEHOLDER
@@ -1244,6 +1486,7 @@ openScanner();
 
 
 function placeholder(title){
+
 
 
 mainContent.innerHTML = `
@@ -1259,7 +1502,6 @@ ${title}
 
 
 
-
 <div class="card">
 
 
@@ -1268,7 +1510,6 @@ ${title}
 ${title}
 
 </h2>
-
 
 
 
@@ -1299,17 +1540,13 @@ This module will be developed next.
 
 
 // ================================
-// APPLICATION START
+// START APPLICATION
 // ================================
 
 
 console.log(
-
 "🔥 ATTENDANCE CHECKER READY"
-
 );
-
-
 
 
 
