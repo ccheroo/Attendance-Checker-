@@ -1,7 +1,7 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // FIREBASE STUDENT MANAGEMENT
-// VERSION 2.1 FIXED
+// VERSION 2.2 STABLE FIRESTORE + STORAGE READY
 // ======================================================
 
 
@@ -18,7 +18,9 @@ import {
 
     deleteDoc,
 
-    doc
+    doc,
+
+    serverTimestamp
 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -28,7 +30,12 @@ import {
 
 let students = [];
 
-const studentCollection = collection(db,"students");
+
+
+const studentCollection =
+collection(db,"students");
+
+
 
 
 
@@ -42,17 +49,25 @@ const studentCollection = collection(db,"students");
 export async function loadStudents(){
 
 
-    students = [];
+    const container =
+    document.getElementById(
+        "studentContainer"
+    );
 
 
-    try {
+    try{
 
 
-        const snapshot = await getDocs(studentCollection);
+        const snapshot =
+        await getDocs(studentCollection);
 
 
 
-        snapshot.forEach((item)=>{
+        students = [];
+
+
+
+        snapshot.forEach(item=>{
 
 
             students.push({
@@ -68,11 +83,21 @@ export async function loadStudents(){
 
 
 
+
         renderStudents();
 
 
 
+        console.log(
+            "Students loaded:",
+            students.length
+        );
+
+
+
     }
+
+
 
     catch(error){
 
@@ -81,6 +106,29 @@ export async function loadStudents(){
             "Loading students failed:",
             error
         );
+
+
+
+        if(container){
+
+            container.innerHTML = `
+
+            <div class="card">
+
+            <h2>
+            Error loading students
+            </h2>
+
+            <p>
+            ${error.message}
+            </p>
+
+            </div>
+
+            `;
+
+        }
+
 
 
     }
@@ -106,18 +154,39 @@ export async function addStudent(student){
     try{
 
 
-        await addDoc(studentCollection,{
+        console.log(
+            "Saving student to Firestore..."
+        );
 
 
-            ...student,
+
+        const docRef = await addDoc(
+
+            studentCollection,
 
 
-            createdAt:
-
-            Date.now()
+            {
 
 
-        });
+                ...student,
+
+
+                createdAt:
+                serverTimestamp()
+
+
+
+            }
+
+
+        );
+
+
+
+        console.log(
+            "Student saved ID:",
+            docRef.id
+        );
 
 
 
@@ -125,7 +194,12 @@ export async function addStudent(student){
 
 
 
+        return true;
+
+
+
     }
+
 
 
     catch(error){
@@ -137,16 +211,29 @@ export async function addStudent(student){
         );
 
 
+
         alert(
+
             "Cannot save student: "
-            + error.message
+
+            +
+
+            error.message
+
         );
+
+
+
+        return false;
+
 
 
     }
 
 
+
 }
+
 
 
 
@@ -162,15 +249,27 @@ export async function addStudent(student){
 export async function deleteStudent(id){
 
 
+
     try{
+
+
+        console.log(
+            "Deleting:",
+            id
+        );
+
 
 
         await deleteDoc(
 
             doc(
+
                 db,
+
                 "students",
+
                 id
+
             )
 
         );
@@ -181,9 +280,18 @@ export async function deleteStudent(id){
 
 
 
+        alert(
+            "Student deleted successfully!"
+        );
+
+
+
     }
 
+
+
     catch(error){
+
 
 
         console.error(
@@ -192,10 +300,21 @@ export async function deleteStudent(id){
         );
 
 
+
+        alert(
+            "Delete failed: "
+            +
+            error.message
+        );
+
+
+
     }
 
 
+
 }
+
 
 
 
@@ -213,42 +332,52 @@ export function searchStudents(keyword){
 
 
     keyword =
-    keyword.toLowerCase();
+    keyword
+    .toLowerCase();
 
 
 
     const filtered =
-    students.filter(student =>
+    students.filter(student=>{
+
+
+        const name =
+        (student.fullName || "")
+        .toLowerCase();
 
 
 
-        student.fullName
-        .toLowerCase()
-        .includes(keyword)
+        const id =
+        (student.studentID || "")
+        .toLowerCase();
 
 
 
-        ||
+        const course =
+        (student.course || "")
+        .toLowerCase();
 
 
 
-        student.studentID
-        .toLowerCase()
-        .includes(keyword)
+
+        return (
+
+            name.includes(keyword)
+
+            ||
+
+            id.includes(keyword)
+
+            ||
+
+            course.includes(keyword)
+
+        );
 
 
 
-        ||
+    });
 
-
-
-        student.course
-        .toLowerCase()
-        .includes(keyword)
-
-
-
-    );
 
 
 
@@ -257,6 +386,7 @@ export function searchStudents(keyword){
 
 
 }
+
 
 
 
@@ -289,27 +419,40 @@ export function renderStudents(data = students){
 
 
 
+
     if(data.length === 0){
 
 
         container.innerHTML = `
 
+
         <div class="card">
 
-        <h2>No Students Yet</h2>
+
+        <h2>
+        No Students Yet
+        </h2>
+
 
         <p>
         Add your first student.
         </p>
 
+
+
         </div>
+
+
 
         `;
 
 
         return;
 
+
     }
+
+
 
 
 
@@ -318,60 +461,90 @@ export function renderStudents(data = students){
     data.forEach(student=>{
 
 
+
         container.innerHTML += `
 
 
-        <div class="card">
+        <div class="card student-card">
 
 
         <img
 
+
         src="${student.photo || 'assets/students/default.png'}"
 
+
+
+        onerror="this.src='assets/students/default.png'"
+
+
+
         style="
+
         width:120px;
+
         height:120px;
+
         border-radius:50%;
+
         object-fit:cover;
+
         ">
 
 
 
         <h2>
+
         ${student.fullName}
+
         </h2>
 
 
 
+
         <p>
+
         ID:
         ${student.studentID}
+
         </p>
 
 
 
+
         <p>
+
         Course:
         ${student.course}
+
         </p>
+
 
 
 
         <p>
+
         Year:
         ${student.yearLevel}
+
         </p>
+
+
 
 
 
 
         <button
 
-        class="button"
+
+        class="button delete-btn"
+
 
         onclick="removeStudent('${student.id}')">
 
+
         Delete
+
 
         </button>
 
@@ -383,7 +556,9 @@ export function renderStudents(data = students){
         `;
 
 
+
     });
+
 
 
 }
@@ -391,4 +566,9 @@ export function renderStudents(data = students){
 
 
 
-window.removeStudent = deleteStudent;
+
+
+
+
+window.removeStudent =
+deleteStudent;
