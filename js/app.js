@@ -1,7 +1,7 @@
 // ================================
 // ATTENDANCE CHECKER
 // MAIN APPLICATION
-// VERSION 3.2 SUBJECTS MODULE ADDED
+// VERSION 3.3 CLEAN MODULE SYSTEM
 // ================================
 
 
@@ -46,7 +46,6 @@ import {
 
 
 
-
 const mainContent =
 document.getElementById("mainContent");
 
@@ -54,8 +53,6 @@ document.getElementById("mainContent");
 
 const menuButtons =
 document.querySelectorAll(".menu");
-
-
 
 
 
@@ -101,18 +98,15 @@ menuButtons.forEach(button=>{
 
 
 
-
 // ================================
-// PAGE LOADER
+// PAGE ROUTER
 // ================================
 
 
 function loadPage(page){
 
 
-
     switch(page){
-
 
 
         case "dashboard":
@@ -178,11 +172,11 @@ function loadPage(page){
             break;
 
 
+
     }
 
 
 }
-
 
 
 
@@ -212,14 +206,12 @@ function dashboard(){
 
 
 
-
 // ================================
 // STUDENTS MODULE
 // ================================
 
 
 function students(){
-
 
 
 mainContent.innerHTML = `
@@ -230,7 +222,6 @@ Students
 </h1>
 
 
-
 <div class="card">
 
 
@@ -239,12 +230,10 @@ Register Student
 </h2>
 
 
-
 <input
 id="fullName"
 placeholder="Full Name"
 >
-
 
 
 <input
@@ -253,19 +242,16 @@ placeholder="Student ID"
 >
 
 
-
 <input
 id="course"
 placeholder="Course"
 >
 
 
-
 <input
 id="yearLevel"
 placeholder="Year Level"
 >
-
 
 
 
@@ -278,14 +264,13 @@ Save Student
 </button>
 
 
-
 </div>
 
 
 
 
 
-<div class="card search-card">
+<div class="card">
 
 
 <input
@@ -307,9 +292,7 @@ class="student-grid">
 </div>
 
 
-
 `;
-
 
 
 
@@ -319,6 +302,7 @@ const addButton =
 document.getElementById(
 "addStudentBtn"
 );
+
 
 
 
@@ -336,13 +320,11 @@ document
 .trim(),
 
 
-
 studentID:
 document
 .getElementById("studentID")
 .value
 .trim(),
-
 
 
 course:
@@ -352,13 +334,11 @@ document
 .trim(),
 
 
-
 yearLevel:
 document
 .getElementById("yearLevel")
 .value
 .trim()
-
 
 
 };
@@ -367,27 +347,20 @@ document
 
 
 
-
 if(
 
 !student.fullName ||
-
 !student.studentID ||
-
 !student.course ||
-
 !student.yearLevel
 
 ){
-
 
 alert(
 "Please complete all fields."
 );
 
-
 return;
-
 
 }
 
@@ -397,8 +370,7 @@ return;
 
 addButton.disabled=true;
 
-addButton.innerText=
-"Saving...";
+addButton.innerText="Saving...";
 
 
 
@@ -414,21 +386,10 @@ await addStudent(student);
 if(saved){
 
 
-document
-.getElementById("fullName")
-.value="";
-
-document
-.getElementById("studentID")
-.value="";
-
-document
-.getElementById("course")
-.value="";
-
-document
-.getElementById("yearLevel")
-.value="";
+document.getElementById("fullName").value="";
+document.getElementById("studentID").value="";
+document.getElementById("course").value="";
+document.getElementById("yearLevel").value="";
 
 
 alert(
@@ -440,11 +401,9 @@ alert(
 
 
 
-
 addButton.disabled=false;
 
-addButton.innerText=
-"Save Student";
+addButton.innerText="Save Student";
 
 
 };
@@ -484,13 +443,233 @@ e.target.value
 loadStudents();
 
 
+}
+
+// ================================
+// COURSES MODULE
+// ================================
+
+
+function courses(){
+
+
+mainContent.innerHTML = `
+
+
+<h1 class="page-title">
+Courses
+</h1>
+
+
+
+
+<div class="card">
+
+
+<h2>
+Add Course
+</h2>
+
+
+
+
+<input
+id="courseName"
+placeholder="Course Name"
+>
+
+
+
+<input
+id="courseCode"
+placeholder="Course Code"
+>
+
+
+
+<button
+class="button"
+id="addCourseBtn">
+
+Save Course
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="card">
+
+
+<h2>
+Course List
+</h2>
+
+
+
+<div
+id="courseContainer"
+class="student-grid">
+
+</div>
+
+
+
+</div>
+
+
+
+`;
+
+
+
+
+
+const button =
+document.getElementById(
+"addCourseBtn"
+);
+
+
+
+
+
+button.onclick = async()=>{
+
+
+const course={
+
+
+name:
+document
+.getElementById("courseName")
+.value
+.trim(),
+
+
+
+code:
+document
+.getElementById("courseCode")
+.value
+.trim()
+
+
+
+};
+
+
+
+
+
+if(
+
+!course.name ||
+!course.code
+
+){
+
+
+alert(
+"Please complete all fields."
+);
+
+
+return;
+
 
 }
+
+
+
+
+
+
+
+button.disabled=true;
+
+button.innerText=
+"Saving...";
+
+
+
+
+
+const saved =
+await addCourse(course);
+
+
+
+
+
+
+if(saved){
+
+
+document
+.getElementById("courseName")
+.value="";
+
+
+document
+.getElementById("courseCode")
+.value="";
+
+
+
+alert(
+"Course saved successfully!"
+);
+
+
+}
+
+
+
+
+
+button.disabled=false;
+
+button.innerText=
+"Save Course";
+
+
+
+};
+
+
+
+
+
+
+loadCourses();
+
+
+
+}
+
+
+
+
+
+
+
+
+
 // ================================
 // SUBJECTS MODULE
 // ================================
 
+
 function subjects(){
+
 
 
 mainContent.innerHTML = `
@@ -516,50 +695,29 @@ Add Subject
 
 
 
-
 <input
-
 id="subjectName"
-
-type="text"
-
 placeholder="Subject Name"
-
 >
 
 
 
-
 <input
-
 id="subjectCode"
-
-type="text"
-
 placeholder="Subject Code"
-
 >
-
 
 
 
 <input
-
 id="subjectInstructor"
-
-type="text"
-
 placeholder="Instructor Name"
-
 >
-
 
 
 
 <button
-
 class="button"
-
 id="addSubjectBtn">
 
 Save Subject
@@ -576,9 +734,7 @@ Save Subject
 
 
 
-<div class="card"
-
-style="margin-top:25px;">
+<div class="card">
 
 
 <h2>
@@ -588,9 +744,7 @@ Subject List
 
 
 <div
-
 id="subjectContainer"
-
 class="student-grid">
 
 </div>
@@ -598,7 +752,6 @@ class="student-grid">
 
 
 </div>
-
 
 
 `;
@@ -609,9 +762,7 @@ class="student-grid">
 
 
 
-
 const button =
-
 document.getElementById(
 "addSubjectBtn"
 );
@@ -620,32 +771,13 @@ document.getElementById(
 
 
 
-if(!button){
-
-console.error(
-"Subject button missing"
-);
-
-return;
-
-}
-
-
-
-
-
-
-
 button.onclick = async()=>{
 
 
-
-const subject = {
-
+const subject={
 
 
 name:
-
 document
 .getElementById("subjectName")
 .value
@@ -653,9 +785,7 @@ document
 
 
 
-
 code:
-
 document
 .getElementById("subjectCode")
 .value
@@ -663,9 +793,7 @@ document
 
 
 
-
 instructor:
-
 document
 .getElementById("subjectInstructor")
 .value
@@ -679,11 +807,9 @@ document
 
 
 
-
 if(
 
 !subject.name ||
-
 !subject.code
 
 ){
@@ -703,13 +829,7 @@ return;
 
 
 
-
-
-try{
-
-
 button.disabled=true;
-
 
 button.innerText=
 "Saving...";
@@ -718,11 +838,8 @@ button.innerText=
 
 
 
-
 const saved =
-
 await addSubject(subject);
-
 
 
 
@@ -731,22 +848,11 @@ await addSubject(subject);
 if(saved){
 
 
+document.getElementById("subjectName").value="";
 
-document
-.getElementById("subjectName")
-.value="";
+document.getElementById("subjectCode").value="";
 
-
-
-document
-.getElementById("subjectCode")
-.value="";
-
-
-
-document
-.getElementById("subjectInstructor")
-.value="";
+document.getElementById("subjectInstructor").value="";
 
 
 
@@ -760,50 +866,15 @@ alert(
 
 
 
-}
-
-
-
-catch(error){
-
-
-console.error(
-"SUBJECT SAVE ERROR:",
-error
-);
-
-
-
-alert(
-"Saving failed: "
-+
-error.message
-);
-
-
-
-}
-
-
-
-finally{
 
 
 button.disabled=false;
-
 
 button.innerText=
 "Save Subject";
 
 
-}
-
-
-
 };
-
-
-
 
 
 
@@ -824,7 +895,7 @@ loadSubjects();
 
 
 // ================================
-// PLACEHOLDER MODULES
+// PLACEHOLDER
 // ================================
 
 
@@ -834,13 +905,11 @@ function placeholder(title){
 mainContent.innerHTML = `
 
 
-
 <h1 class="page-title">
 
 ${title}
 
 </h1>
-
 
 
 
@@ -881,18 +950,14 @@ This module will be developed next.
 
 
 
-
 // ================================
-// APP START
+// START APPLICATION
 // ================================
 
 
 console.log(
-
 "🔥 ATTENDANCE CHECKER READY"
-
 );
-
 
 
 
