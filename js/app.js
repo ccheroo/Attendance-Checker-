@@ -1,7 +1,7 @@
 // ================================
 // ATTENDANCE CHECKER
 // MAIN APPLICATION
-// VERSION 2.1 FIREBASE + PHOTO UPLOAD
+// VERSION 2.2 FIRESTORE STABLE
 // ================================
 
 
@@ -20,23 +20,6 @@ import {
 
 
 
-import { storage } from "./firebase.js";
-
-
-import {
-
-    ref,
-
-    uploadBytes,
-
-    getDownloadURL
-
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-
-
-
-
-
 const mainContent = document.getElementById("mainContent");
 
 const menuButtons = document.querySelectorAll(".menu");
@@ -44,9 +27,6 @@ const menuButtons = document.querySelectorAll(".menu");
 
 
 
-// ================================
-// MENU
-// ================================
 
 menuButtons.forEach(button => {
 
@@ -54,7 +34,7 @@ menuButtons.forEach(button => {
     button.addEventListener("click",()=>{
 
 
-        menuButtons.forEach(btn=>{
+        menuButtons.forEach(btn => {
 
             btn.classList.remove("active");
 
@@ -75,10 +55,6 @@ menuButtons.forEach(button => {
 
 
 
-
-// ================================
-// PAGE LOADER
-// ================================
 
 function loadPage(page){
 
@@ -144,16 +120,11 @@ function loadPage(page){
 
     }
 
-
 }
 
 
 
 
-
-// ================================
-// DASHBOARD
-// ================================
 
 function dashboard(){
 
@@ -168,24 +139,15 @@ function dashboard(){
 
 
 
-// ================================
-// STUDENTS PAGE
-// ================================
-
 function students(){
-
 
 
 mainContent.innerHTML = `
 
 
-
 <h1 class="page-title">
-
 Students
-
 </h1>
-
 
 
 
@@ -193,84 +155,24 @@ Students
 
 
 <h2>
-
 Register Student
-
 </h2>
 
 
 
-
-<input
-
-id="fullName"
-
-placeholder="Full Name"
-
->
+<input id="fullName" placeholder="Full Name">
 
 
+<input id="studentID" placeholder="Student ID">
 
 
-<input
-
-id="studentID"
-
-placeholder="Student ID"
-
->
+<input id="course" placeholder="Course">
 
 
+<input id="yearLevel" placeholder="Year Level">
 
 
-<input
-
-id="course"
-
-placeholder="Course"
-
->
-
-
-
-
-<input
-
-id="yearLevel"
-
-placeholder="Year Level"
-
->
-
-
-
-
-<label>
-
-Student Photo
-
-</label>
-
-
-
-<input
-
-type="file"
-
-id="studentPhoto"
-
-accept="image/*"
-
->
-
-
-
-
-<button
-
-class="button"
-
-id="addStudentBtn">
+<button class="button" id="addStudentBtn">
 
 Add Student
 
@@ -283,41 +185,17 @@ Add Student
 
 
 
+<div class="card" style="margin-top:25px">
 
 
-
-<div class="card"
-
-style="margin-top:25px">
-
-
-<input
-
-id="searchStudent"
-
-placeholder="Search Student..."
-
->
+<input id="searchStudent" placeholder="Search Student">
 
 
 </div>
 
 
 
-
-
-
-
-
-<div
-
-id="studentContainer"
-
-class="grid"
-
-style="margin-top:25px">
-
-</div>
+<div id="studentContainer" class="grid"></div>
 
 
 
@@ -327,12 +205,6 @@ style="margin-top:25px">
 
 
 
-
-
-// ================================
-// ADD STUDENT
-// ================================
-
 const addButton = document.getElementById("addStudentBtn");
 
 
@@ -340,109 +212,50 @@ const addButton = document.getElementById("addStudentBtn");
 addButton.addEventListener("click", async ()=>{
 
 
-const fullName =
-document.getElementById("fullName").value.trim();
+const student = {
 
 
-const studentID =
-document.getElementById("studentID").value.trim();
+fullName:
+document.getElementById("fullName").value.trim(),
 
 
-const course =
-document.getElementById("course").value.trim();
+studentID:
+document.getElementById("studentID").value.trim(),
 
 
-const yearLevel =
-document.getElementById("yearLevel").value.trim();
+course:
+document.getElementById("course").value.trim(),
 
 
-const photoFile =
-document.getElementById("studentPhoto").files[0];
+yearLevel:
+document.getElementById("yearLevel").value.trim(),
 
+
+photo:""
+
+
+};
 
 
 
 
 if(
 
-!fullName ||
+!student.fullName ||
 
-!studentID ||
+!student.studentID ||
 
-!course ||
+!student.course ||
 
-!yearLevel ||
-
-!photoFile
+!student.yearLevel
 
 ){
 
-
-alert("Please complete all information and upload a photo.");
+alert("Please complete all fields.");
 
 return;
 
-
 }
-
-
-
-
-
-
-
-try {
-
-
-
-const imageRef = ref(
-
-storage,
-
-"students/" + studentID + "_" + photoFile.name
-
-);
-
-
-
-
-
-await uploadBytes(
-
-imageRef,
-
-photoFile
-
-);
-
-
-
-
-
-const photoURL = await getDownloadURL(imageRef);
-
-
-
-
-
-
-const student = {
-
-
-fullName,
-
-studentID,
-
-course,
-
-yearLevel,
-
-photo: photoURL
-
-
-};
-
-
 
 
 
@@ -451,6 +264,7 @@ await addStudent(student);
 
 
 
+alert("Student saved successfully!");
 
 
 
@@ -462,34 +276,6 @@ document.getElementById("course").value="";
 
 document.getElementById("yearLevel").value="";
 
-document.getElementById("studentPhoto").value="";
-
-
-
-
-
-alert("Student saved successfully!");
-
-
-
-
-}
-
-catch(error){
-
-
-console.error(error);
-
-
-alert(
-
-"Upload failed: " + error.message
-
-);
-
-
-}
-
 
 
 });
@@ -499,21 +285,12 @@ alert(
 
 
 
+document
+.getElementById("searchStudent")
+.addEventListener("input",(e)=>{
 
 
-
-// ================================
-// SEARCH
-// ================================
-
-const searchBox = document.getElementById("searchStudent");
-
-
-
-searchBox.addEventListener("input",(event)=>{
-
-
-searchStudents(event.target.value);
+searchStudents(e.target.value);
 
 
 });
@@ -521,10 +298,6 @@ searchStudents(event.target.value);
 
 
 
-
-
-
-// LOAD STUDENTS
 
 loadStudents();
 
@@ -537,9 +310,6 @@ loadStudents();
 
 
 
-// ================================
-// PLACEHOLDER
-// ================================
 
 function placeholder(title){
 
@@ -554,24 +324,15 @@ ${title}
 </h1>
 
 
-
 <div class="card">
 
 
-<h2>
-
-${title}
-
-</h2>
-
+<h2>${title}</h2>
 
 
 <p>
-
 This module will be built next.
-
 </p>
-
 
 
 </div>
@@ -579,17 +340,8 @@ This module will be built next.
 
 `;
 
-
-
 }
 
 
-
-
-
-
-// ================================
-// START APP
-// ================================
 
 loadPage("dashboard");
