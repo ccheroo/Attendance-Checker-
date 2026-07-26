@@ -1,7 +1,7 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // QR SCANNER MODULE
-// VERSION 4.0 BETTER UX
+// VERSION 5.0 PROFESSIONAL SCANNER UX
 // ======================================================
 
 
@@ -25,9 +25,179 @@ import {
 
 
 
+
 let scanner = null;
 
 let processing = false;
+
+let audioContext = null;
+
+
+
+
+
+
+
+// ================================
+// SOUND SYSTEM
+// ================================
+
+
+function playBeep(type="success"){
+
+
+
+try{
+
+
+
+if(!audioContext){
+
+
+audioContext =
+new (
+window.AudioContext ||
+window.webkitAudioContext
+)();
+
+
+}
+
+
+
+
+
+
+const oscillator =
+audioContext.createOscillator();
+
+
+
+const gain =
+audioContext.createGain();
+
+
+
+
+
+
+if(type==="success"){
+
+
+oscillator.frequency.value = 1200;
+
+
+}
+
+else if(type==="warning"){
+
+
+oscillator.frequency.value = 500;
+
+
+}
+
+else{
+
+
+oscillator.frequency.value = 300;
+
+
+}
+
+
+
+
+
+
+oscillator.type="square";
+
+
+
+gain.gain.value=0.15;
+
+
+
+
+
+oscillator.connect(gain);
+
+
+gain.connect(
+audioContext.destination
+);
+
+
+
+
+
+
+oscillator.start();
+
+
+
+setTimeout(()=>{
+
+
+oscillator.stop();
+
+
+},120);
+
+
+
+}
+
+
+
+
+
+catch(error){
+
+
+console.log(
+"Sound blocked:",
+error
+);
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+// ================================
+// VIBRATION
+// ================================
+
+
+function vibrate(){
+
+
+if(
+navigator.vibrate
+){
+
+
+navigator.vibrate(150);
+
+
+}
+
+
+}
+
+
+
+
 
 
 
@@ -53,6 +223,7 @@ document.getElementById(
 
 if(!result)
 return;
+
 
 
 
@@ -85,7 +256,9 @@ if(scanner){
 
 try{
 
+
 scanner.clear();
+
 
 }
 
@@ -110,7 +283,10 @@ new Html5QrcodeScanner(
 
 fps:10,
 
-qrbox:250
+qrbox:250,
+
+rememberLastUsedCamera:true
+
 
 },
 
@@ -138,15 +314,33 @@ return;
 
 
 
-processing = true;
+
+processing=true;
 
 
 
 
-console.log(
-"QR:",
-decodedText
-);
+
+result.innerHTML=`
+
+
+<div class="card">
+
+
+<h2>
+⏳ Processing...
+</h2>
+
+
+<p>
+Checking student record...
+</p>
+
+
+</div>
+
+
+`;
 
 
 
@@ -159,6 +353,7 @@ decodedText,
 result
 
 );
+
 
 
 
@@ -225,9 +420,10 @@ await getDocs(q);
 
 
 
-// FALLBACK SA OLD STUDENTS
+// FALLBACK USING STUDENT ID
 
 if(snapshot.empty){
+
 
 
 const oldQuery =
@@ -262,7 +458,15 @@ await getDocs(oldQuery);
 
 
 
+
+
 if(snapshot.empty){
+
+
+
+playBeep("error");
+
+vibrate();
 
 
 
@@ -272,7 +476,22 @@ result,
 
 "❌ Student Not Found",
 
-"QR Code: " + qr,
+`
+
+QR Code:
+
+<br>
+
+<strong>
+${qr}
+</strong>
+
+
+<br><br>
+
+Please register this student first.
+
+`,
 
 "error"
 
@@ -286,6 +505,7 @@ processing=false;
 return;
 
 
+
 }
 
 
@@ -294,7 +514,9 @@ return;
 
 
 
-let student = null;
+
+
+let student=null;
 
 
 
@@ -316,7 +538,11 @@ id:item.id,
 };
 
 
+
 });
+
+
+
 
 
 
@@ -334,21 +560,18 @@ await recordAttendance(student);
 
 
 
+
+
 if(saved){
 
 
 
-// SUCCESS SOUND
-
-const beep =
-new Audio(
-
-"https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
-
+playBeep(
+"success"
 );
 
 
-beep.play();
+vibrate();
 
 
 
@@ -364,27 +587,52 @@ result,
 
 `
 
-<strong>
+<strong style="font-size:22px">
+
 ${student.fullName}
+
 </strong>
+
 
 <br><br>
 
+
 Student ID:
+
 ${student.studentID}
+
 
 <br>
 
+
 Course:
+
 ${student.course || "N/A"}
+
+
+<br>
+
+
+Year:
+
+${student.yearLevel || "N/A"}
+
+
 
 <br><br>
 
-<span style="color:green">
 
-Present
+<span style="
+color:green;
+font-weight:bold;
+font-size:20px;
+">
+
+PRESENT
 
 </span>
+
+
 
 `,
 
@@ -398,7 +646,24 @@ Present
 
 
 
+
+
+
+
 else{
+
+
+
+playBeep(
+"warning"
+);
+
+
+
+vibrate();
+
+
+
 
 
 
@@ -406,15 +671,21 @@ showMessage(
 
 result,
 
-"⚠ Already Recorded",
+"⚠ Already Checked In",
 
 `
 
+<strong>
+
 ${student.fullName}
+
+</strong>
+
 
 <br><br>
 
-This student already checked in today.
+
+This student already has attendance today.
 
 `,
 
@@ -443,8 +714,18 @@ catch(error){
 
 
 console.error(
-"Scan error:",
+
+"Scanner error:",
+
 error
+
+);
+
+
+
+
+playBeep(
+"error"
 );
 
 
@@ -485,7 +766,7 @@ processing=false;
 
 
 // ================================
-// RESULT DISPLAY
+// MESSAGE DISPLAY
 // ================================
 
 
@@ -526,6 +807,7 @@ ${message}
 
 
 
+
 <button
 
 id="scanAgainBtn"
@@ -533,14 +815,14 @@ id="scanAgainBtn"
 class="button">
 
 
-Scan Another QR Code
+📷 Scan Another QR Code
+
 
 </button>
 
 
 
 </div>
-
 
 
 `;
@@ -551,23 +833,38 @@ Scan Another QR Code
 
 
 
-document
-.getElementById(
+
+const button =
+document.getElementById(
 "scanAgainBtn"
-)
-.onclick = ()=>{
+);
 
 
-container.innerHTML = `
+
+
+
+if(button){
+
+
+button.onclick=()=>{
+
+
+processing=false;
+
+
+
+container.innerHTML=`
 
 
 <div class="card">
 
-<h3>
 
-Ready to Scan
+<h2>
 
-</h3>
+📷 Ready to Scan
+
+</h2>
+
 
 
 <p>
@@ -580,15 +877,16 @@ Place another QR code inside the scanner.
 </div>
 
 
+
 `;
 
 
 
-processing=false;
-
-
-
 };
+
+
+
+}
 
 
 
