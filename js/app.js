@@ -1,7 +1,7 @@
 // ================================
 // ATTENDANCE CHECKER
 // MAIN APPLICATION
-// VERSION 2.5 PHOTO UPLOAD FIXED
+// VERSION 2.6 STABLE PHOTO UPLOAD
 // ================================
 
 
@@ -46,30 +46,29 @@ const menuButtons = document.querySelectorAll(".menu");
 
 
 
-// ================================
 // MENU
-// ================================
 
-menuButtons.forEach(button => {
-
-
-    button.addEventListener("click",()=>{
+menuButtons.forEach(button=>{
 
 
-        menuButtons.forEach(btn=>{
-
-            btn.classList.remove("active");
-
-        });
+button.addEventListener("click",()=>{
 
 
-        button.classList.add("active");
+menuButtons.forEach(btn=>{
+
+btn.classList.remove("active");
+
+});
 
 
-        loadPage(button.dataset.page);
+button.classList.add("active");
 
 
-    });
+loadPage(button.dataset.page);
+
+
+
+});
 
 
 });
@@ -79,73 +78,80 @@ menuButtons.forEach(button => {
 
 
 
-// ================================
-// PAGE LOADER
-// ================================
+
 
 function loadPage(page){
 
 
-    switch(page){
+switch(page){
 
 
-        case "dashboard":
+case "dashboard":
 
-            dashboard();
+dashboard();
 
-            break;
-
-
-        case "students":
-
-            students();
-
-            break;
+break;
 
 
-        case "courses":
 
-            placeholder("Courses");
+case "students":
 
-            break;
+students();
 
-
-        case "subjects":
-
-            placeholder("Subjects");
-
-            break;
+break;
 
 
-        case "scanner":
 
-            placeholder("Scanner");
+case "courses":
 
-            break;
+placeholder("Courses");
 
-
-        case "attendance":
-
-            placeholder("Attendance");
-
-            break;
+break;
 
 
-        case "reports":
 
-            placeholder("Reports");
+case "subjects":
 
-            break;
+placeholder("Subjects");
 
-
-        case "settings":
-
-            placeholder("Settings");
-
-            break;
+break;
 
 
-    }
+
+case "scanner":
+
+placeholder("Scanner");
+
+break;
+
+
+
+case "attendance":
+
+placeholder("Attendance");
+
+break;
+
+
+
+case "reports":
+
+placeholder("Reports");
+
+break;
+
+
+
+case "settings":
+
+placeholder("Settings");
+
+break;
+
+
+
+}
+
 
 
 }
@@ -155,13 +161,11 @@ function loadPage(page){
 
 
 
-// ================================
-// DASHBOARD
-// ================================
+
 
 function dashboard(){
 
-    mainContent.innerHTML = loadDashboard();
+mainContent.innerHTML = loadDashboard();
 
 }
 
@@ -172,9 +176,6 @@ function dashboard(){
 
 
 
-// ================================
-// STUDENTS PAGE
-// ================================
 
 function students(){
 
@@ -190,7 +191,6 @@ Students
 
 
 
-
 <div class="card">
 
 
@@ -199,7 +199,6 @@ Students
 Register Student
 
 </h2>
-
 
 
 
@@ -215,7 +214,6 @@ placeholder="Full Name"
 
 
 
-
 <input
 
 id="studentID"
@@ -225,7 +223,6 @@ type="text"
 placeholder="Student ID"
 
 >
-
 
 
 
@@ -241,7 +238,6 @@ placeholder="Course"
 
 
 
-
 <input
 
 id="yearLevel"
@@ -251,8 +247,6 @@ type="text"
 placeholder="Year Level"
 
 >
-
-
 
 
 
@@ -279,12 +273,12 @@ accept="image/*"
 
 
 
-
 <p>
 
 Upload student's profile picture
 
 </p>
+
 
 
 </div>
@@ -295,12 +289,14 @@ Upload student's profile picture
 
 <button
 
+type="button"
+
 class="button"
 
 id="addStudentBtn">
 
 
-Add Student
+Save Student
 
 
 </button>
@@ -308,6 +304,7 @@ Add Student
 
 
 </div>
+
 
 
 
@@ -336,6 +333,7 @@ placeholder="Search Student..."
 
 
 
+
 <div
 
 id="studentContainer"
@@ -343,6 +341,7 @@ id="studentContainer"
 class="grid">
 
 </div>
+
 
 
 
@@ -355,15 +354,26 @@ class="grid">
 
 
 
-// ================================
-// ADD STUDENT
-// ================================
 
-
-const addButton =
-document.getElementById(
+const addButton = document.getElementById(
 "addStudentBtn"
 );
+
+
+
+
+
+if(!addButton){
+
+console.error("Save button missing");
+
+return;
+
+}
+
+
+
+
 
 
 
@@ -372,38 +382,38 @@ addButton.onclick = async ()=>{
 
 
 
+console.log("SAVE CLICKED");
+
+
+
 const fullName =
-document.getElementById(
-"fullName"
-).value.trim();
+document.getElementById("fullName").value.trim();
 
 
 
 const studentID =
-document.getElementById(
-"studentID"
-).value.trim();
+document.getElementById("studentID").value.trim();
 
 
 
 const course =
-document.getElementById(
-"course"
-).value.trim();
+document.getElementById("course").value.trim();
 
 
 
 const yearLevel =
-document.getElementById(
-"yearLevel"
-).value.trim();
+document.getElementById("yearLevel").value.trim();
+
+
+
+const photoInput =
+document.getElementById("studentPhoto");
 
 
 
 const photoFile =
-document.getElementById(
-"studentPhoto"
-).files[0];
+photoInput.files[0];
+
 
 
 
@@ -426,7 +436,7 @@ if(
 
 
 alert(
-"Please complete all information and upload a photo."
+"Please complete all fields and choose a photo."
 );
 
 
@@ -445,7 +455,16 @@ try{
 
 
 
-// Upload Image
+addButton.disabled = true;
+
+addButton.innerHTML =
+"Saving...";
+
+
+
+
+
+// UPLOAD PHOTO
 
 
 const imageRef = ref(
@@ -478,11 +497,17 @@ photoFile
 
 
 
-const photoURL = await getDownloadURL(
-
-imageRef
-
+console.log(
+"PHOTO UPLOADED"
 );
+
+
+
+
+
+const photoURL =
+await getDownloadURL(imageRef);
+
 
 
 
@@ -510,7 +535,16 @@ photo:photoURL
 
 
 
+
 await addStudent(student);
+
+
+
+
+
+console.log(
+"STUDENT SAVED"
+);
 
 
 
@@ -519,6 +553,7 @@ await addStudent(student);
 alert(
 "Student saved successfully!"
 );
+
 
 
 
@@ -537,7 +572,18 @@ document.getElementById("studentPhoto").value="";
 
 
 
+
+
+addButton.disabled=false;
+
+addButton.innerHTML="Save Student";
+
+
+
+
 }
+
+
 
 
 
@@ -548,15 +594,20 @@ catch(error){
 console.error(error);
 
 
+
 alert(
 
-"Saving failed: "
-
-+
+"Saving failed: " +
 
 error.message
 
 );
+
+
+
+addButton.disabled=false;
+
+addButton.innerHTML="Save Student";
 
 
 
@@ -573,15 +624,13 @@ error.message
 
 
 
-// ================================
-// SEARCH
-// ================================
+
+const searchBox =
+document.getElementById("searchStudent");
 
 
-const searchBox = document.getElementById(
-"searchStudent"
-);
 
+if(searchBox){
 
 
 searchBox.addEventListener(
@@ -594,18 +643,15 @@ e.target.value
 );
 
 
+
 });
 
 
+}
 
 
 
 
-
-
-// ================================
-// LOAD STUDENTS
-// ================================
 
 
 loadStudents();
@@ -622,14 +668,11 @@ loadStudents();
 
 
 
-// ================================
-// PLACEHOLDER
-// ================================
-
 function placeholder(title){
 
 
-mainContent.innerHTML = `
+
+mainContent.innerHTML=`
 
 
 <h1 class="page-title">
@@ -675,13 +718,11 @@ This module will be built next.
 
 
 
-// ================================
-// START
-// ================================
 
 console.log(
 "ATTENDANCE CHECKER READY"
 );
+
 
 
 loadPage("dashboard");
