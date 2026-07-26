@@ -1,60 +1,170 @@
 // ======================================================
 // ATTENDANCE CHECKER
-// STUDENT MANAGEMENT MODULE
-// VERSION 1.2
+// FIREBASE STUDENT MANAGEMENT
+// VERSION 2.0
 // ======================================================
+
+
+import { db } from "./firebase.js";
+
+
+import {
+
+    collection,
+
+    addDoc,
+
+    getDocs,
+
+    deleteDoc,
+
+    doc,
+
+    orderBy,
+
+    query
+
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+
 
 
 let students = [];
 
-
-// ADD STUDENT
-
-export function addStudent(student){
-
-    students.push(student);
-
-    console.log("Student Added:", student);
-
-    renderStudents();
-
-}
+const studentCollection = collection(db,"students");
 
 
 
-// DELETE STUDENT
-
-export function deleteStudent(id){
 
 
-    students = students.filter(student =>
+// ======================================
+// LOAD STUDENTS
+// ======================================
 
-        student.studentID !== id
+export async function loadStudents(){
+
+
+    students = [];
+
+
+    const q = query(
+
+        studentCollection,
+
+        orderBy("createdAt","desc")
 
     );
 
 
+
+    const snapshot = await getDocs(q);
+
+
+
+    snapshot.forEach((item)=>{
+
+
+        students.push({
+
+            id:item.id,
+
+            ...item.data()
+
+        });
+
+
+    });
+
+
+
     renderStudents();
+
 
 
 }
 
 
 
+
+
+
+// ======================================
+// ADD STUDENT
+// ======================================
+
+export async function addStudent(student){
+
+
+
+    await addDoc(studentCollection,{
+
+        ...student,
+
+        createdAt:new Date()
+
+    });
+
+
+
+    await loadStudents();
+
+
+
+}
+
+
+
+
+
+
+// ======================================
+// DELETE STUDENT
+// ======================================
+
+export async function deleteStudent(id){
+
+
+
+    await deleteDoc(
+
+        doc(db,"students",id)
+
+    );
+
+
+
+    await loadStudents();
+
+
+
+}
+
+
+
+
+
+
+// ======================================
 // SEARCH STUDENT
+// ======================================
 
 export function searchStudents(keyword){
+
 
 
     keyword = keyword.toLowerCase();
 
 
-    const filtered = students.filter(student =>
+
+    const filtered = students.filter(student=>
+
 
 
         student.fullName
         .toLowerCase()
         .includes(keyword)
+
 
 
         ||
@@ -64,6 +174,7 @@ export function searchStudents(keyword){
         .includes(keyword)
 
 
+
         ||
 
         student.course
@@ -71,10 +182,13 @@ export function searchStudents(keyword){
         .includes(keyword)
 
 
+
     );
 
 
+
     renderStudents(filtered);
+
 
 
 }
@@ -82,9 +196,14 @@ export function searchStudents(keyword){
 
 
 
+
+
+// ======================================
 // DISPLAY STUDENTS
+// ======================================
 
 export function renderStudents(data = students){
+
 
 
     const container =
@@ -92,13 +211,8 @@ export function renderStudents(data = students){
 
 
 
-    if(!container){
+    if(!container) return;
 
-        console.log("studentContainer not found");
-
-        return;
-
-    }
 
 
 
@@ -106,18 +220,19 @@ export function renderStudents(data = students){
 
 
 
-    if(data.length === 0){
+
+    if(data.length===0){
 
 
         container.innerHTML=`
 
         <div class="card">
 
-            <h2>No Students Added</h2>
+        <h2>No Students Yet</h2>
 
-            <p>
-            Add students to begin.
-            </p>
+        <p>
+        Add your first student.
+        </p>
 
         </div>
 
@@ -135,54 +250,71 @@ export function renderStudents(data = students){
     data.forEach(student=>{
 
 
-        container.innerHTML += `
+        container.innerHTML+=`
 
 
         <div class="card">
 
 
-            <img
+        <img
 
-            src="${student.photo}"
+        src="${student.photo}"
 
-            style="
-            width:120px;
-            height:120px;
-            border-radius:50%;
-            object-fit:cover;
-            ">
-
-
-            <h2>
-            ${student.fullName}
-            </h2>
-
-
-            <p>
-            ID: ${student.studentID}
-            </p>
-
-
-            <p>
-            Course: ${student.course}
-            </p>
-
-
-            <p>
-            Year: ${student.yearLevel}
-            </p>
+        style="
+        width:120px;
+        height:120px;
+        border-radius:50%;
+        object-fit:cover;
+        ">
 
 
 
-            <button
+        <h2>
 
-            class="button"
+        ${student.fullName}
 
-            onclick="removeStudent('${student.studentID}')">
+        </h2>
 
-            Delete
 
-            </button>
+
+        <p>
+
+        ID:
+        ${student.studentID}
+
+        </p>
+
+
+
+        <p>
+
+        Course:
+        ${student.course}
+
+        </p>
+
+
+
+        <p>
+
+        Year:
+        ${student.yearLevel}
+
+        </p>
+
+
+
+
+        <button
+
+        class="button"
+
+        onclick="removeStudent('${student.id}')">
+
+        Delete
+
+        </button>
+
 
 
         </div>
@@ -191,10 +323,12 @@ export function renderStudents(data = students){
         `;
 
 
+
     });
 
 
 }
+
 
 
 
