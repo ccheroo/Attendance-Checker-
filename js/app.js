@@ -1,7 +1,7 @@
 // ================================
 // ATTENDANCE CHECKER
 // MAIN APPLICATION
-// VERSION 2.4 PHOTO UPLOAD READY
+// VERSION 2.5 PHOTO UPLOAD FIXED
 // ================================
 
 
@@ -56,7 +56,7 @@ menuButtons.forEach(button => {
     button.addEventListener("click",()=>{
 
 
-        menuButtons.forEach(btn => {
+        menuButtons.forEach(btn=>{
 
             btn.classList.remove("active");
 
@@ -161,9 +161,7 @@ function loadPage(page){
 
 function dashboard(){
 
-
     mainContent.innerHTML = loadDashboard();
-
 
 }
 
@@ -175,11 +173,10 @@ function dashboard(){
 
 
 // ================================
-// STUDENTS
+// STUDENTS PAGE
 // ================================
 
 function students(){
-
 
 
 mainContent.innerHTML = `
@@ -198,7 +195,9 @@ Students
 
 
 <h2>
+
 Register Student
+
 </h2>
 
 
@@ -207,6 +206,8 @@ Register Student
 <input
 
 id="fullName"
+
+type="text"
 
 placeholder="Full Name"
 
@@ -219,6 +220,8 @@ placeholder="Full Name"
 
 id="studentID"
 
+type="text"
+
 placeholder="Student ID"
 
 >
@@ -229,6 +232,8 @@ placeholder="Student ID"
 <input
 
 id="course"
+
+type="text"
 
 placeholder="Course"
 
@@ -241,6 +246,8 @@ placeholder="Course"
 
 id="yearLevel"
 
+type="text"
+
 placeholder="Year Level"
 
 >
@@ -248,11 +255,15 @@ placeholder="Year Level"
 
 
 
-<label>
+
+<div class="photo-upload">
+
+
+<h3>
 
 Student Photo
 
-</label>
+</h3>
 
 
 
@@ -269,13 +280,28 @@ accept="image/*"
 
 
 
+<p>
+
+Upload student's profile picture
+
+</p>
+
+
+</div>
+
+
+
+
+
 <button
 
 class="button"
 
 id="addStudentBtn">
 
+
 Add Student
+
 
 </button>
 
@@ -289,14 +315,16 @@ Add Student
 
 
 
-<div class="card" style="margin-top:25px">
+<div class="card"
+
+style="margin-top:25px">
 
 
 <input
 
 id="searchStudent"
 
-placeholder="Search Student"
+placeholder="Search Student..."
 
 >
 
@@ -328,76 +356,54 @@ class="grid">
 
 
 // ================================
-// ADD BUTTON
+// ADD STUDENT
 // ================================
 
 
-const addButton = document.getElementById(
+const addButton =
+document.getElementById(
 "addStudentBtn"
 );
 
 
 
 
-
-console.log(
-"ADD BUTTON:",
-addButton
-);
+addButton.onclick = async ()=>{
 
 
 
-
-
-if(addButton){
-
-
-
-addButton.onclick = async function(){
+const fullName =
+document.getElementById(
+"fullName"
+).value.trim();
 
 
 
-console.log(
-"ADD BUTTON CLICKED"
-);
+const studentID =
+document.getElementById(
+"studentID"
+).value.trim();
 
 
 
-
-
-const fullName = document
-.getElementById("fullName")
-.value
-.trim();
-
-
-
-const studentID = document
-.getElementById("studentID")
-.value
-.trim();
+const course =
+document.getElementById(
+"course"
+).value.trim();
 
 
 
-const course = document
-.getElementById("course")
-.value
-.trim();
-
-
-
-const yearLevel = document
-.getElementById("yearLevel")
-.value
-.trim();
+const yearLevel =
+document.getElementById(
+"yearLevel"
+).value.trim();
 
 
 
 const photoFile =
-document
-.getElementById("studentPhoto")
-.files[0];
-
+document.getElementById(
+"studentPhoto"
+).files[0];
 
 
 
@@ -420,7 +426,7 @@ if(
 
 
 alert(
-"Please complete all fields and upload a photo."
+"Please complete all information and upload a photo."
 );
 
 
@@ -434,23 +440,25 @@ return;
 
 
 
+
 try{
 
 
 
-// ================================
-// UPLOAD PHOTO
-// ================================
+// Upload Image
 
 
 const imageRef = ref(
 
 storage,
 
-"students/" 
-+ studentID 
-+ "_" 
-+ photoFile.name
+"students/" +
+
+studentID +
+
+"_" +
+
+photoFile.name
 
 );
 
@@ -481,11 +489,6 @@ imageRef
 
 
 
-// ================================
-// SAVE STUDENT
-// ================================
-
-
 const student = {
 
 
@@ -497,10 +500,11 @@ course,
 
 yearLevel,
 
-photo: photoURL
+photo:photoURL
 
 
 };
+
 
 
 
@@ -533,15 +537,12 @@ document.getElementById("studentPhoto").value="";
 
 
 
-
-
 }
 
 
 
-
-
 catch(error){
+
 
 
 console.error(error);
@@ -550,7 +551,9 @@ console.error(error);
 alert(
 
 "Saving failed: "
+
 +
+
 error.message
 
 );
@@ -562,25 +565,6 @@ error.message
 
 
 };
-
-
-
-}
-
-
-
-
-
-
-else{
-
-
-console.error(
-"ADD STUDENT BUTTON NOT FOUND"
-);
-
-
-}
 
 
 
@@ -600,15 +584,8 @@ const searchBox = document.getElementById(
 
 
 
-
-
-if(searchBox){
-
-
 searchBox.addEventListener(
-
 "input",
-
 (e)=>{
 
 
@@ -618,9 +595,6 @@ e.target.value
 
 
 });
-
-
-}
 
 
 
@@ -634,25 +608,7 @@ e.target.value
 // ================================
 
 
-try{
-
-
 loadStudents();
-
-
-
-}
-
-catch(error){
-
-
-console.error(
-"Loading failed:",
-error
-);
-
-
-}
 
 
 
@@ -719,13 +675,12 @@ This module will be built next.
 
 
 
-
 // ================================
 // START
 // ================================
 
 console.log(
-"APP JS LOADED"
+"ATTENDANCE CHECKER READY"
 );
 
 
