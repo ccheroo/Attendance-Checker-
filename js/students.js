@@ -1,7 +1,7 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // FIREBASE STUDENT MANAGEMENT
-// VERSION 2.3 STABLE SAVE SYSTEM
+// VERSION 2.4 FINAL STABLE
 // ======================================================
 
 
@@ -31,8 +31,8 @@ import {
 let students = [];
 
 
-const studentCollection = collection(db,"students");
-
+const studentCollection =
+collection(db,"students");
 
 
 
@@ -50,15 +50,16 @@ export async function loadStudents(){
     try{
 
 
-        const snapshot = await getDocs(
-            studentCollection
-        );
+        const snapshot =
+        await getDocs(studentCollection);
+
 
 
         students = [];
 
 
-        snapshot.forEach((item)=>{
+
+        snapshot.forEach(item=>{
 
 
             students.push({
@@ -97,12 +98,6 @@ export async function loadStudents(){
         );
 
 
-        alert(
-            "Cannot load students: "
-            + error.message
-        );
-
-
     }
 
 
@@ -123,32 +118,41 @@ export async function loadStudents(){
 export async function addStudent(student){
 
 
-    console.log(
-        "START SAVING STUDENT",
-        student
-    );
-
-
-
     try{
 
 
-        const savePromise = addDoc(
+        console.log(
+            "Saving student..."
+        );
+
+
+
+        const docRef =
+        await addDoc(
 
             studentCollection,
 
             {
 
 
-                fullName: student.fullName,
+                fullName:
+                student.fullName,
 
-                studentID: student.studentID,
 
-                course: student.course,
+                studentID:
+                student.studentID,
 
-                yearLevel: student.yearLevel,
 
-                photo: student.photo || "",
+                course:
+                student.course,
+
+
+                yearLevel:
+                student.yearLevel,
+
+
+                photo:
+                student.photo || "",
 
 
                 createdAt:
@@ -157,49 +161,14 @@ export async function addStudent(student){
 
             }
 
-        );
-
-
-
-
-        const timeout = new Promise(
-
-            (_, reject)=>{
-
-                setTimeout(()=>{
-
-                    reject(
-                        new Error(
-                            "Saving timeout. Check Firestore Rules."
-                        )
-                    );
-
-
-                },15000);
-
-
-            }
 
         );
-
-
-
-
-
-        const result = await Promise.race([
-
-            savePromise,
-
-            timeout
-
-        ]);
-
 
 
 
         console.log(
-            "STUDENT SAVED:",
-            result.id
+            "Saved ID:",
+            docRef.id
         );
 
 
@@ -219,7 +188,6 @@ export async function addStudent(student){
     catch(error){
 
 
-
         console.error(
             "SAVE ERROR:",
             error
@@ -228,13 +196,8 @@ export async function addStudent(student){
 
 
         alert(
-
-            "Student was not saved:\n"
-
-            +
-
-            error.message
-
+            "Save failed: "
+            + error.message
         );
 
 
@@ -286,13 +249,8 @@ export async function deleteStudent(id){
 
 
 
-        alert(
-            "Student deleted!"
-        );
-
-
-
     }
+
 
 
     catch(error){
@@ -305,7 +263,8 @@ export async function deleteStudent(id){
 
 
         alert(
-            error.message
+            "Delete failed: "
+            + error.message
         );
 
 
@@ -339,28 +298,33 @@ export function searchStudents(keyword){
     students.filter(student=>{
 
 
+        const name =
+        (student.fullName || "")
+        .toLowerCase();
+
+
+        const id =
+        (student.studentID || "")
+        .toLowerCase();
+
+
+        const course =
+        (student.course || "")
+        .toLowerCase();
+
+
+
         return (
 
-            (student.fullName || "")
-            .toLowerCase()
-            .includes(keyword)
-
+            name.includes(keyword)
 
             ||
 
-
-            (student.studentID || "")
-            .toLowerCase()
-            .includes(keyword)
-
+            id.includes(keyword)
 
             ||
 
-
-            (student.course || "")
-            .toLowerCase()
-            .includes(keyword)
-
+            course.includes(keyword)
 
         );
 
@@ -384,11 +348,10 @@ export function searchStudents(keyword){
 
 
 // ======================================
-// DISPLAY
+// DISPLAY STUDENTS
 // ======================================
 
 export function renderStudents(data = students){
-
 
 
     const container =
@@ -403,7 +366,8 @@ export function renderStudents(data = students){
 
 
 
-    container.innerHTML="";
+    container.innerHTML = "";
+
 
 
 
@@ -413,24 +377,31 @@ export function renderStudents(data = students){
 
         container.innerHTML = `
 
+
         <div class="card">
+
 
         <h2>
         No Students Yet
         </h2>
 
+
         <p>
         Register your first student.
         </p>
 
+
         </div>
+
 
         `;
 
 
         return;
 
+
     }
+
 
 
 
@@ -440,17 +411,35 @@ export function renderStudents(data = students){
     data.forEach(student=>{
 
 
+        const image = student.photo
+
+        ?
+
+        student.photo
+
+        :
+
+        "https://via.placeholder.com/120";
+
+
+
+
+
         container.innerHTML += `
 
 
         <div class="card student-card">
 
 
+
         <img
 
-        src="${student.photo || 'assets/students/default.png'}"
 
-        onerror="this.src='assets/students/default.png'"
+        src="${image}"
+
+
+        onerror="this.src='https://via.placeholder.com/120'"
+
 
         style="
         width:120px;
@@ -460,42 +449,65 @@ export function renderStudents(data = students){
         ">
 
 
+
         <h2>
+
         ${student.fullName}
+
         </h2>
 
 
+
         <p>
-        ID: ${student.studentID}
+
+        ID:
+        ${student.studentID}
+
         </p>
 
 
+
         <p>
-        Course: ${student.course}
+
+        Course:
+        ${student.course}
+
         </p>
 
 
+
         <p>
-        Year: ${student.yearLevel}
+
+        Year:
+        ${student.yearLevel}
+
         </p>
+
+
 
 
 
         <button
 
+
         class="button delete-btn"
+
 
         onclick="removeStudent('${student.id}')">
 
+
         Delete
 
+
         </button>
+
 
 
         </div>
 
 
         `;
+
 
 
     });
@@ -511,4 +523,5 @@ export function renderStudents(data = students){
 
 
 
-window.removeStudent = deleteStudent;
+window.removeStudent =
+deleteStudent;
