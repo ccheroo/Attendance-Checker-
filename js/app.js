@@ -1,7 +1,7 @@
 // ================================
 // ATTENDANCE CHECKER
 // MAIN APPLICATION
-// VERSION 2.2 FIRESTORE STABLE
+// VERSION 2.3 FIXED BUTTON SYSTEM
 // ================================
 
 
@@ -27,6 +27,10 @@ const menuButtons = document.querySelectorAll(".menu");
 
 
 
+
+// ================================
+// MENU
+// ================================
 
 menuButtons.forEach(button => {
 
@@ -56,6 +60,11 @@ menuButtons.forEach(button => {
 
 
 
+
+// ================================
+// PAGE LOADER
+// ================================
+
 function loadPage(page){
 
 
@@ -69,11 +78,13 @@ function loadPage(page){
             break;
 
 
+
         case "students":
 
             students();
 
             break;
+
 
 
         case "courses":
@@ -83,11 +94,13 @@ function loadPage(page){
             break;
 
 
+
         case "subjects":
 
             placeholder("Subjects");
 
             break;
+
 
 
         case "scanner":
@@ -97,6 +110,7 @@ function loadPage(page){
             break;
 
 
+
         case "attendance":
 
             placeholder("Attendance");
@@ -104,11 +118,13 @@ function loadPage(page){
             break;
 
 
+
         case "reports":
 
             placeholder("Reports");
 
             break;
+
 
 
         case "settings":
@@ -120,11 +136,18 @@ function loadPage(page){
 
     }
 
+
 }
 
 
 
 
+
+
+
+// ================================
+// DASHBOARD
+// ================================
 
 function dashboard(){
 
@@ -139,7 +162,13 @@ function dashboard(){
 
 
 
+
+// ================================
+// STUDENTS
+// ================================
+
 function students(){
+
 
 
 mainContent.innerHTML = `
@@ -160,19 +189,33 @@ Register Student
 
 
 
-<input id="fullName" placeholder="Full Name">
+<input 
+id="fullName"
+placeholder="Full Name">
 
 
-<input id="studentID" placeholder="Student ID">
+
+<input 
+id="studentID"
+placeholder="Student ID">
 
 
-<input id="course" placeholder="Course">
+
+<input 
+id="course"
+placeholder="Course">
 
 
-<input id="yearLevel" placeholder="Year Level">
+
+<input 
+id="yearLevel"
+placeholder="Year Level">
 
 
-<button class="button" id="addStudentBtn">
+
+<button 
+class="button" 
+id="addStudentBtn">
 
 Add Student
 
@@ -185,17 +228,26 @@ Add Student
 
 
 
+
 <div class="card" style="margin-top:25px">
 
 
-<input id="searchStudent" placeholder="Search Student">
+<input 
+id="searchStudent"
+placeholder="Search Student">
 
 
 </div>
 
 
 
-<div id="studentContainer" class="grid"></div>
+
+
+<div 
+id="studentContainer"
+class="grid">
+
+</div>
 
 
 
@@ -205,36 +257,87 @@ Add Student
 
 
 
-const addButton = document.getElementById("addStudentBtn");
+
+// ================================
+// ADD BUTTON
+// ================================
+
+
+const addButton = document.getElementById(
+    "addStudentBtn"
+);
 
 
 
-addButton.addEventListener("click", async ()=>{
+console.log(
+    "ADD BUTTON:",
+    addButton
+);
+
+
+
+
+if(addButton){
+
+
+
+addButton.onclick = async function(){
+
+
+
+console.log(
+    "ADD BUTTON CLICKED"
+);
+
+
 
 
 const student = {
 
 
 fullName:
-document.getElementById("fullName").value.trim(),
+
+document
+.getElementById("fullName")
+.value
+.trim(),
+
 
 
 studentID:
-document.getElementById("studentID").value.trim(),
+
+document
+.getElementById("studentID")
+.value
+.trim(),
+
 
 
 course:
-document.getElementById("course").value.trim(),
+
+document
+.getElementById("course")
+.value
+.trim(),
+
 
 
 yearLevel:
-document.getElementById("yearLevel").value.trim(),
+
+document
+.getElementById("yearLevel")
+.value
+.trim(),
+
 
 
 photo:""
 
 
+
 };
+
+
 
 
 
@@ -251,20 +354,32 @@ if(
 
 ){
 
-alert("Please complete all fields.");
+
+alert(
+"Please complete all fields."
+);
+
 
 return;
+
 
 }
 
 
 
 
+
+try{
+
+
 await addStudent(student);
 
 
 
-alert("Student saved successfully!");
+alert(
+"Student saved successfully!"
+);
+
 
 
 
@@ -278,28 +393,110 @@ document.getElementById("yearLevel").value="";
 
 
 
+}
+
+
+catch(error){
+
+
+console.error(error);
+
+
+alert(
+"Saving failed: " + error.message
+);
+
+
+}
+
+
+
+};
+
+
+
+}
+
+
+
+
+
+else{
+
+
+console.error(
+"ADD STUDENT BUTTON NOT FOUND"
+);
+
+
+}
+
+
+
+
+
+
+
+
+// ================================
+// SEARCH
+// ================================
+
+
+const searchBox =
+document.getElementById(
+"searchStudent"
+);
+
+
+
+if(searchBox){
+
+
+searchBox.addEventListener(
+"input",
+(e)=>{
+
+
+searchStudents(
+e.target.value
+);
+
+
 });
 
 
+}
 
 
 
 
-document
-.getElementById("searchStudent")
-.addEventListener("input",(e)=>{
-
-
-searchStudents(e.target.value);
-
-
-});
 
 
 
+// ================================
+// LOAD FIREBASE DATA
+// ================================
+
+try{
 
 
 loadStudents();
+
+
+
+}
+
+catch(error){
+
+
+console.error(
+"Loading failed:",
+error
+);
+
+
+}
 
 
 
@@ -310,6 +507,11 @@ loadStudents();
 
 
 
+
+
+// ================================
+// PLACEHOLDER
+// ================================
 
 function placeholder(title){
 
@@ -324,10 +526,14 @@ ${title}
 </h1>
 
 
+
 <div class="card">
 
 
-<h2>${title}</h2>
+<h2>
+${title}
+</h2>
+
 
 
 <p>
@@ -335,13 +541,30 @@ This module will be built next.
 </p>
 
 
+
 </div>
+
 
 
 `;
 
+
+
 }
 
+
+
+
+
+
+
+// ================================
+// START
+// ================================
+
+console.log(
+"APP JS LOADED"
+);
 
 
 loadPage("dashboard");
