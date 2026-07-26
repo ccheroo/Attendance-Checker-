@@ -1,100 +1,478 @@
-/* ==========================================================
+/* ===========================================================
    ATTENDANCE CHECKER
    VERSION 1.0
-   Ocean Premium Theme
-   Author: OpenAI + User
-========================================================== */
+   GLOBAL DESIGN SYSTEM
+=========================================================== */
 
-/* ===========================
+/* =======================
    GOOGLE FONT
-=========================== */
+======================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
-/* ===========================
+/* =======================
    ROOT VARIABLES
-=========================== */
+======================= */
 
 :root{
 
-    --primary:#0A6EBD;
-    --secondary:#5CB8E4;
-    --dark:#082442;
+    --primary:#0B6FBF;
+    --secondary:#53B7E8;
+    --accent:#7FD3F7;
+
+    --dark:#0A2740;
+
     --white:#ffffff;
-    --text:#1e293b;
 
-    --glass:rgba(255,255,255,.18);
-    --glass-border:rgba(255,255,255,.28);
+    --glass:rgba(255,255,255,.14);
 
-    --shadow:0 15px 45px rgba(0,0,0,.20);
+    --glassBorder:rgba(255,255,255,.18);
 
-    --radius:22px;
+    --shadow:0 18px 45px rgba(0,0,0,.18);
+
+    --radius:24px;
+
+    --transition:.35s ease;
 
 }
 
-/* ===========================
+/* =======================
    RESET
-=========================== */
+======================= */
 
 *{
 
     margin:0;
+
     padding:0;
+
     box-sizing:border-box;
 
 }
 
-/* ===========================
+/* =======================
    BODY
-=========================== */
+======================= */
 
 body{
 
-    font-family:'Poppins',sans-serif;
-
-    min-height:100vh;
-
-    color:var(--white);
-
-    background-image:
-    linear-gradient(rgba(8,36,66,.55),rgba(8,36,66,.55)),
-    url("../assets/backgrounds/ocean.jpg");
-
-    background-position:center;
-
-    background-size:cover;
-
-    background-repeat:no-repeat;
-
-    background-attachment:fixed;
+    font-family:"Poppins",sans-serif;
 
     overflow-x:hidden;
 
+    color:white;
+
+    min-height:100vh;
+
 }
 
-/* ===========================
-   BACKGROUND OVERLAY
-=========================== */
+/* =======================
+   BACKGROUND
+======================= */
 
-.background-overlay{
+#background{
 
     position:fixed;
 
     inset:0;
 
-    backdrop-filter:blur(4px);
+    background:
 
-    z-index:-1;
+    linear-gradient(
+
+        rgba(5,28,49,.60),
+
+        rgba(5,28,49,.60)
+
+    ),
+
+    url("../assets/backgrounds/ocean.jpg");
+
+    background-size:cover;
+
+    background-position:center;
+
+    background-repeat:no-repeat;
+
+    background-attachment:fixed;
+
+    z-index:-2;
 
 }
 
-/* ===========================
-   HEADER
-=========================== */
+/* =======================
+   APP
+======================= */
 
-header{
+#app{
+
+    display:flex;
+
+    min-height:100vh;
+
+}
+
+/* =======================
+   SIDEBAR
+======================= */
+
+#sidebar{
+
+    width:285px;
+
+    padding:35px 25px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    background:rgba(255,255,255,.10);
+
+    backdrop-filter:blur(18px);
+
+    border-right:1px solid rgba(255,255,255,.18);
+
+}
+
+/* =======================
+   LOGO
+======================= */
+
+.logo{
+
+    font-size:1.9rem;
+
+    font-weight:700;
+
+    margin-bottom:45px;
+
+}
+
+/* =======================
+   NAVIGATION
+======================= */
+
+nav{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:14px;
+
+}
+
+.menu{
 
     width:100%;
+
+    border:none;
+
+    cursor:pointer;
+
+    font-family:Poppins;
+
+    font-size:15px;
+
+    color:white;
+
+    background:transparent;
+
+    padding:16px;
+
+    text-align:left;
+
+    border-radius:16px;
+
+    transition:var(--transition);
+
+}
+
+.menu:hover{
+
+    background:rgba(255,255,255,.15);
+
+}
+
+.menu.active{
+
+    background:linear-gradient(
+
+    135deg,
+
+    var(--primary),
+
+    var(--secondary)
+
+    );
+
+}
+
+/* =======================
+   MAIN CONTENT
+======================= */
+
+#mainContent{
+
+    flex:1;
+
+    padding:40px;
+
+}
+
+/* =======================
+   PAGE TITLE
+======================= */
+
+.page-title{
+
+    font-size:2.3rem;
+
+    font-weight:700;
+
+    margin-bottom:30px;
+
+}
+
+/* =======================
+   CARD GRID
+======================= */
+
+.grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+
+    gap:25px;
+
+}
+
+/* =======================
+   GLASS CARD
+======================= */
+
+.card{
+
+    background:var(--glass);
+
+    border:1px solid var(--glassBorder);
+
+    backdrop-filter:blur(18px);
+
+    border-radius:var(--radius);
+
+    padding:25px;
+
+    box-shadow:var(--shadow);
+
+    transition:var(--transition);
+
+}
+
+.card:hover{
+
+    transform:translateY(-6px);
+
+}
+
+.card h2{
+
+    font-size:1.1rem;
+
+    margin-bottom:15px;
+
+}
+
+.card h1{
+
+    font-size:2.5rem;
+
+    font-weight:700;
+
+}
+
+/* =======================
+   BUTTON
+======================= */
+
+.button{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:14px 24px;
+
+    border:none;
+
+    cursor:pointer;
+
+    font-family:Poppins;
+
+    font-weight:600;
+
+    border-radius:16px;
+
+    background:linear-gradient(
+
+    135deg,
+
+    var(--primary),
+
+    var(--secondary)
+
+    );
+
+    color:white;
+
+    transition:var(--transition);
+
+}
+
+.button:hover{
+
+    transform:translateY(-3px);
+
+}
+
+/* =======================
+   INPUTS
+======================= */
+
+input,
+
+select,
+
+textarea{
+
+    width:100%;
+
+    margin-top:8px;
+
+    margin-bottom:18px;
+
+    border:none;
+
+    outline:none;
+
+    padding:15px;
+
+    border-radius:14px;
+
+    font-family:Poppins;
+
+    background:rgba(255,255,255,.15);
+
+    color:white;
+
+    border:1px solid rgba(255,255,255,.18);
+
+}
+
+input::placeholder,
+
+textarea::placeholder{
+
+    color:rgba(255,255,255,.75);
+
+}
+
+select option{
+
+    color:#000;
+
+}
+
+/* =======================
+   TABLE CARD
+======================= */
+
+.table-card{
+
+    margin-top:30px;
+
+    overflow:auto;
+
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+th{
+
+    padding:18px;
+
+    text-align:left;
+
+    font-weight:600;
+
+    border-bottom:1px solid rgba(255,255,255,.15);
+
+}
+
+td{
+
+    padding:18px;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+}
+
+tbody tr:hover{
+
+    background:rgba(255,255,255,.06);
+
+}
+
+/* =======================
+   MOBILE MENU
+======================= */
+
+.mobile-header{
+
+    display:none;
+
+}
+
+/* =======================
+   RESPONSIVE
+======================= */
+
+@media(max-width:950px){
+
+#sidebar{
+
+    width:100%;
+
+    position:fixed;
+
+    left:-100%;
+
+    top:0;
+
+    height:100vh;
+
+    z-index:999;
+
+    transition:.35s;
+
+}
+
+#sidebar.show{
+
+    left:0;
+
+}
+
+.mobile-header{
 
     display:flex;
 
@@ -102,295 +480,57 @@ header{
 
     align-items:center;
 
-    padding:30px 70px;
-
-}
-
-/* ===========================
-   LOGO
-=========================== */
-
-.logo{
-
-    font-size:2rem;
-
-    font-weight:700;
-
-    letter-spacing:.5px;
-
-}
-
-/* ===========================
-   NAVIGATION
-=========================== */
-
-nav{
-
-    display:flex;
-
-    gap:15px;
-
-}
-
-/* ===========================
-   NAV BUTTON
-=========================== */
-
-.nav-btn{
-
-    text-decoration:none;
-
-    color:white;
-
-    padding:13px 28px;
-
-    border-radius:999px;
-
-    border:1px solid rgba(255,255,255,.30);
-
-    background:rgba(255,255,255,.08);
-
-    backdrop-filter:blur(15px);
-
-    transition:.35s;
-
-}
-
-.nav-btn:hover{
-
-    background:rgba(255,255,255,.18);
-
-    transform:translateY(-2px);
-
-}
-
-/* ===========================
-   HERO
-=========================== */
-
-.hero{
-
-    min-height:82vh;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    padding:40px;
-
-}
-
-/* ===========================
-   GLASS CARD
-=========================== */
-
-.glass-card{
-
-    width:100%;
-
-    max-width:720px;
-
-    padding:70px 60px;
-
-    text-align:center;
-
-    border-radius:var(--radius);
-
-    background:var(--glass);
-
-    backdrop-filter:blur(18px);
-
-    border:1px solid var(--glass-border);
-
-    box-shadow:var(--shadow);
-
-}
-
-/* ===========================
-   TITLE
-=========================== */
-
-.glass-card h1{
-
-    font-size:3.6rem;
-
-    font-weight:800;
-
-    margin-bottom:18px;
-
-}
-
-/* ===========================
-   DESCRIPTION
-=========================== */
-
-.glass-card p{
-
-    font-size:1.1rem;
-
-    font-weight:400;
-
-    line-height:1.8;
-
-    opacity:.95;
-
-    margin-bottom:45px;
-
-}
-
-/* ===========================
-   BUTTON GROUP
-=========================== */
-
-.button-group{
-
-    display:flex;
-
-    justify-content:center;
-
-    gap:22px;
-
-    flex-wrap:wrap;
-
-}
-
-/* ===========================
-   PRIMARY BUTTON
-=========================== */
-
-.primary-btn{
-
-    text-decoration:none;
-
-    color:white;
-
-    background:linear-gradient(
-    135deg,
-    #0A6EBD,
-    #5CB8E4);
-
-    padding:17px 42px;
-
-    border-radius:999px;
-
-    font-weight:600;
-
-    transition:.35s;
-
-    box-shadow:0 10px 25px rgba(0,0,0,.18);
-
-}
-
-.primary-btn:hover{
-
-    transform:translateY(-4px);
-
-}
-
-/* ===========================
-   SECONDARY BUTTON
-=========================== */
-
-.secondary-btn{
-
-    text-decoration:none;
-
-    color:white;
-
-    border:1px solid rgba(255,255,255,.25);
+    padding:18px;
 
     background:rgba(255,255,255,.10);
 
-    backdrop-filter:blur(10px);
-
-    padding:17px 42px;
-
-    border-radius:999px;
-
-    font-weight:600;
-
-    transition:.35s;
+    backdrop-filter:blur(18px);
 
 }
 
-.secondary-btn:hover{
+#mainContent{
 
-    transform:translateY(-4px);
-
-    background:rgba(255,255,255,.20);
+    padding:20px;
 
 }
 
-/* ===========================
-   SCROLLBAR
-=========================== */
+.page-title{
 
-::-webkit-scrollbar{
-
-    width:10px;
+    font-size:1.8rem;
 
 }
 
-::-webkit-scrollbar-thumb{
+.grid{
 
-    background:#5CB8E4;
-
-    border-radius:100px;
+    grid-template-columns:1fr;
 
 }
 
-::-webkit-scrollbar-track{
+}
 
-    background:#0A3658;
+@media(max-width:600px){
+
+.card{
+
+    padding:20px;
 
 }
 
-/* ===========================
-   RESPONSIVE
-=========================== */
+.logo{
 
-@media(max-width:900px){
-
-header{
-
-padding:25px;
-
-flex-direction:column;
-
-gap:25px;
+    font-size:1.5rem;
 
 }
 
-.glass-card{
+.button{
 
-padding:45px 30px;
-
-}
-
-.glass-card h1{
-
-font-size:2.4rem;
+    width:100%;
 
 }
 
-.glass-card p{
+table{
 
-font-size:1rem;
-
-}
-
-.button-group{
-
-flex-direction:column;
-
-}
-
-.primary-btn,
-.secondary-btn{
-
-width:100%;
+    font-size:14px;
 
 }
 
