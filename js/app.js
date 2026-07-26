@@ -1,11 +1,12 @@
 // ================================
 // ATTENDANCE CHECKER
 // MAIN APPLICATION
-// VERSION 1.2
+// VERSION 1.3
 // ================================
 
 
 import { loadDashboard } from "./dashboard.js";
+
 
 import {
 
@@ -22,6 +23,7 @@ import {
 const mainContent = document.getElementById("mainContent");
 
 const menuButtons = document.querySelectorAll(".menu");
+
 
 
 
@@ -48,9 +50,7 @@ menuButtons.forEach(button => {
         loadPage(button.dataset.page);
 
 
-
     });
-
 
 
 });
@@ -75,13 +75,11 @@ function loadPage(page){
             break;
 
 
-
         case "students":
 
             students();
 
             break;
-
 
 
         case "courses":
@@ -91,13 +89,11 @@ function loadPage(page){
             break;
 
 
-
         case "subjects":
 
             placeholder("Subjects");
 
             break;
-
 
 
         case "scanner":
@@ -107,7 +103,6 @@ function loadPage(page){
             break;
 
 
-
         case "attendance":
 
             placeholder("Attendance");
@@ -115,13 +110,11 @@ function loadPage(page){
             break;
 
 
-
         case "reports":
 
             placeholder("Reports");
 
             break;
-
 
 
         case "settings":
@@ -135,6 +128,7 @@ function loadPage(page){
 
 
 }
+
 
 
 
@@ -153,6 +147,7 @@ function dashboard(){
 
 
 
+
 // ================================
 // STUDENTS PAGE
 // ================================
@@ -160,8 +155,8 @@ function dashboard(){
 function students(){
 
 
-mainContent.innerHTML = `
 
+mainContent.innerHTML = `
 
 
 <h1 class="page-title">
@@ -169,7 +164,6 @@ mainContent.innerHTML = `
 Students
 
 </h1>
-
 
 
 
@@ -194,7 +188,6 @@ placeholder="Full Name"
 
 
 
-
 <input
 
 id="studentID"
@@ -202,7 +195,6 @@ id="studentID"
 placeholder="Student ID"
 
 >
-
 
 
 
@@ -216,7 +208,6 @@ placeholder="Course"
 
 
 
-
 <input
 
 id="yearLevel"
@@ -224,7 +215,6 @@ id="yearLevel"
 placeholder="Year Level"
 
 >
-
 
 
 
@@ -238,14 +228,11 @@ placeholder="Photo URL"
 
 
 
-
 <button
 
 class="button"
 
-id="addStudentBtn"
-
->
+id="addStudentBtn">
 
 Add Student
 
@@ -254,7 +241,6 @@ Add Student
 
 
 </div>
-
 
 
 
@@ -268,13 +254,12 @@ style="margin-top:25px">
 
 id="searchStudent"
 
-placeholder="Search Student"
+placeholder="Search Student..."
 
 >
 
 
 </div>
-
 
 
 
@@ -287,7 +272,6 @@ class="grid"
 
 style="margin-top:25px">
 
-
 </div>
 
 
@@ -298,43 +282,68 @@ style="margin-top:25px">
 
 
 
-// ADD BUTTON
+// ================================
+// ADD STUDENT BUTTON
+// ================================
 
-document
-.getElementById("addStudentBtn")
-.addEventListener("click",()=>{
+const addButton = document.getElementById("addStudentBtn");
+
+
+addButton.addEventListener("click",()=>{
+
+
+const fullName =
+document.getElementById("fullName").value.trim();
+
+
+const studentID =
+document.getElementById("studentID").value.trim();
+
+
+const course =
+document.getElementById("course").value.trim();
+
+
+const yearLevel =
+document.getElementById("yearLevel").value.trim();
+
+
+const photo =
+document.getElementById("photo").value.trim();
+
+
+
+if(
+    !fullName ||
+    !studentID ||
+    !course ||
+    !yearLevel
+){
+
+    alert("Please complete all student information.");
+
+    return;
+
+}
+
+
 
 
 const student = {
 
 
-fullName:
+fullName,
 
-document.getElementById("fullName").value,
+studentID,
 
+course,
 
-studentID:
-
-document.getElementById("studentID").value,
-
-
-course:
-
-document.getElementById("course").value,
-
-
-yearLevel:
-
-document.getElementById("yearLevel").value,
+yearLevel,
 
 
 photo:
 
-document.getElementById("photo").value
-
-||
-"assets/students/default.png"
-
+photo || "assets/students/default.png"
 
 
 };
@@ -344,17 +353,25 @@ document.getElementById("photo").value
 addStudent(student);
 
 
+renderStudents();
 
 
-document.getElementById("fullName").value="";
 
-document.getElementById("studentID").value="";
 
-document.getElementById("course").value="";
 
-document.getElementById("yearLevel").value="";
+document.getElementById("fullName").value = "";
 
-document.getElementById("photo").value="";
+document.getElementById("studentID").value = "";
+
+document.getElementById("course").value = "";
+
+document.getElementById("yearLevel").value = "";
+
+document.getElementById("photo").value = "";
+
+
+
+alert("Student added successfully!");
 
 
 
@@ -364,18 +381,24 @@ document.getElementById("photo").value="";
 
 
 
+
+
+// ================================
 // SEARCH
+// ================================
 
-document
-.getElementById("searchStudent")
-.addEventListener("input",(e)=>{
+const searchBox = document.getElementById("searchStudent");
 
 
-searchStudents(e.target.value);
+searchBox.addEventListener("input",(event)=>{
 
+
+searchStudents(event.target.value);
 
 
 });
+
+
 
 
 
@@ -384,6 +407,8 @@ renderStudents();
 
 
 }
+
+
 
 
 
@@ -431,11 +456,15 @@ This module will be built next.
 `;
 
 
-
 }
 
 
 
-// START
+
+
+
+// ================================
+// START APP
+// ================================
 
 loadPage("dashboard");
