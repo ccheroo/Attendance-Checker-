@@ -1,7 +1,7 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // FIRESTORE STUDENT MANAGEMENT
-// VERSION 3.1 POLISHED STABLE
+// VERSION 4.0 QR READY
 // ======================================================
 
 
@@ -11,13 +11,22 @@ import { db } from "./firebase.js";
 import {
 
     collection,
+
     addDoc,
+
     getDocs,
+
     deleteDoc,
+
+    updateDoc,
+
     doc,
+
     serverTimestamp
 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
 
 
 
@@ -27,6 +36,10 @@ let students = [];
 
 const studentCollection =
 collection(db,"students");
+
+
+
+
 
 
 
@@ -47,7 +60,7 @@ export async function loadStudents(){
 
 
 
-        students = [];
+        students=[];
 
 
 
@@ -68,7 +81,7 @@ export async function loadStudents(){
 
 
         console.log(
-            "Students loaded:",
+            "Loaded students:",
             students.length
         );
 
@@ -79,6 +92,7 @@ export async function loadStudents(){
 
 
     }
+
 
 
     catch(error){
@@ -101,6 +115,8 @@ export async function loadStudents(){
 
 
 
+
+
 // ================================
 // ADD STUDENT
 // ================================
@@ -108,33 +124,401 @@ export async function loadStudents(){
 export async function addStudent(student){
 
 
+
     try{
+
+
+
+        const data = {
+
+
+            fullName:
+            student.fullName,
+
+
+            studentID:
+            student.studentID,
+
+
+
+            qrCode:
+
+            student.qrCode ||
+            student.studentID,
+
+
+
+            course:
+            student.course,
+
+
+
+            yearLevel:
+            student.yearLevel,
+
+
+
+            photo:
+
+            student.photo ||
+            "",
+
+
+
+            createdAt:
+            serverTimestamp()
+
+
+
+        };
+
+
+
 
 
         await addDoc(
 
             studentCollection,
 
+            data
+
+        );
+
+
+
+
+        await loadStudents();
+
+
+
+
+        return true;
+
+
+
+    }
+
+
+
+
+    catch(error){
+
+
+        console.error(
+            "Save student error:",
+            error
+        );
+
+
+
+        alert(
+            "Saving failed: "
+            +
+            error.message
+        );
+
+
+
+        return false;
+
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ================================
+// UPDATE STUDENT
+// ================================
+
+export async function updateStudent(id,data){
+
+
+
+    try{
+
+
+        await updateDoc(
+
+            doc(
+                db,
+                "students",
+                id
+            ),
+
+            data
+
+        );
+
+
+
+        await loadStudents();
+
+
+
+        return true;
+
+
+
+    }
+
+
+
+    catch(error){
+
+
+        console.error(
+            error
+        );
+
+
+        return false;
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+// ================================
+// DELETE STUDENT
+// ================================
+
+export async function deleteStudent(id){
+
+
+
+    const confirmDelete =
+    confirm(
+        "Delete this student?"
+    );
+
+
+
+    if(!confirmDelete)
+    return;
+
+
+
+
+    try{
+
+
+        await deleteDoc(
+
+            doc(
+
+                db,
+
+                "students",
+
+                id
+
+            )
+
+        );
+
+
+
+        await loadStudents();
+
+
+
+        alert(
+            "Student deleted!"
+        );
+
+
+
+    }
+
+
+
+    catch(error){
+
+
+        alert(
+            "Delete failed: "
+            +
+            error.message
+        );
+
+
+    }
+
+
+
+}
+// ================================
+// STUDENT PHOTO SUPPORT
+// ================================
+
+export function updateStudentPhoto(id,photoURL){
+
+
+    const student =
+    students.find(
+        s=>s.id===id
+    );
+
+
+    if(student){
+
+
+        student.photo =
+        photoURL;
+
+
+        renderStudents();
+
+
+    }
+
+
+}
+
+
+
+
+
+
+// ================================
+// GET STUDENT BY ID
+// ================================
+
+export function getStudent(id){
+
+
+    return students.find(
+        student =>
+        student.id === id
+    );
+
+
+}
+
+
+
+
+
+
+// ================================
+// COUNT STUDENTS
+// ================================
+
+export function getStudentCount(){
+
+
+    return students.length;
+
+
+}
+
+
+
+
+
+
+// ================================
+// FILTER BY COURSE
+// ================================
+
+export function filterStudentsByCourse(course){
+
+
+    const result =
+
+    students.filter(student=>{
+
+
+        return (
+
+            student.course === course
+
+        );
+
+
+    });
+
+
+
+    renderStudents(result);
+
+
+
+}
+
+
+
+
+
+
+
+// ================================
+// EXPORT STUDENTS DATA
+// ================================
+
+export function getStudents(){
+
+
+    return students;
+
+
+}
+
+
+
+
+
+
+// ================================
+// UPDATE STUDENT
+// ================================
+
+export async function updateStudent(id,data){
+
+
+    try{
+
+
+        const studentRef =
+        doc(
+            db,
+            "students",
+            id
+        );
+
+
+
+        await updateDoc(
+
+            studentRef,
+
             {
 
 
-                fullName:
-                student.fullName,
+                ...data,
 
 
-                studentID:
-                student.studentID,
-
-
-                course:
-                student.course,
-
-
-                yearLevel:
-                student.yearLevel,
-
-
-                createdAt:
+                updatedAt:
                 serverTimestamp()
 
 
@@ -156,25 +540,25 @@ export async function addStudent(student){
     }
 
 
+
     catch(error){
 
 
         console.error(
-            "Save error:",
+            "Update error:",
             error
         );
 
 
+
         alert(
-            "Saving failed: "
-            + error.message
+            error.message
         );
 
 
         return false;
 
 
-
     }
 
 
@@ -185,73 +569,14 @@ export async function addStudent(student){
 
 
 
-
 // ================================
-// DELETE STUDENT
+// RESET SEARCH
 // ================================
 
-export async function deleteStudent(id){
+export function resetStudentSearch(){
 
 
-
-    const confirmDelete =
-    confirm(
-        "Are you sure you want to delete this student?"
-    );
-
-
-
-    if(!confirmDelete)
-    return;
-
-
-
-    try{
-
-
-        await deleteDoc(
-
-            doc(
-                db,
-                "students",
-                id
-            )
-
-        );
-
-
-
-        await loadStudents();
-
-
-
-        alert(
-            "Student deleted successfully!"
-        );
-
-
-
-    }
-
-
-
-    catch(error){
-
-
-        console.error(
-            "Delete error:",
-            error
-        );
-
-
-
-        alert(
-            "Delete failed: "
-            + error.message
-        );
-
-
-    }
+    renderStudents();
 
 
 
@@ -262,260 +587,6 @@ export async function deleteStudent(id){
 
 
 
-
-// ================================
-// SEARCH
-// ================================
-
-export function searchStudents(keyword){
-
-
-
-    keyword =
-    keyword
-    .toLowerCase()
-    .trim();
-
-
-
-
-    const result =
-
-    students.filter(student=>{
-
-
-        const name =
-        (student.fullName || "")
-        .toLowerCase();
-
-
-
-        const id =
-        (student.studentID || "")
-        .toLowerCase();
-
-
-
-        const course =
-        (student.course || "")
-        .toLowerCase();
-
-
-
-
-        return (
-
-            name.includes(keyword)
-
-            ||
-
-            id.includes(keyword)
-
-            ||
-
-            course.includes(keyword)
-
-        );
-
-
-    });
-
-
-
-    renderStudents(result);
-
-
-
-}
-
-
-
-
-
-
-
-
-// ================================
-// DISPLAY STUDENTS
-// ================================
-
-export function renderStudents(data = students){
-
-
-
-    const container =
-    document.getElementById(
-        "studentContainer"
-    );
-
-
-
-    if(!container)
-    return;
-
-
-
-    container.innerHTML="";
-
-
-
-
-
-
-    if(data.length===0){
-
-
-
-        container.innerHTML=`
-
-        <div class="empty-card">
-
-            <h2>
-            No Students Yet
-            </h2>
-
-            <p>
-            Register your first student.
-            </p>
-
-        </div>
-
-        `;
-
-
-        return;
-
-
-
-    }
-
-
-
-
-
-
-
-
-    data.forEach(student=>{
-
-
-        const name =
-        student.fullName || "Unknown Student";
-
-
-
-        const initial =
-        name.charAt(0)
-        .toUpperCase();
-
-
-
-
-
-        container.innerHTML += `
-
-
-        <div class="student-card">
-
-
-
-            <div class="student-avatar">
-
-                ${initial}
-
-            </div>
-
-
-
-
-            <div class="student-info">
-
-
-                <h2>
-
-                ${name}
-
-                </h2>
-
-
-
-                <p>
-
-                <strong>
-                ID:
-                </strong>
-
-                ${student.studentID || "N/A"}
-
-                </p>
-
-
-
-
-                <p>
-
-                <strong>
-                Course:
-                </strong>
-
-                ${student.course || "N/A"}
-
-                </p>
-
-
-
-
-                <p>
-
-                <strong>
-                Year:
-                </strong>
-
-                ${student.yearLevel || "N/A"}
-
-                </p>
-
-
-
-
-
-                <button
-
-                class="delete-btn"
-
-                onclick="removeStudent('${student.id}')">
-
-
-                Delete
-
-
-                </button>
-
-
-
-
-            </div>
-
-
-
-        </div>
-
-
-
-        `;
-
-
-
-    });
-
-
-
-}
-
-
-
-
-
-
-window.removeStudent =
-deleteStudent;
+console.log(
+    "👨‍🎓 Student Module Ready"
+);
