@@ -1,7 +1,7 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // QR SCANNER MODULE
-// VERSION 3.0 ATTENDANCE CONNECTED
+// VERSION 4.0 BETTER UX
 // ======================================================
 
 
@@ -25,10 +25,9 @@ import {
 
 
 
-
 let scanner = null;
 
-
+let processing = false;
 
 
 
@@ -51,6 +50,7 @@ document.getElementById(
 
 
 
+
 if(!result)
 return;
 
@@ -58,32 +58,43 @@ return;
 
 
 
-if(
-typeof Html5QrcodeScanner === "undefined"
-){
+startScanner(result);
 
-
-result.innerHTML=`
-
-<div class="card">
-
-<h3>
-Scanner Error
-</h3>
-
-<p>
-QR library not loaded.
-</p>
-
-</div>
-
-`;
-
-
-return;
 
 
 }
+
+
+
+
+
+
+
+
+// ================================
+// START SCANNER
+// ================================
+
+
+function startScanner(result){
+
+
+
+if(scanner){
+
+
+try{
+
+scanner.clear();
+
+}
+
+catch(e){}
+
+
+
+}
+
 
 
 
@@ -120,21 +131,34 @@ scanner.render(
 async(decodedText)=>{
 
 
+
+if(processing)
+return;
+
+
+
+
+processing = true;
+
+
+
+
 console.log(
-"QR SCANNED:",
+"QR:",
 decodedText
 );
 
 
 
+
+
 await findStudent(
+
 decodedText,
+
 result
+
 );
-
-
-
-scanner.clear();
 
 
 
@@ -154,15 +178,6 @@ scanner.clear();
 
 
 }
-
-
-
-
-
-
-
-
-
 // ================================
 // FIND STUDENT
 // ================================
@@ -174,13 +189,13 @@ result
 ){
 
 
+
 try{
 
 
 
 const q =
 query(
-
 
 collection(
 db,
@@ -194,7 +209,6 @@ where(
 qr
 )
 
-
 );
 
 
@@ -202,8 +216,45 @@ qr
 
 
 
-const snapshot =
+let snapshot =
 await getDocs(q);
+
+
+
+
+
+
+
+// FALLBACK SA OLD STUDENTS
+
+if(snapshot.empty){
+
+
+const oldQuery =
+query(
+
+collection(
+db,
+"students"
+),
+
+
+where(
+"studentID",
+"==",
+qr
+)
+
+);
+
+
+
+snapshot =
+await getDocs(oldQuery);
+
+
+
+}
 
 
 
@@ -214,24 +265,23 @@ await getDocs(q);
 if(snapshot.empty){
 
 
-result.innerHTML=`
 
-<div class="card">
+showMessage(
 
-<h3>
-Student Not Found
-</h3>
+result,
+
+"❌ Student Not Found",
+
+"QR Code: " + qr,
+
+"error"
+
+);
 
 
-<p>
-QR:
-${qr}
-</p>
 
+processing=false;
 
-</div>
-
-`;
 
 return;
 
@@ -259,11 +309,11 @@ student={
 
 id:item.id,
 
+
 ...item.data()
 
 
 };
-
 
 
 });
@@ -274,14 +324,9 @@ id:item.id,
 
 
 
-
-
-// SAVE ATTENDANCE
-
 const saved =
+
 await recordAttendance(student);
-
-
 
 
 
@@ -292,53 +337,90 @@ await recordAttendance(student);
 if(saved){
 
 
-result.innerHTML=`
 
-<div class="card">
+// SUCCESS SOUND
+
+const beep =
+new Audio(
+
+"https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
+
+);
 
 
-<h2>
-✅ Attendance Recorded
-</h2>
+beep.play();
 
 
 
-<p>
+
+
+
+
+showMessage(
+
+result,
+
+"✅ Attendance Recorded",
+
+`
 
 <strong>
 ${student.fullName}
 </strong>
 
-</p>
+<br><br>
 
-
-
-
-<p>
-ID:
+Student ID:
 ${student.studentID}
-</p>
 
+<br>
 
-
-<p>
 Course:
-${student.course}
-</p>
+${student.course || "N/A"}
 
+<br><br>
 
+<span style="color:green">
 
-<p>
-Status:
 Present
-</p>
+
+</span>
+
+`,
+
+"success"
+
+);
 
 
 
-</div>
+}
 
 
-`;
+
+else{
+
+
+
+showMessage(
+
+result,
+
+"⚠ Already Recorded",
+
+`
+
+${student.fullName}
+
+<br><br>
+
+This student already checked in today.
+
+`,
+
+"warning"
+
+);
 
 
 
@@ -349,33 +431,149 @@ Present
 
 
 
-
 }
+
+
+
 
 
 
 catch(error){
 
 
+
 console.error(
-"Scanner error:",
+"Scan error:",
 error
 );
 
 
 
-result.innerHTML=`
+showMessage(
+
+result,
+
+"❌ Error",
+
+error.message,
+
+"error"
+
+);
+
+
+
+}
+
+
+
+
+
+
+processing=false;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ================================
+// RESULT DISPLAY
+// ================================
+
+
+function showMessage(
+
+container,
+
+title,
+
+message,
+
+type
+
+){
+
+
+
+container.innerHTML = `
+
+
+<div class="card scan-${type}">
+
+
+<h2>
+
+${title}
+
+</h2>
+
+
+
+<p>
+
+${message}
+
+</p>
+
+
+
+
+<button
+
+id="scanAgainBtn"
+
+class="button">
+
+
+Scan Another QR Code
+
+</button>
+
+
+
+</div>
+
+
+
+`;
+
+
+
+
+
+
+
+document
+.getElementById(
+"scanAgainBtn"
+)
+.onclick = ()=>{
+
+
+container.innerHTML = `
+
 
 <div class="card">
 
-
 <h3>
-Error
+
+Ready to Scan
+
 </h3>
 
 
 <p>
-${error.message}
+
+Place another QR code inside the scanner.
+
 </p>
 
 
@@ -386,7 +584,11 @@ ${error.message}
 
 
 
-}
+processing=false;
+
+
+
+};
 
 
 
