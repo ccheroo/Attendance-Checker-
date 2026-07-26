@@ -1,7 +1,7 @@
 // ================================
 // ATTENDANCE CHECKER
 // MAIN APPLICATION
-// VERSION 1.3
+// VERSION 2.0 FIREBASE CONNECTED
 // ================================
 
 
@@ -12,9 +12,9 @@ import {
 
     addStudent,
 
-    renderStudents,
+    searchStudents,
 
-    searchStudents
+    loadStudents
 
 } from "./students.js";
 
@@ -54,6 +54,7 @@ menuButtons.forEach(button => {
 
 
 });
+
 
 
 
@@ -132,6 +133,7 @@ function loadPage(page){
 
 
 
+
 // ================================
 // DASHBOARD
 // ================================
@@ -143,6 +145,8 @@ function dashboard(){
 
 
 }
+
+
 
 
 
@@ -164,6 +168,7 @@ mainContent.innerHTML = `
 Students
 
 </h1>
+
 
 
 
@@ -245,6 +250,8 @@ Add Student
 
 
 
+
+
 <div class="card"
 
 style="margin-top:25px">
@@ -260,6 +267,9 @@ placeholder="Search Student..."
 
 
 </div>
+
+
+
 
 
 
@@ -282,14 +292,16 @@ style="margin-top:25px">
 
 
 
+
 // ================================
-// ADD STUDENT BUTTON
+// ADD STUDENT
 // ================================
 
 const addButton = document.getElementById("addStudentBtn");
 
 
-addButton.addEventListener("click",()=>{
+
+addButton.addEventListener("click", async ()=>{
 
 
 const fullName =
@@ -313,18 +325,29 @@ document.getElementById("photo").value.trim();
 
 
 
+
+
 if(
-    !fullName ||
-    !studentID ||
-    !course ||
-    !yearLevel
+
+!fullName ||
+
+!studentID ||
+
+!course ||
+
+!yearLevel
+
 ){
 
-    alert("Please complete all student information.");
 
-    return;
+alert("Please complete all student information.");
+
+return;
+
 
 }
+
+
 
 
 
@@ -350,10 +373,9 @@ photo || "assets/students/default.png"
 
 
 
-addStudent(student);
 
 
-renderStudents();
+await addStudent(student);
 
 
 
@@ -371,11 +393,13 @@ document.getElementById("photo").value = "";
 
 
 
-alert("Student added successfully!");
+
+alert("Student saved successfully!");
 
 
 
 });
+
 
 
 
@@ -390,10 +414,12 @@ alert("Student added successfully!");
 const searchBox = document.getElementById("searchStudent");
 
 
+
 searchBox.addEventListener("input",(event)=>{
 
 
 searchStudents(event.target.value);
+
 
 
 });
@@ -402,11 +428,15 @@ searchStudents(event.target.value);
 
 
 
-renderStudents();
+
+// LOAD FIREBASE STUDENTS
+
+loadStudents();
 
 
 
 }
+
 
 
 
@@ -457,6 +487,7 @@ This module will be built next.
 
 
 }
+
 
 
 
