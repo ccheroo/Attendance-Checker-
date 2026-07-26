@@ -1,7 +1,7 @@
 // ================================
 // ATTENDANCE CHECKER
 // MAIN APPLICATION
-// VERSION 2.6 STABLE PHOTO UPLOAD
+// VERSION 2.7 FIRESTORE ONLY STABLE
 // ================================
 
 
@@ -20,152 +20,158 @@ import {
 
 
 
-import { storage } from "./firebase.js";
 
 
-import {
-
-    ref,
-
-    uploadBytes,
-
-    getDownloadURL
-
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+const mainContent =
+document.getElementById("mainContent");
 
 
-
-
-
-const mainContent = document.getElementById("mainContent");
-
-const menuButtons = document.querySelectorAll(".menu");
+const menuButtons =
+document.querySelectorAll(".menu");
 
 
 
 
 
 
+
+// ================================
 // MENU
+// ================================
+
 
 menuButtons.forEach(button=>{
 
 
-button.addEventListener("click",()=>{
+    button.addEventListener("click",()=>{
 
 
-menuButtons.forEach(btn=>{
+        menuButtons.forEach(btn=>{
 
-btn.classList.remove("active");
+            btn.classList.remove("active");
+
+        });
+
+
+
+        button.classList.add("active");
+
+
+
+        loadPage(button.dataset.page);
+
+
+
+    });
+
 
 });
 
 
-button.classList.add("active");
-
-
-loadPage(button.dataset.page);
-
-
-
-});
-
-
-});
 
 
 
 
 
 
+// ================================
+// PAGE LOADER
+// ================================
 
 
 function loadPage(page){
 
 
-switch(page){
+    switch(page){
 
 
-case "dashboard":
+        case "dashboard":
 
-dashboard();
+            dashboard();
 
-break;
-
-
-
-case "students":
-
-students();
-
-break;
+            break;
 
 
 
-case "courses":
+        case "students":
 
-placeholder("Courses");
+            students();
 
-break;
-
-
-
-case "subjects":
-
-placeholder("Subjects");
-
-break;
+            break;
 
 
 
-case "scanner":
+        case "courses":
 
-placeholder("Scanner");
+            placeholder("Courses");
 
-break;
-
-
-
-case "attendance":
-
-placeholder("Attendance");
-
-break;
+            break;
 
 
 
-case "reports":
+        case "subjects":
 
-placeholder("Reports");
+            placeholder("Subjects");
 
-break;
+            break;
 
 
 
-case "settings":
+        case "scanner":
 
-placeholder("Settings");
+            placeholder("Scanner");
 
-break;
+            break;
 
+
+
+        case "attendance":
+
+            placeholder("Attendance");
+
+            break;
+
+
+
+        case "reports":
+
+            placeholder("Reports");
+
+            break;
+
+
+
+        case "settings":
+
+            placeholder("Settings");
+
+            break;
+
+
+
+    }
 
 
 }
 
 
 
-}
 
 
 
 
 
-
+// ================================
+// DASHBOARD
+// ================================
 
 
 function dashboard(){
 
-mainContent.innerHTML = loadDashboard();
+
+    mainContent.innerHTML =
+    loadDashboard();
+
 
 }
 
@@ -175,12 +181,18 @@ mainContent.innerHTML = loadDashboard();
 
 
 
+
+// ================================
+// STUDENTS
+// ================================
 
 
 function students(){
 
 
+
 mainContent.innerHTML = `
+
 
 
 <h1 class="page-title">
@@ -188,6 +200,8 @@ mainContent.innerHTML = `
 Students
 
 </h1>
+
+
 
 
 
@@ -199,6 +213,8 @@ Students
 Register Student
 
 </h2>
+
+
 
 
 
@@ -214,6 +230,8 @@ placeholder="Full Name"
 
 
 
+
+
 <input
 
 id="studentID"
@@ -223,6 +241,8 @@ type="text"
 placeholder="Student ID"
 
 >
+
+
 
 
 
@@ -238,6 +258,8 @@ placeholder="Course"
 
 
 
+
+
 <input
 
 id="yearLevel"
@@ -247,41 +269,6 @@ type="text"
 placeholder="Year Level"
 
 >
-
-
-
-<div class="photo-upload">
-
-
-<h3>
-
-Student Photo
-
-</h3>
-
-
-
-<input
-
-type="file"
-
-id="studentPhoto"
-
-accept="image/*"
-
->
-
-
-
-<p>
-
-Upload student's profile picture
-
-</p>
-
-
-
-</div>
 
 
 
@@ -300,6 +287,7 @@ Save Student
 
 
 </button>
+
 
 
 
@@ -340,8 +328,8 @@ id="studentContainer"
 
 class="grid">
 
-</div>
 
+</div>
 
 
 
@@ -354,23 +342,28 @@ class="grid">
 
 
 
+// ================================
+// SAVE STUDENT
+// ================================
 
-const addButton = document.getElementById(
+
+const addButton =
+document.getElementById(
 "addStudentBtn"
 );
 
 
 
 
-
 if(!addButton){
 
-console.error("Save button missing");
+console.error(
+"Save button not found"
+);
 
 return;
 
 }
-
 
 
 
@@ -381,38 +374,65 @@ return;
 addButton.onclick = async ()=>{
 
 
-
-console.log("SAVE CLICKED");
-
-
-
-const fullName =
-document.getElementById("fullName").value.trim();
+console.log(
+"SAVE CLICKED"
+);
 
 
 
-const studentID =
-document.getElementById("studentID").value.trim();
+
+
+const student = {
 
 
 
-const course =
-document.getElementById("course").value.trim();
+fullName:
+
+document
+.getElementById("fullName")
+.value
+.trim(),
 
 
 
-const yearLevel =
-document.getElementById("yearLevel").value.trim();
+
+studentID:
+
+document
+.getElementById("studentID")
+.value
+.trim(),
 
 
 
-const photoInput =
-document.getElementById("studentPhoto");
+
+course:
+
+document
+.getElementById("course")
+.value
+.trim(),
 
 
 
-const photoFile =
-photoInput.files[0];
+
+yearLevel:
+
+document
+.getElementById("yearLevel")
+.value
+.trim(),
+
+
+
+
+photo:
+
+"assets/default-avatar.png"
+
+
+
+};
 
 
 
@@ -422,21 +442,19 @@ photoInput.files[0];
 
 if(
 
-!fullName ||
+!student.fullName ||
 
-!studentID ||
+!student.studentID ||
 
-!course ||
+!student.course ||
 
-!yearLevel ||
-
-!photoFile
+!student.yearLevel
 
 ){
 
 
 alert(
-"Please complete all fields and choose a photo."
+"Please complete all fields."
 );
 
 
@@ -450,111 +468,33 @@ return;
 
 
 
-
 try{
 
 
 
-addButton.disabled = true;
-
-addButton.innerHTML =
-"Saving...";
+addButton.disabled=true;
 
 
-
-
-
-// UPLOAD PHOTO
-
-
-const imageRef = ref(
-
-storage,
-
-"students/" +
-
-studentID +
-
-"_" +
-
-photoFile.name
-
-);
+addButton.innerHTML="Saving...";
 
 
 
 
 
-await uploadBytes(
-
-imageRef,
-
-photoFile
-
-);
-
-
-
-
-
-console.log(
-"PHOTO UPLOADED"
-);
-
-
-
-
-
-const photoURL =
-await getDownloadURL(imageRef);
-
-
-
-
-
-
-
-const student = {
-
-
-fullName,
-
-studentID,
-
-course,
-
-yearLevel,
-
-photo:photoURL
-
-
-};
-
-
-
-
-
-
-
+const saved =
 await addStudent(student);
 
 
 
 
 
-console.log(
-"STUDENT SAVED"
-);
-
-
+if(saved !== false){
 
 
 
 alert(
 "Student saved successfully!"
 );
-
-
 
 
 
@@ -568,16 +508,9 @@ document.getElementById("course").value="";
 
 document.getElementById("yearLevel").value="";
 
-document.getElementById("studentPhoto").value="";
 
 
-
-
-
-addButton.disabled=false;
-
-addButton.innerHTML="Save Student";
-
+}
 
 
 
@@ -585,30 +518,34 @@ addButton.innerHTML="Save Student";
 
 
 
-
-
 catch(error){
 
 
-
-console.error(error);
-
-
-
-alert(
-
-"Saving failed: " +
-
-error.message
-
+console.error(
+error
 );
 
 
 
+alert(
+"Saving failed: "
++
+error.message
+);
+
+
+
+}
+
+
+
+finally{
+
+
 addButton.disabled=false;
 
-addButton.innerHTML="Save Student";
 
+addButton.innerHTML="Save Student";
 
 
 }
@@ -625,8 +562,15 @@ addButton.innerHTML="Save Student";
 
 
 
+// ================================
+// SEARCH
+// ================================
+
+
 const searchBox =
-document.getElementById("searchStudent");
+document.getElementById(
+"searchStudent"
+);
 
 
 
@@ -654,6 +598,10 @@ e.target.value
 
 
 
+
+// LOAD EXISTING STUDENTS
+
+
 loadStudents();
 
 
@@ -666,6 +614,11 @@ loadStudents();
 
 
 
+
+
+// ================================
+// PLACEHOLDER
+// ================================
 
 
 function placeholder(title){
