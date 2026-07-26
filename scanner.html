@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Attendance Checker | Scanner</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/scanner.css">
+
+</head>
+
+<body>
+
+<div class="background-overlay"></div>
+
+<div class="dashboard">
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <h2>Attendance Checker</h2>
+
+        <nav>
+
+            <a href="dashboard.html">Dashboard</a>
+
+            <a href="scanner.html" class="active">QR Scanner</a>
+
+            <a href="students.html">Students</a>
+
+            <a href="attendance.html">Attendance</a>
+
+            <a href="reports.html">Reports</a>
+
+            <a href="settings.html">Settings</a>
+
+            <a href="index.html">Logout</a>
+
+        </nav>
+
+    </aside>
+
+    <!-- Main -->
+
+    <main class="scanner-content">
+
+        <header>
+
+            <h1>QR Attendance Scanner</h1>
+
+        </header>
+
+        <!-- Subject -->
+
+        <div class="subject-bar">
+
+            <label>Select Subject</label>
+
+            <select id="subjectSelect">
+
+                <option>Filipino</option>
+                <option>English</option>
+                <option>Social Studies</option>
+                <option>Engineering</option>
+
+            </select>
+
+        </div>
+
+        <div class="scanner-layout">
+
+            <!-- Camera -->
+
+            <section class="camera-card">
+
+                <h2>Camera Scanner</h2>
+
+                <div id="reader"></div>
+
+            </section>
+
+            <!-- Student -->
+
+            <section class="student-card">
+
+                <img src="assets/students/default.png"
+                id="studentPhoto">
+
+                <h2 id="studentName">
+
+                    Waiting for Scan...
+
+                </h2>
+
+                <p id="studentID">
+
+                    Student ID
+
+                </p>
+
+                <p id="studentCourse">
+
+                    Course
+
+                </p>
+
+                <p id="studentTime">
+
+                    --
+
+                </p>
+
+                <div class="status">
+
+                    Ready
+
+                </div>
+
+            </section>
+
+        </div>
+
+        <!-- Live Attendance -->
+
+        <section class="attendance-list">
+
+            <div class="list-header">
+
+                <h2>
+
+                    Today's Attendance
+
+                </h2>
+
+            </div>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Name</th>
+                        <th>Student ID</th>
+                        <th>Course</th>
+                        <th>Time</th>
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="attendanceTable">
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<script type="module" src="js/scanner.js"></script>
+
+</body>
+
+</html>
