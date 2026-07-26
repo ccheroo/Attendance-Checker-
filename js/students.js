@@ -443,14 +443,6 @@ export function searchStudents(keyword){
 
 }
 
-
-
-
-
-
-
-
-
 // ================================
 // DISPLAY STUDENTS
 // ================================
@@ -543,10 +535,15 @@ ${initial}
 
 </div>
 
+
+
 <div 
 class="qr-box"
 id="qr-${student.id}">
 </div>
+
+
+
 
 <div class="student-info">
 
@@ -595,7 +592,6 @@ ${student.yearLevel || "N/A"}
 
 
 
-
 <button
 
 class="delete-btn"
@@ -625,15 +621,71 @@ Delete
 
 
 
+
+
+// ================================
+// GENERATE QR CODES
+// ================================
+
+
+setTimeout(()=>{
+
+
+data.forEach(student=>{
+
+
+const qrBox =
+document.getElementById(
+"qr-"+student.id
+);
+
+
+
+if(qrBox){
+
+
+qrBox.innerHTML="";
+
+
+
+new QRCode(
+
+qrBox,
+
+{
+
+text:
+
+student.qrCode ||
+
+student.studentID,
+
+
+width:120,
+
+
+height:120
+
+
+}
+
+);
+
+
+
 }
 
 
+});
+
+
+},300);
 
 
 
 
 
-
+}
 
 // ================================
 // GET STUDENT
