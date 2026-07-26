@@ -1,7 +1,7 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // FIREBASE STUDENT MANAGEMENT
-// VERSION 2.0
+// VERSION 2.1 FIXED
 // ======================================================
 
 
@@ -18,11 +18,7 @@ import {
 
     deleteDoc,
 
-    doc,
-
-    orderBy,
-
-    query
+    doc
 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -38,6 +34,7 @@ const studentCollection = collection(db,"students");
 
 
 
+
 // ======================================
 // LOAD STUDENTS
 // ======================================
@@ -48,41 +45,51 @@ export async function loadStudents(){
     students = [];
 
 
-    const q = query(
+    try {
 
-        studentCollection,
 
-        orderBy("createdAt","desc")
-
-    );
+        const snapshot = await getDocs(studentCollection);
 
 
 
-    const snapshot = await getDocs(q);
+        snapshot.forEach((item)=>{
 
 
+            students.push({
 
-    snapshot.forEach((item)=>{
+                id:item.id,
 
+                ...item.data()
 
-        students.push({
+            });
 
-            id:item.id,
-
-            ...item.data()
 
         });
 
 
-    });
+
+        renderStudents();
 
 
 
-    renderStudents();
+    }
+
+    catch(error){
+
+
+        console.error(
+            "Loading students failed:",
+            error
+        );
+
+
+    }
 
 
 
 }
+
+
 
 
 
@@ -96,22 +103,52 @@ export async function loadStudents(){
 export async function addStudent(student){
 
 
-
-    await addDoc(studentCollection,{
-
-        ...student,
-
-        createdAt:new Date()
-
-    });
+    try{
 
 
+        await addDoc(studentCollection,{
 
-    await loadStudents();
 
+            ...student,
+
+
+            createdAt:
+
+            Date.now()
+
+
+        });
+
+
+
+        await loadStudents();
+
+
+
+    }
+
+
+    catch(error){
+
+
+        console.error(
+            "Adding student failed:",
+            error
+        );
+
+
+        alert(
+            "Cannot save student: "
+            + error.message
+        );
+
+
+    }
 
 
 }
+
+
 
 
 
@@ -125,20 +162,42 @@ export async function addStudent(student){
 export async function deleteStudent(id){
 
 
-
-    await deleteDoc(
-
-        doc(db,"students",id)
-
-    );
+    try{
 
 
+        await deleteDoc(
 
-    await loadStudents();
+            doc(
+                db,
+                "students",
+                id
+            )
 
+        );
+
+
+
+        await loadStudents();
+
+
+
+    }
+
+    catch(error){
+
+
+        console.error(
+            "Delete failed:",
+            error
+        );
+
+
+    }
 
 
 }
+
+
 
 
 
@@ -153,11 +212,13 @@ export function searchStudents(keyword){
 
 
 
-    keyword = keyword.toLowerCase();
+    keyword =
+    keyword.toLowerCase();
 
 
 
-    const filtered = students.filter(student=>
+    const filtered =
+    students.filter(student =>
 
 
 
@@ -169,6 +230,8 @@ export function searchStudents(keyword){
 
         ||
 
+
+
         student.studentID
         .toLowerCase()
         .includes(keyword)
@@ -176,6 +239,8 @@ export function searchStudents(keyword){
 
 
         ||
+
+
 
         student.course
         .toLowerCase()
@@ -198,6 +263,8 @@ export function searchStudents(keyword){
 
 
 
+
+
 // ======================================
 // DISPLAY STUDENTS
 // ======================================
@@ -207,12 +274,13 @@ export function renderStudents(data = students){
 
 
     const container =
-    document.getElementById("studentContainer");
+    document.getElementById(
+        "studentContainer"
+    );
 
 
 
     if(!container) return;
-
 
 
 
@@ -221,10 +289,10 @@ export function renderStudents(data = students){
 
 
 
-    if(data.length===0){
+    if(data.length === 0){
 
 
-        container.innerHTML=`
+        container.innerHTML = `
 
         <div class="card">
 
@@ -241,8 +309,8 @@ export function renderStudents(data = students){
 
         return;
 
-
     }
+
 
 
 
@@ -250,7 +318,7 @@ export function renderStudents(data = students){
     data.forEach(student=>{
 
 
-        container.innerHTML+=`
+        container.innerHTML += `
 
 
         <div class="card">
@@ -258,7 +326,7 @@ export function renderStudents(data = students){
 
         <img
 
-        src="${student.photo}"
+        src="${student.photo || 'assets/students/default.png'}"
 
         style="
         width:120px;
@@ -270,36 +338,28 @@ export function renderStudents(data = students){
 
 
         <h2>
-
         ${student.fullName}
-
         </h2>
 
 
 
         <p>
-
         ID:
         ${student.studentID}
-
         </p>
 
 
 
         <p>
-
         Course:
         ${student.course}
-
         </p>
 
 
 
         <p>
-
         Year:
         ${student.yearLevel}
-
         </p>
 
 
@@ -321,7 +381,6 @@ export function renderStudents(data = students){
 
 
         `;
-
 
 
     });
