@@ -1,23 +1,24 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // QR SCANNER MODULE
-// VERSION 3.0 ATTENDANCE CONNECTED
+// VERSION 3.0 AUTO ATTENDANCE
 // ======================================================
+
+
+import { db } from "./firebase.js";
 
 
 import {
 
     collection,
+
     getDocs,
+
     query,
+
     where
 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-
-
-import { db } from "./firebase.js";
-
 
 
 import {
@@ -25,7 +26,6 @@ import {
     recordAttendance
 
 } from "./attendance.js";
-
 
 
 
@@ -40,11 +40,10 @@ let scanner = null;
 
 
 
-
-
 // ================================
 // OPEN SCANNER
 // ================================
+
 
 export function openScanner(){
 
@@ -61,17 +60,13 @@ document.getElementById(
 
 if(!result){
 
-
 console.error(
 "Scan result container missing"
 );
 
-
 return;
 
-
 }
-
 
 
 
@@ -83,27 +78,21 @@ typeof Html5QrcodeScanner === "undefined"
 ){
 
 
-result.innerHTML = `
-
+result.innerHTML=`
 
 <div class="card">
 
-
 <h3>
-QR Scanner Error
+Scanner Error
 </h3>
-
 
 <p>
 QR library not loaded.
 </p>
 
-
 </div>
 
-
 `;
-
 
 return;
 
@@ -118,28 +107,21 @@ return;
 
 
 scanner =
-
 new Html5QrcodeScanner(
 
 "reader",
 
 {
 
-
 fps:10,
-
 
 qrbox:250
 
-
 },
-
 
 false
 
-
 );
-
 
 
 
@@ -154,22 +136,19 @@ scanner.render(
 async(decodedText)=>{
 
 
-console.log(
 
+console.log(
 "QR SCANNED:",
 decodedText
-
 );
 
 
 
 
+
 await findStudent(
-
 decodedText,
-
 result
-
 );
 
 
@@ -188,7 +167,7 @@ scanner.clear();
 (error)=>{
 
 
-// scanning errors ignored
+// ignore scanning errors
 
 
 }
@@ -213,6 +192,7 @@ scanner.clear();
 // FIND STUDENT
 // ================================
 
+
 async function findStudent(qr,result){
 
 
@@ -221,20 +201,13 @@ try{
 
 
 
-
-
 const q = query(
 
 
-
 collection(
-
 db,
-
 "students"
-
 ),
-
 
 
 
@@ -245,6 +218,7 @@ where(
 "==",
 
 qr
+
 
 )
 
@@ -257,11 +231,48 @@ qr
 
 
 
-
-
-const snapshot =
-
+let snapshot =
 await getDocs(q);
+
+
+
+
+
+
+// fallback kapag old student ID ang QR
+
+if(snapshot.empty){
+
+
+const oldQuery =
+query(
+
+collection(
+db,
+"students"
+),
+
+where(
+
+"studentID",
+
+"==",
+
+qr
+
+)
+
+);
+
+
+
+snapshot =
+await getDocs(oldQuery);
+
+
+
+}
+
 
 
 
@@ -272,9 +283,7 @@ await getDocs(q);
 if(snapshot.empty){
 
 
-
-result.innerHTML = `
-
+result.innerHTML=`
 
 
 <div class="card">
@@ -287,8 +296,11 @@ Student Not Found
 
 
 <p>
+
 QR:
+
 ${qr}
+
 </p>
 
 
@@ -296,8 +308,6 @@ ${qr}
 
 
 `;
-
-
 
 return;
 
@@ -312,7 +322,6 @@ return;
 
 
 let student = null;
-
 
 
 
@@ -343,17 +352,8 @@ id:item.id,
 
 
 
-
-// SAVE ATTENDANCE HERE
-
 const saved =
-
-await recordAttendance(
-
-student
-
-);
-
+await recordAttendance(student);
 
 
 
@@ -366,22 +366,23 @@ if(saved){
 
 
 
-result.innerHTML = `
-
+result.innerHTML=`
 
 
 <div class="card">
 
 
-<h3>
-Attendance Recorded
-</h3>
-
-
-
 <h2>
-${student.fullName}
+✅ Attendance Recorded
 </h2>
+
+
+
+<h3>
+
+${student.fullName}
+
+</h3>
 
 
 
@@ -394,6 +395,7 @@ Student ID:
 ${student.studentID}
 
 </p>
+
 
 
 
@@ -412,10 +414,10 @@ ${student.course}
 <p>
 
 <strong>
-Year:
+Status:
 </strong>
 
-${student.yearLevel}
+Present
 
 </p>
 
@@ -443,18 +445,13 @@ catch(error){
 
 
 console.error(
-
-"QR Search Error:",
-
+"Scanner error:",
 error
-
 );
 
 
 
-
-result.innerHTML = `
-
+result.innerHTML=`
 
 
 <div class="card">
@@ -466,12 +463,13 @@ Error
 
 
 <p>
+
 ${error.message}
+
 </p>
 
 
 </div>
-
 
 
 `;
