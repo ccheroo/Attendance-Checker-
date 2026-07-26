@@ -1,7 +1,7 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // QR SCANNER MODULE
-// VERSION 2.0 FIRESTORE CONNECTED
+// VERSION 3.0 ATTENDANCE CONNECTED
 // ======================================================
 
 
@@ -15,7 +15,16 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
+
 import { db } from "./firebase.js";
+
+
+
+import {
+
+    recordAttendance
+
+} from "./attendance.js";
 
 
 
@@ -24,6 +33,9 @@ import { db } from "./firebase.js";
 
 
 let scanner = null;
+
+
+
 
 
 
@@ -49,11 +61,14 @@ document.getElementById(
 
 if(!result){
 
+
 console.error(
-"Scan result missing"
+"Scan result container missing"
 );
 
+
 return;
+
 
 }
 
@@ -68,15 +83,27 @@ typeof Html5QrcodeScanner === "undefined"
 ){
 
 
-result.innerHTML=`
+result.innerHTML = `
 
-<p style="color:red">
 
-QR Scanner library not loaded.
+<div class="card">
 
+
+<h3>
+QR Scanner Error
+</h3>
+
+
+<p>
+QR library not loaded.
 </p>
 
+
+</div>
+
+
 `;
+
 
 return;
 
@@ -89,22 +116,30 @@ return;
 
 
 
+
 scanner =
+
 new Html5QrcodeScanner(
 
 "reader",
 
 {
 
+
 fps:10,
+
 
 qrbox:250
 
+
 },
+
 
 false
 
+
 );
+
 
 
 
@@ -119,19 +154,24 @@ scanner.render(
 async(decodedText)=>{
 
 
-
 console.log(
-"QR RESULT:",
+
+"QR SCANNED:",
 decodedText
+
 );
 
 
 
 
 await findStudent(
+
 decodedText,
+
 result
+
 );
+
 
 
 
@@ -148,7 +188,7 @@ scanner.clear();
 (error)=>{
 
 
-// ignore scanning errors
+// scanning errors ignored
 
 
 }
@@ -173,7 +213,6 @@ scanner.clear();
 // FIND STUDENT
 // ================================
 
-
 async function findStudent(qr,result){
 
 
@@ -182,13 +221,20 @@ try{
 
 
 
+
+
 const q = query(
 
 
+
 collection(
+
 db,
+
 "students"
+
 ),
+
 
 
 
@@ -199,7 +245,6 @@ where(
 "==",
 
 qr
-
 
 )
 
@@ -212,7 +257,10 @@ qr
 
 
 
+
+
 const snapshot =
+
 await getDocs(q);
 
 
@@ -224,7 +272,10 @@ await getDocs(q);
 if(snapshot.empty){
 
 
-result.innerHTML=`
+
+result.innerHTML = `
+
+
 
 <div class="card">
 
@@ -234,15 +285,19 @@ Student Not Found
 </h3>
 
 
+
 <p>
-QR Code:
+QR:
 ${qr}
 </p>
 
 
 </div>
 
+
 `;
+
+
 
 return;
 
@@ -255,7 +310,10 @@ return;
 
 
 
-let student;
+
+let student = null;
+
+
 
 
 
@@ -265,11 +323,15 @@ snapshot.forEach(item=>{
 
 student={
 
+
 id:item.id,
+
 
 ...item.data()
 
+
 };
+
 
 
 });
@@ -282,7 +344,31 @@ id:item.id,
 
 
 
-result.innerHTML=`
+// SAVE ATTENDANCE HERE
+
+const saved =
+
+await recordAttendance(
+
+student
+
+);
+
+
+
+
+
+
+
+
+
+if(saved){
+
+
+
+result.innerHTML = `
+
+
 
 <div class="card">
 
@@ -292,41 +378,59 @@ Attendance Recorded
 </h3>
 
 
+
+<h2>
+${student.fullName}
+</h2>
+
+
+
 <p>
 
 <strong>
-${student.fullName}
+Student ID:
 </strong>
 
-</p>
-
-
-
-<p>
-ID:
 ${student.studentID}
+
 </p>
 
 
 
 <p>
+
+<strong>
 Course:
+</strong>
+
 ${student.course}
+
+</p>
+
+
+
+<p>
+
+<strong>
+Year:
+</strong>
+
+${student.yearLevel}
+
 </p>
 
 
 
 </div>
 
+
 `;
 
 
 
+}
 
 
-
-
-// dito natin ikakabit ang attendance saving next
 
 
 
@@ -339,25 +443,36 @@ catch(error){
 
 
 console.error(
+
 "QR Search Error:",
+
 error
+
 );
 
 
 
-result.innerHTML=`
+
+result.innerHTML = `
+
+
 
 <div class="card">
+
 
 <h3>
 Error
 </h3>
 
+
 <p>
 ${error.message}
 </p>
 
+
 </div>
+
+
 
 `;
 
