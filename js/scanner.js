@@ -1,8 +1,32 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // QR SCANNER MODULE
-// VERSION 1.0 CLEAN STABLE
+// VERSION 2.0 FIRESTORE CONNECTED
 // ======================================================
+
+
+import {
+
+    collection,
+    getDocs,
+    query,
+    where
+
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+import { db } from "./firebase.js";
+
+
+
+
+
+
+
+let scanner = null;
+
+
+
 
 
 
@@ -10,29 +34,28 @@
 // OPEN SCANNER
 // ================================
 
-
 export function openScanner(){
 
 
 
-    const result =
-    document.getElementById(
-        "scanResult"
-    );
+const result =
+document.getElementById(
+"scanResult"
+);
 
 
 
 
 
-    if(!result){
+if(!result){
 
-        console.error(
-            "Scan result container missing"
-        );
+console.error(
+"Scan result missing"
+);
 
-        return;
+return;
 
-    }
+}
 
 
 
@@ -40,134 +63,307 @@ export function openScanner(){
 
 
 
-    if(typeof Html5QrcodeScanner === "undefined"){
+if(
+typeof Html5QrcodeScanner === "undefined"
+){
 
 
-        result.innerHTML = `
+result.innerHTML=`
 
+<p style="color:red">
 
-        <p style="color:red;">
+QR Scanner library not loaded.
 
-        QR Scanner library not loaded.
+</p>
 
-        </p>
+`;
 
+return;
 
-        `;
 
+}
 
-        console.error(
-            "Html5QrcodeScanner missing"
-        );
 
 
-        return;
 
 
-    }
 
 
+scanner =
+new Html5QrcodeScanner(
 
+"reader",
 
+{
 
+fps:10,
 
+qrbox:250
 
+},
 
+false
 
-    const scanner =
-    new Html5QrcodeScanner(
+);
 
-        "reader",
 
-        {
 
-            fps:10,
 
-            qrbox:250
 
-        },
 
-        false
 
-    );
+scanner.render(
 
 
 
+async(decodedText)=>{
 
 
 
+console.log(
+"QR RESULT:",
+decodedText
+);
 
 
 
-    scanner.render(
 
-        (decodedText)=>{
+await findStudent(
+decodedText,
+result
+);
 
 
 
-            console.log(
-                "QR RESULT:",
-                decodedText
-            );
 
+scanner.clear();
 
 
 
+},
 
-            result.innerHTML = `
 
 
-            <div class="card">
 
+(error)=>{
 
-            <h3>
-            QR Detected
-            </h3>
 
+// ignore scanning errors
 
 
-            <p>
+}
 
-            Student ID:
 
-            <strong>
-            ${decodedText}
-            </strong>
 
+);
 
-            </p>
 
 
+}
 
-            </div>
 
 
 
-            `;
 
 
 
 
 
-            scanner.clear();
+// ================================
+// FIND STUDENT
+// ================================
 
 
+async function findStudent(qr,result){
 
-        },
 
 
+try{
 
-        (errorMessage)=>{
 
 
-            // scanning process errors ignored
+const q = query(
 
 
-        }
+collection(
+db,
+"students"
+),
 
 
 
-    );
+where(
+
+"qrCode",
+
+"==",
+
+qr
+
+
+)
+
+
+
+);
+
+
+
+
+
+
+const snapshot =
+await getDocs(q);
+
+
+
+
+
+
+
+if(snapshot.empty){
+
+
+result.innerHTML=`
+
+<div class="card">
+
+
+<h3>
+Student Not Found
+</h3>
+
+
+<p>
+QR Code:
+${qr}
+</p>
+
+
+</div>
+
+`;
+
+return;
+
+
+}
+
+
+
+
+
+
+
+let student;
+
+
+
+
+snapshot.forEach(item=>{
+
+
+student={
+
+id:item.id,
+
+...item.data()
+
+};
+
+
+});
+
+
+
+
+
+
+
+
+
+result.innerHTML=`
+
+<div class="card">
+
+
+<h3>
+Attendance Recorded
+</h3>
+
+
+<p>
+
+<strong>
+${student.fullName}
+</strong>
+
+</p>
+
+
+
+<p>
+ID:
+${student.studentID}
+</p>
+
+
+
+<p>
+Course:
+${student.course}
+</p>
+
+
+
+</div>
+
+`;
+
+
+
+
+
+
+
+// dito natin ikakabit ang attendance saving next
+
+
+
+}
+
+
+
+catch(error){
+
+
+
+console.error(
+"QR Search Error:",
+error
+);
+
+
+
+result.innerHTML=`
+
+<div class="card">
+
+<h3>
+Error
+</h3>
+
+<p>
+${error.message}
+</p>
+
+</div>
+
+`;
+
+
+
+}
 
 
 
