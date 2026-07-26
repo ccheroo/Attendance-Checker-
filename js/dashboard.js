@@ -1,7 +1,7 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // DASHBOARD
-// VERSION 2.0 FIRESTORE CONNECTED
+// VERSION 2.1 QUICK ACTIONS FUNCTIONAL
 // ======================================================
 
 
@@ -29,7 +29,6 @@ import {
 export function loadDashboard(){
 
 
-
     setTimeout(()=>{
 
 
@@ -39,7 +38,13 @@ export function loadDashboard(){
         loadSubjectCount();
 
 
+        setupQuickActions();
+
+
+
     },100);
+
+
 
 
 
@@ -78,6 +83,7 @@ export function loadDashboard(){
 
 
 
+
 return `
 
 
@@ -100,7 +106,6 @@ ${date} • ${time}
 
 
 
-
 <div class="grid">
 
 
@@ -109,9 +114,7 @@ ${date} • ${time}
 
 
 <h3>
-
 Total Students
-
 </h3>
 
 
@@ -128,22 +131,16 @@ Loading...
 
 
 
-
-
 <div class="card stat-card">
 
 
 <h3>
-
 Present Today
-
 </h3>
 
 
 <h1 id="presentToday">
-
 0
-
 </h1>
 
 
@@ -153,22 +150,16 @@ Present Today
 
 
 
-
-
 <div class="card stat-card">
 
 
 <h3>
-
 Subjects
-
 </h3>
 
 
 <h1 id="totalSubjects">
-
 0
-
 </h1>
 
 
@@ -178,22 +169,16 @@ Subjects
 
 
 
-
-
 <div class="card stat-card">
 
 
 <h3>
-
 Attendance Rate
-
 </h3>
 
 
 <h1 id="attendanceRate">
-
 0%
-
 </h1>
 
 
@@ -230,16 +215,12 @@ gap:25px;
 
 
 
-
 <div class="card">
 
 
 <h2>
-
 Quick Actions
-
 </h2>
-
 
 
 
@@ -258,9 +239,7 @@ Student Management
 
 
 
-
 <br><br>
-
 
 
 
@@ -279,9 +258,7 @@ Open QR Scanner
 
 
 
-
 <br><br>
-
 
 
 
@@ -300,7 +277,6 @@ Download Reports
 
 
 
-
 </div>
 
 
@@ -315,20 +291,15 @@ Download Reports
 
 
 <h2>
-
 Recent Attendance
-
 </h2>
-
 
 
 
 <div id="recentAttendance">
 
-
 No attendance records yet.
 
-
 </div>
 
 
@@ -340,14 +311,146 @@ No attendance records yet.
 
 
 
-
 </div>
-
 
 
 
 
 `;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ================================
+// QUICK ACTIONS
+// ================================
+
+
+function setupQuickActions(){
+
+
+
+const studentBtn =
+document.getElementById(
+"openStudents"
+);
+
+
+
+const scannerBtn =
+document.getElementById(
+"openScanner"
+);
+
+
+
+const reportsBtn =
+document.getElementById(
+"openReports"
+);
+
+
+
+
+
+if(studentBtn){
+
+
+studentBtn.onclick = ()=>{
+
+
+const menu =
+document.querySelector(
+'[data-page="students"]'
+);
+
+
+
+if(menu){
+
+menu.click();
+
+}
+
+
+
+};
+
+
+}
+
+
+
+
+
+
+
+if(scannerBtn){
+
+
+scannerBtn.onclick = ()=>{
+
+
+const menu =
+document.querySelector(
+'[data-page="scanner"]'
+);
+
+
+
+if(menu){
+
+menu.click();
+
+}
+
+
+
+};
+
+
+}
+
+
+
+
+
+
+
+if(reportsBtn){
+
+
+reportsBtn.onclick = ()=>{
+
+
+const menu =
+document.querySelector(
+'[data-page="reports"]'
+);
+
+
+
+if(menu){
+
+menu.click();
+
+}
+
+
+
+};
+
+
+}
 
 
 
@@ -375,12 +478,9 @@ collection(db,"students");
 
 
 
-
-
 onSnapshot(
 
 studentRef,
-
 
 (snapshot)=>{
 
@@ -419,7 +519,6 @@ snapshot.size;
 
 
 
-
 // ================================
 // SUBJECT COUNT
 // ================================
@@ -429,17 +528,13 @@ async function loadSubjectCount(){
 
 
 
-const subjectRef =
-collection(db,"subjects");
-
-
-
 try{
 
 
 const snapshot =
-await getDocs(subjectRef);
-
+await getDocs(
+collection(db,"subjects")
+);
 
 
 
@@ -447,7 +542,6 @@ const counter =
 document.getElementById(
 "totalSubjects"
 );
-
 
 
 
@@ -462,19 +556,11 @@ snapshot.size;
 
 
 
-
 }
 
 
 
 catch(error){
-
-
-
-console.log(
-"Subjects collection not created yet."
-);
-
 
 
 const counter =
@@ -489,7 +575,6 @@ if(counter){
 counter.innerHTML = 0;
 
 }
-
 
 
 }
