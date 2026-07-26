@@ -1,7 +1,7 @@
 // ================================
 // ATTENDANCE CHECKER
 // MAIN APPLICATION
-// VERSION 2.3 FIXED BUTTON SYSTEM
+// VERSION 2.4 PHOTO UPLOAD READY
 // ================================
 
 
@@ -20,9 +20,27 @@ import {
 
 
 
+import { storage } from "./firebase.js";
+
+
+import {
+
+    ref,
+
+    uploadBytes,
+
+    getDownloadURL
+
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+
+
+
+
 const mainContent = document.getElementById("mainContent");
 
 const menuButtons = document.querySelectorAll(".menu");
+
 
 
 
@@ -78,13 +96,11 @@ function loadPage(page){
             break;
 
 
-
         case "students":
 
             students();
 
             break;
-
 
 
         case "courses":
@@ -94,13 +110,11 @@ function loadPage(page){
             break;
 
 
-
         case "subjects":
 
             placeholder("Subjects");
 
             break;
-
 
 
         case "scanner":
@@ -110,7 +124,6 @@ function loadPage(page){
             break;
 
 
-
         case "attendance":
 
             placeholder("Attendance");
@@ -118,13 +131,11 @@ function loadPage(page){
             break;
 
 
-
         case "reports":
 
             placeholder("Reports");
 
             break;
-
 
 
         case "settings":
@@ -138,7 +149,6 @@ function loadPage(page){
 
 
 }
-
 
 
 
@@ -163,6 +173,7 @@ function dashboard(){
 
 
 
+
 // ================================
 // STUDENTS
 // ================================
@@ -175,8 +186,11 @@ mainContent.innerHTML = `
 
 
 <h1 class="page-title">
+
 Students
+
 </h1>
+
 
 
 
@@ -189,32 +203,76 @@ Register Student
 
 
 
-<input 
+
+<input
+
 id="fullName"
-placeholder="Full Name">
+
+placeholder="Full Name"
+
+>
 
 
 
-<input 
+
+<input
+
 id="studentID"
-placeholder="Student ID">
+
+placeholder="Student ID"
+
+>
 
 
 
-<input 
+
+<input
+
 id="course"
-placeholder="Course">
+
+placeholder="Course"
+
+>
 
 
 
-<input 
+
+<input
+
 id="yearLevel"
-placeholder="Year Level">
+
+placeholder="Year Level"
+
+>
 
 
 
-<button 
-class="button" 
+
+<label>
+
+Student Photo
+
+</label>
+
+
+
+<input
+
+type="file"
+
+id="studentPhoto"
+
+accept="image/*"
+
+>
+
+
+
+
+<button
+
+class="button"
+
 id="addStudentBtn">
 
 Add Student
@@ -229,12 +287,18 @@ Add Student
 
 
 
+
+
 <div class="card" style="margin-top:25px">
 
 
-<input 
+<input
+
 id="searchStudent"
-placeholder="Search Student">
+
+placeholder="Search Student"
+
+>
 
 
 </div>
@@ -243,8 +307,11 @@ placeholder="Search Student">
 
 
 
-<div 
+
+<div
+
 id="studentContainer"
+
 class="grid">
 
 </div>
@@ -258,21 +325,26 @@ class="grid">
 
 
 
+
+
 // ================================
 // ADD BUTTON
 // ================================
 
 
 const addButton = document.getElementById(
-    "addStudentBtn"
+"addStudentBtn"
 );
+
+
 
 
 
 console.log(
-    "ADD BUTTON:",
-    addButton
+"ADD BUTTON:",
+addButton
 );
+
 
 
 
@@ -286,56 +358,46 @@ addButton.onclick = async function(){
 
 
 console.log(
-    "ADD BUTTON CLICKED"
+"ADD BUTTON CLICKED"
 );
 
 
 
 
-const student = {
 
-
-fullName:
-
-document
+const fullName = document
 .getElementById("fullName")
 .value
-.trim(),
+.trim();
 
 
 
-studentID:
-
-document
+const studentID = document
 .getElementById("studentID")
 .value
-.trim(),
+.trim();
 
 
 
-course:
-
-document
+const course = document
 .getElementById("course")
 .value
-.trim(),
+.trim();
 
 
 
-yearLevel:
-
-document
+const yearLevel = document
 .getElementById("yearLevel")
 .value
-.trim(),
+.trim();
 
 
 
-photo:""
+const photoFile =
+document
+.getElementById("studentPhoto")
+.files[0];
 
-
-
-};
 
 
 
@@ -344,19 +406,21 @@ photo:""
 
 if(
 
-!student.fullName ||
+!fullName ||
 
-!student.studentID ||
+!studentID ||
 
-!student.course ||
+!course ||
 
-!student.yearLevel
+!yearLevel ||
+
+!photoFile
 
 ){
 
 
 alert(
-"Please complete all fields."
+"Please complete all fields and upload a photo."
 );
 
 
@@ -369,16 +433,90 @@ return;
 
 
 
+
 try{
+
+
+
+// ================================
+// UPLOAD PHOTO
+// ================================
+
+
+const imageRef = ref(
+
+storage,
+
+"students/" 
++ studentID 
++ "_" 
++ photoFile.name
+
+);
+
+
+
+
+
+await uploadBytes(
+
+imageRef,
+
+photoFile
+
+);
+
+
+
+
+
+const photoURL = await getDownloadURL(
+
+imageRef
+
+);
+
+
+
+
+
+
+// ================================
+// SAVE STUDENT
+// ================================
+
+
+const student = {
+
+
+fullName,
+
+studentID,
+
+course,
+
+yearLevel,
+
+photo: photoURL
+
+
+};
+
+
+
 
 
 await addStudent(student);
 
 
 
+
+
 alert(
 "Student saved successfully!"
 );
+
+
 
 
 
@@ -391,9 +529,16 @@ document.getElementById("course").value="";
 
 document.getElementById("yearLevel").value="";
 
+document.getElementById("studentPhoto").value="";
+
+
+
 
 
 }
+
+
+
 
 
 catch(error){
@@ -403,8 +548,13 @@ console.error(error);
 
 
 alert(
-"Saving failed: " + error.message
+
+"Saving failed: "
++
+error.message
+
 );
+
 
 
 }
@@ -416,6 +566,7 @@ alert(
 
 
 }
+
 
 
 
@@ -443,10 +594,11 @@ console.error(
 // ================================
 
 
-const searchBox =
-document.getElementById(
+const searchBox = document.getElementById(
 "searchStudent"
 );
+
+
 
 
 
@@ -454,7 +606,9 @@ if(searchBox){
 
 
 searchBox.addEventListener(
+
 "input",
+
 (e)=>{
 
 
@@ -474,9 +628,11 @@ e.target.value
 
 
 
+
 // ================================
-// LOAD FIREBASE DATA
+// LOAD STUDENTS
 // ================================
+
 
 try{
 
@@ -509,6 +665,7 @@ error
 
 
 
+
 // ================================
 // PLACEHOLDER
 // ================================
@@ -531,13 +688,17 @@ ${title}
 
 
 <h2>
+
 ${title}
+
 </h2>
 
 
 
 <p>
+
 This module will be built next.
+
 </p>
 
 
@@ -551,6 +712,7 @@ This module will be built next.
 
 
 }
+
 
 
 
