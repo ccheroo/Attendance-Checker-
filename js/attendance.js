@@ -1,7 +1,7 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // FIRESTORE ATTENDANCE MANAGEMENT
-// VERSION 1.0 QR READY
+// VERSION 2.0 QR CONNECTED STABLE
 // ======================================================
 
 
@@ -15,6 +15,7 @@ import {
     getDocs,
     query,
     where,
+    orderBy,
     serverTimestamp
 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -23,8 +24,10 @@ import {
 
 
 
+
 const attendanceCollection =
 collection(db,"attendance");
+
 
 
 
@@ -50,12 +53,13 @@ export async function recordAttendance(student){
 
 
 
-        // CHECK DUPLICATE
 
-        const q =
+        const check =
         query(
 
+
             attendanceCollection,
+
 
             where(
                 "studentID",
@@ -63,11 +67,13 @@ export async function recordAttendance(student){
                 student.studentID
             ),
 
+
             where(
                 "date",
                 "==",
                 today
             )
+
 
         );
 
@@ -75,8 +81,11 @@ export async function recordAttendance(student){
 
 
 
+
         const existing =
-        await getDocs(q);
+        await getDocs(check);
+
+
 
 
 
@@ -104,7 +113,9 @@ export async function recordAttendance(student){
 
         await addDoc(
 
+
             attendanceCollection,
+
 
             {
 
@@ -140,6 +151,11 @@ export async function recordAttendance(student){
 
 
 
+                status:
+                "Present",
+
+
+
                 createdAt:
                 serverTimestamp()
 
@@ -154,8 +170,14 @@ export async function recordAttendance(student){
 
 
 
+
+
         alert(
-            "Attendance recorded!"
+
+            student.fullName
+            +
+            " attendance recorded!"
+
         );
 
 
@@ -172,9 +194,12 @@ export async function recordAttendance(student){
 
 
         console.error(
-            "Attendance error:",
+
+            "Attendance save error:",
             error
+
         );
+
 
 
         alert(
@@ -182,11 +207,13 @@ export async function recordAttendance(student){
         );
 
 
+
         return false;
 
 
 
     }
+
 
 
 }
@@ -206,17 +233,37 @@ export async function recordAttendance(student){
 export async function loadAttendance(){
 
 
+
     try{
 
 
         const snapshot =
+
         await getDocs(
-            attendanceCollection
+
+            query(
+
+                attendanceCollection,
+
+                orderBy(
+                    "createdAt",
+                    "desc"
+                )
+
+            )
+
         );
 
 
 
+
+
+
+
         let records=[];
+
+
+
 
 
 
@@ -236,7 +283,12 @@ export async function loadAttendance(){
 
 
 
+
+
+
+
         renderAttendance(records);
+
 
 
 
@@ -248,8 +300,10 @@ export async function loadAttendance(){
 
 
         console.error(
+
             "Load attendance error:",
             error
+
         );
 
 
@@ -266,22 +320,28 @@ export async function loadAttendance(){
 
 
 
+
 // ================================
-// DISPLAY
+// DISPLAY ATTENDANCE
 // ================================
 
 export function renderAttendance(records){
 
 
+
 const container =
+
 document.getElementById(
 "attendanceContainer"
 );
 
 
 
+
+
 if(!container)
 return;
+
 
 
 
@@ -293,22 +353,30 @@ container.innerHTML="";
 
 
 
+
 if(records.length===0){
 
 
 container.innerHTML=`
 
+
 <div class="empty-card">
+
 
 <h2>
 No Attendance Yet
 </h2>
 
+
+
 <p>
 Scan student QR codes.
 </p>
 
+
+
 </div>
+
 
 `;
 
@@ -316,6 +384,7 @@ return;
 
 
 }
+
 
 
 
@@ -334,11 +403,17 @@ container.innerHTML += `
 
 <div class="student-avatar">
 
-${record.fullName
+${
+
+(record.fullName || "?")
 .charAt(0)
-.toUpperCase()}
+.toUpperCase()
+
+}
 
 </div>
+
+
 
 
 
@@ -353,9 +428,13 @@ ${record.fullName}
 
 
 
+
+
 <p>
 
-<strong>ID:</strong>
+<strong>
+ID:
+</strong>
 
 ${record.studentID}
 
@@ -363,9 +442,27 @@ ${record.studentID}
 
 
 
+
+
 <p>
 
-<strong>Date:</strong>
+<strong>
+Course:
+</strong>
+
+${record.course || "N/A"}
+
+</p>
+
+
+
+
+
+<p>
+
+<strong>
+Date:
+</strong>
 
 ${record.date}
 
@@ -373,13 +470,33 @@ ${record.date}
 
 
 
+
+
 <p>
 
-<strong>Time:</strong>
+<strong>
+Time:
+</strong>
 
 ${record.time}
 
 </p>
+
+
+
+
+
+<p>
+
+<strong>
+Status:
+</strong>
+
+${record.status}
+
+</p>
+
+
 
 
 
