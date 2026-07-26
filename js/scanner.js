@@ -1,32 +1,26 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // QR SCANNER MODULE
-// VERSION 3.0 AUTO ATTENDANCE
+// VERSION 3.0 ATTENDANCE CONNECTED
 // ======================================================
+
+
+import {
+
+    collection,
+    getDocs,
+    query,
+    where
+
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
 import { db } from "./firebase.js";
 
 
 import {
-
-    collection,
-
-    getDocs,
-
-    query,
-
-    where
-
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-
-import {
-
     recordAttendance
-
 } from "./attendance.js";
-
 
 
 
@@ -57,17 +51,8 @@ document.getElementById(
 
 
 
-
-if(!result){
-
-console.error(
-"Scan result container missing"
-);
-
+if(!result)
 return;
-
-}
-
 
 
 
@@ -94,12 +79,11 @@ QR library not loaded.
 
 `;
 
+
 return;
 
 
 }
-
-
 
 
 
@@ -136,7 +120,6 @@ scanner.render(
 async(decodedText)=>{
 
 
-
 console.log(
 "QR SCANNED:",
 decodedText
@@ -144,14 +127,10 @@ decodedText
 
 
 
-
-
 await findStudent(
 decodedText,
 result
 );
-
-
 
 
 
@@ -163,11 +142,7 @@ scanner.clear();
 
 
 
-
 (error)=>{
-
-
-// ignore scanning errors
 
 
 }
@@ -193,86 +168,42 @@ scanner.clear();
 // ================================
 
 
-async function findStudent(qr,result){
-
+async function findStudent(
+qr,
+result
+){
 
 
 try{
 
 
 
-const q = query(
-
-
-collection(
-db,
-"students"
-),
-
-
-
-where(
-
-"qrCode",
-
-"==",
-
-qr
-
-
-)
-
-
-
-);
-
-
-
-
-
-
-let snapshot =
-await getDocs(q);
-
-
-
-
-
-
-// fallback kapag old student ID ang QR
-
-if(snapshot.empty){
-
-
-const oldQuery =
+const q =
 query(
 
+
 collection(
 db,
 "students"
 ),
 
+
 where(
-
-"studentID",
-
+"qrCode",
 "==",
-
 qr
-
 )
+
 
 );
 
 
 
-snapshot =
-await getDocs(oldQuery);
 
 
 
-}
-
+const snapshot =
+await getDocs(q);
 
 
 
@@ -285,27 +216,20 @@ if(snapshot.empty){
 
 result.innerHTML=`
 
-
 <div class="card">
-
 
 <h3>
 Student Not Found
 </h3>
 
 
-
 <p>
-
 QR:
-
 ${qr}
-
 </p>
 
 
 </div>
-
 
 `;
 
@@ -320,8 +244,8 @@ return;
 
 
 
-
 let student = null;
+
 
 
 
@@ -334,7 +258,6 @@ student={
 
 
 id:item.id,
-
 
 ...item.data()
 
@@ -352,8 +275,12 @@ id:item.id,
 
 
 
+
+// SAVE ATTENDANCE
+
 const saved =
 await recordAttendance(student);
+
 
 
 
@@ -365,9 +292,7 @@ await recordAttendance(student);
 if(saved){
 
 
-
 result.innerHTML=`
-
 
 <div class="card">
 
@@ -378,47 +303,34 @@ result.innerHTML=`
 
 
 
-<h3>
+<p>
 
+<strong>
 ${student.fullName}
+</strong>
 
-</h3>
+</p>
+
 
 
 
 <p>
-
-<strong>
-Student ID:
-</strong>
-
+ID:
 ${student.studentID}
-
 </p>
 
 
 
-
 <p>
-
-<strong>
 Course:
-</strong>
-
 ${student.course}
-
 </p>
 
 
 
 <p>
-
-<strong>
 Status:
-</strong>
-
 Present
-
 </p>
 
 
@@ -436,12 +348,13 @@ Present
 
 
 
+
+
 }
 
 
 
 catch(error){
-
 
 
 console.error(
@@ -453,7 +366,6 @@ error
 
 result.innerHTML=`
 
-
 <div class="card">
 
 
@@ -463,9 +375,7 @@ Error
 
 
 <p>
-
 ${error.message}
-
 </p>
 
 
