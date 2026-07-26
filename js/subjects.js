@@ -1,7 +1,7 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // FIRESTORE SUBJECT MANAGEMENT
-// VERSION 1.0 CLEAN
+// VERSION 1.1 POLISHED
 // ======================================================
 
 
@@ -24,8 +24,11 @@ import {
 let subjects = [];
 
 
+
 const subjectCollection =
 collection(db,"subjects");
+
+
 
 
 
@@ -69,6 +72,13 @@ export async function loadSubjects(){
 
 
 
+        console.log(
+            "Subjects loaded:",
+            subjects.length
+        );
+
+
+
     }
 
 
@@ -93,6 +103,7 @@ export async function loadSubjects(){
 
 
 
+
 // ================================
 // ADD SUBJECT
 // ================================
@@ -109,10 +120,22 @@ export async function addSubject(subject){
 
             {
 
-                ...subject,
+
+                name:
+                subject.name,
+
+
+                code:
+                subject.code,
+
+
+                instructor:
+                subject.instructor || "Not Assigned",
+
 
                 createdAt:
                 serverTimestamp()
+
 
             }
 
@@ -131,10 +154,14 @@ export async function addSubject(subject){
     }
 
 
+
     catch(error){
 
 
-        console.error(error);
+        console.error(
+            "Add subject error:",
+            error
+        );
 
 
         alert(
@@ -165,23 +192,43 @@ export async function addSubject(subject){
 export async function deleteSubject(id){
 
 
-    await deleteDoc(
-
-        doc(
-
-            db,
-
-            "subjects",
-
-            id
-
-        )
-
-    );
+    try{
 
 
+        await deleteDoc(
 
-    await loadSubjects();
+            doc(
+
+                db,
+
+                "subjects",
+
+                id
+
+            )
+
+        );
+
+
+
+        await loadSubjects();
+
+
+
+    }
+
+
+    catch(error){
+
+
+        alert(
+            "Delete failed: "
+            +
+            error.message
+        );
+
+
+    }
 
 
 }
@@ -195,7 +242,7 @@ export async function deleteSubject(id){
 
 
 // ================================
-// DISPLAY
+// DISPLAY SUBJECTS
 // ================================
 
 export function renderSubjects(){
@@ -250,7 +297,9 @@ return;
 
 
 
+
 subjects.forEach(subject=>{
+
 
 
 container.innerHTML+=`
@@ -264,6 +313,7 @@ container.innerHTML+=`
 ${subject.code.charAt(0)}
 
 </div>
+
 
 
 
@@ -290,15 +340,18 @@ ${subject.code}
 
 
 
+
 <p>
 
 <strong>
 Instructor:
 </strong>
 
-${subject.instructor}
+${subject.instructor || "Not Assigned"}
 
 </p>
+
+
 
 
 
@@ -330,6 +383,9 @@ Delete
 
 
 }
+
+
+
 
 
 
