@@ -1,0 +1,283 @@
+/* ======================================================
+   ATTENDANCE CHECKER
+   DASHBOARD
+====================================================== */
+
+.dashboard{
+    display:flex;
+    min-height:100vh;
+}
+
+/* ===========================
+   SIDEBAR
+=========================== */
+
+.sidebar{
+    width:280px;
+    background:rgba(255,255,255,.14);
+    backdrop-filter:blur(20px);
+    border-right:1px solid rgba(255,255,255,.18);
+    padding:40px 25px;
+    display:flex;
+    flex-direction:column;
+}
+
+.sidebar h2{
+    color:#fff;
+    font-size:1.8rem;
+    font-weight:700;
+    margin-bottom:50px;
+}
+
+.sidebar nav{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.sidebar nav a{
+
+    text-decoration:none;
+    color:#fff;
+
+    padding:15px 20px;
+
+    border-radius:14px;
+
+    transition:.30s;
+
+    font-weight:500;
+
+}
+
+.sidebar nav a:hover{
+
+    background:rgba(255,255,255,.18);
+
+}
+
+.sidebar nav .active{
+
+    background:linear-gradient(135deg,#0A6EBD,#5CB8E4);
+
+}
+
+/* ===========================
+CONTENT
+=========================== */
+
+.content{
+
+    flex:1;
+
+    padding:45px;
+
+}
+
+.content header{
+
+    margin-bottom:35px;
+
+}
+
+.content h1{
+
+    color:white;
+
+    font-size:2.3rem;
+
+}
+
+/* ===========================
+STAT CARDS
+=========================== */
+
+.cards{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:25px;
+
+    margin-bottom:50px;
+
+}
+
+.card{
+
+    background:rgba(255,255,255,.16);
+
+    backdrop-filter:blur(18px);
+
+    border:1px solid rgba(255,255,255,.22);
+
+    border-radius:22px;
+
+    padding:28px;
+
+    transition:.35s;
+
+    color:white;
+
+}
+
+.card:hover{
+
+    transform:translateY(-6px);
+
+}
+
+.card h3{
+
+    font-size:1rem;
+
+    opacity:.9;
+
+    margin-bottom:18px;
+
+}
+
+.card h2{
+
+    font-size:2.4rem;
+
+    font-weight:700;
+
+}
+
+/* ===========================
+SUBJECTS
+=========================== */
+
+.subjects h2{
+
+    color:white;
+
+    margin-bottom:25px;
+
+}
+
+.subject-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+
+    gap:25px;
+
+}
+
+/* ===========================
+SUBJECT CARD
+=========================== */
+
+.subject-card{
+
+    background:rgba(255,255,255,.15);
+
+    border:1px solid rgba(255,255,255,.18);
+
+    backdrop-filter:blur(20px);
+
+    border-radius:22px;
+
+    padding:30px;
+
+    transition:.35s;
+
+}
+
+.subject-card:hover{
+
+    transform:translateY(-8px);
+
+}
+
+.subject-card h3{
+
+    color:white;
+
+    margin-bottom:25px;
+
+    font-size:1.2rem;
+
+}
+
+.subject-card button{
+
+    width:100%;
+
+    border:none;
+
+    outline:none;
+
+    cursor:pointer;
+
+    border-radius:14px;
+
+    padding:14px;
+
+    color:white;
+
+    font-family:Poppins;
+
+    font-weight:600;
+
+    background:linear-gradient(135deg,#0A6EBD,#5CB8E4);
+
+}
+
+.subject-card button:hover{
+
+    opacity:.9;
+
+}
+
+/* ===========================
+RESPONSIVE
+=========================== */
+
+@media(max-width:1200px){
+
+.cards{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+@media(max-width:900px){
+
+.dashboard{
+
+flex-direction:column;
+
+}
+
+.sidebar{
+
+width:100%;
+
+}
+
+.cards{
+
+grid-template-columns:1fr;
+
+}
+
+.subject-grid{
+
+grid-template-columns:1fr;
+
+}
+
+.content{
+
+padding:25px;
+
+}
+
+}
