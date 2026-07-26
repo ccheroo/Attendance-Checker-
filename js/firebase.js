@@ -1,11 +1,11 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // FIREBASE CONNECTION
-// VERSION 1.0
+// VERSION 1.1
 // ======================================================
 
 
-// Firebase imports
+// Firebase Imports
 
 import { initializeApp } 
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -20,6 +20,7 @@ from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 
 
+
 // Firebase Configuration
 
 const firebaseConfig = {
@@ -30,7 +31,7 @@ const firebaseConfig = {
 
     projectId: "attendance-checker-3f355",
 
-    storageBucket: "attendance-checker-3f355.firebasestorage.app",
+    storageBucket: "attendance-checker-3f355.appspot.com",
 
     messagingSenderId: "962480612505",
 
@@ -47,15 +48,25 @@ const app = initializeApp(firebaseConfig);
 
 
 
-// Database
+
+// Firestore Database
 
 const db = getFirestore(app);
 
 
 
-// Storage for student photos
+
+// Firebase Storage
 
 const storage = getStorage(app);
+
+
+
+
+// Test Connection
+
+console.log("Firebase connected successfully");
+
 
 
 
