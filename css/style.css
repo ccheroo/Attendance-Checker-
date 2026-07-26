@@ -1,14 +1,17 @@
 /* ===========================================================
    ATTENDANCE CHECKER
-   VERSION 1.0
+   VERSION 2.0
    GLOBAL DESIGN SYSTEM
 =========================================================== */
+
 
 /* =======================
    GOOGLE FONT
 ======================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+
 
 /* =======================
    ROOT VARIABLES
@@ -17,7 +20,9 @@
 :root{
 
     --primary:#0B6FBF;
+
     --secondary:#53B7E8;
+
     --accent:#7FD3F7;
 
     --dark:#0A2740;
@@ -36,6 +41,8 @@
 
 }
 
+
+
 /* =======================
    RESET
 ======================= */
@@ -50,11 +57,14 @@
 
 }
 
+
+
 /* =======================
    BODY
 ======================= */
 
 body{
+
 
     font-family:"Poppins",sans-serif;
 
@@ -64,7 +74,11 @@ body{
 
     min-height:100vh;
 
+
 }
+
+
+
 
 /* =======================
    BACKGROUND
@@ -72,9 +86,11 @@ body{
 
 #background{
 
+
     position:fixed;
 
     inset:0;
+
 
     background:
 
@@ -88,6 +104,7 @@ body{
 
     url("../assets/backgrounds/ocean.jpg");
 
+
     background-size:cover;
 
     background-position:center;
@@ -98,47 +115,70 @@ body{
 
     z-index:-2;
 
+
 }
+
+
+
+
 
 /* =======================
    APP
 ======================= */
 
+
 #app{
+
 
     display:flex;
 
     min-height:100vh;
 
+
 }
+
+
+
+
 
 /* =======================
    SIDEBAR
 ======================= */
 
+
 #sidebar{
+
 
     width:285px;
 
     padding:35px 25px;
 
+
     display:flex;
 
     flex-direction:column;
 
-    background:rgba(255,255,255,.10);
+
+    background:
+
+    rgba(255,255,255,.10);
+
 
     backdrop-filter:blur(18px);
 
-    border-right:1px solid rgba(255,255,255,.18);
+
+    border-right:
+
+    1px solid rgba(255,255,255,.18);
+
 
 }
 
-/* =======================
-   LOGO
-======================= */
+
+
 
 .logo{
+
 
     font-size:1.9rem;
 
@@ -146,13 +186,19 @@ body{
 
     margin-bottom:45px;
 
+
 }
 
+
+
+
 /* =======================
-   NAVIGATION
+   MENU
 ======================= */
 
+
 nav{
+
 
     display:flex;
 
@@ -160,71 +206,106 @@ nav{
 
     gap:14px;
 
+
 }
+
+
+
 
 .menu{
 
+
     width:100%;
+
 
     border:none;
 
     cursor:pointer;
 
+
     font-family:Poppins;
+
 
     font-size:15px;
 
+
     color:white;
+
 
     background:transparent;
 
+
     padding:16px;
+
 
     text-align:left;
 
+
     border-radius:16px;
+
 
     transition:var(--transition);
 
+
 }
+
+
+
+
 
 .menu:hover{
 
+
     background:rgba(255,255,255,.15);
 
+
 }
+
+
+
 
 .menu.active{
 
-    background:linear-gradient(
 
-    135deg,
+    background:
 
-    var(--primary),
+    linear-gradient(
 
-    var(--secondary)
+        135deg,
+
+        var(--primary),
+
+        var(--secondary)
 
     );
 
+
 }
+
+
+
+
 
 /* =======================
    MAIN CONTENT
 ======================= */
 
+
 #mainContent{
+
 
     flex:1;
 
     padding:40px;
 
+
 }
 
-/* =======================
-   PAGE TITLE
-======================= */
+
+
 
 .page-title{
+
 
     font-size:2.3rem;
 
@@ -232,115 +313,190 @@ nav{
 
     margin-bottom:30px;
 
+
 }
 
+
+
+
+
 /* =======================
-   CARD GRID
+   GENERAL GRID
 ======================= */
+
 
 .grid{
 
+
     display:grid;
 
-    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+
+    grid-template-columns:
+
+    repeat(auto-fit,minmax(260px,1fr));
+
 
     gap:25px;
 
+
 }
 
+
+
+
+
 /* =======================
-   GLASS CARD
+   CARD
 ======================= */
+
 
 .card{
 
-    background:var(--glass);
 
-    border:1px solid var(--glassBorder);
+    background:
+
+    var(--glass);
+
+
+    border:
+
+    1px solid var(--glassBorder);
+
 
     backdrop-filter:blur(18px);
 
+
     border-radius:var(--radius);
+
 
     padding:25px;
 
+
     box-shadow:var(--shadow);
+
 
     transition:var(--transition);
 
+
 }
+
+
+
+
 
 .card:hover{
 
+
     transform:translateY(-6px);
+
 
 }
 
+
+
+
+
 .card h2{
+
 
     font-size:1.1rem;
 
     margin-bottom:15px;
 
+
 }
 
+
+
+
 .card h1{
+
 
     font-size:2.5rem;
 
     font-weight:700;
 
+
 }
+
+
+
+
 
 /* =======================
    BUTTON
 ======================= */
 
+
 .button{
 
+
     display:inline-flex;
+
 
     align-items:center;
 
     justify-content:center;
 
+
     padding:14px 24px;
+
 
     border:none;
 
+
     cursor:pointer;
+
 
     font-family:Poppins;
 
+
     font-weight:600;
+
 
     border-radius:16px;
 
-    background:linear-gradient(
 
-    135deg,
+    background:
 
-    var(--primary),
+    linear-gradient(
 
-    var(--secondary)
+        135deg,
+
+        var(--primary),
+
+        var(--secondary)
 
     );
 
+
     color:white;
+
 
     transition:var(--transition);
 
+
 }
+
+
+
 
 .button:hover{
 
+
     transform:translateY(-3px);
+
 
 }
 
+
+
+
+
 /* =======================
-   INPUTS
+   INPUT
 ======================= */
+
 
 input,
 
@@ -348,231 +504,398 @@ select,
 
 textarea{
 
+
     width:100%;
+
 
     margin-top:8px;
 
+
     margin-bottom:18px;
+
 
     border:none;
 
+
     outline:none;
+
 
     padding:15px;
 
+
     border-radius:14px;
+
 
     font-family:Poppins;
 
-    background:rgba(255,255,255,.15);
+
+    background:
+
+    rgba(255,255,255,.15);
+
 
     color:white;
 
-    border:1px solid rgba(255,255,255,.18);
+
+    border:
+
+    1px solid rgba(255,255,255,.18);
+
 
 }
+
+
+
 
 input::placeholder,
 
 textarea::placeholder{
 
-    color:rgba(255,255,255,.75);
+
+    color:
+
+    rgba(255,255,255,.75);
+
 
 }
 
-select option{
 
-    color:#000;
+
+
+
+
+
+/* ===========================================================
+   STUDENT MANAGEMENT
+=========================================================== */
+
+
+
+.student-grid{
+
+
+    display:grid;
+
+
+    grid-template-columns:
+
+    repeat(auto-fit,minmax(320px,1fr));
+
+
+    gap:25px;
+
 
 }
 
-/* =======================
-   TABLE CARD
-======================= */
 
-.table-card{
 
-    margin-top:30px;
 
-    overflow:auto;
+
+
+.student-card{
+
+
+    display:flex;
+
+
+    align-items:center;
+
+
+    gap:20px;
+
+
+    padding:25px;
+
+
+    background:
+
+    linear-gradient(
+
+        135deg,
+
+        rgba(255,255,255,.18),
+
+        rgba(255,255,255,.08)
+
+    );
+
+
+    border:
+
+    1px solid rgba(255,255,255,.20);
+
+
+    backdrop-filter:blur(20px);
+
+
+    border-radius:24px;
+
+
+    box-shadow:var(--shadow);
+
+
+    transition:.35s ease;
+
 
 }
 
-table{
 
-    width:100%;
 
-    border-collapse:collapse;
+
+
+.student-card:hover{
+
+
+    transform:translateY(-8px);
+
 
 }
 
-th{
 
-    padding:18px;
 
-    text-align:left;
+
+
+.student-avatar{
+
+
+    width:80px;
+
+
+    height:80px;
+
+
+    border-radius:50%;
+
+
+    display:flex;
+
+
+    justify-content:center;
+
+
+    align-items:center;
+
+
+    font-size:32px;
+
+
+    font-weight:700;
+
+
+    background:
+
+    linear-gradient(
+
+        135deg,
+
+        var(--primary),
+
+        var(--secondary)
+
+    );
+
+
+    color:white;
+
+
+}
+
+
+
+
+
+.student-info{
+
+
+    flex:1;
+
+
+}
+
+
+
+
+.student-info h2{
+
+
+    margin-bottom:10px;
+
+
+    font-size:1.2rem;
+
+
+}
+
+
+
+
+
+.student-info p{
+
+
+    margin-bottom:6px;
+
+
+    font-size:.9rem;
+
+
+    color:
+
+    rgba(255,255,255,.85);
+
+
+}
+
+
+
+
+
+
+.delete-btn{
+
+
+    margin-top:15px;
+
+
+    padding:10px 20px;
+
+
+    border:none;
+
+
+    border-radius:14px;
+
+
+    background:#ff5c5c;
+
+
+    color:white;
+
+
+    font-family:Poppins;
+
 
     font-weight:600;
 
-    border-bottom:1px solid rgba(255,255,255,.15);
+
+    cursor:pointer;
+
 
 }
 
-td{
 
-    padding:18px;
 
-    border-bottom:1px solid rgba(255,255,255,.08);
+
+
+.delete-btn:hover{
+
+
+    opacity:.85;
+
+
+    transform:translateY(-3px);
+
+
+}
+
+
+
+
+
+
+
+.search-card input{
+
+
+    margin-bottom:0;
+
 
 }
 
-tbody tr:hover{
 
-    background:rgba(255,255,255,.06);
 
-}
 
-/* =======================
-   MOBILE MENU
-======================= */
 
-.mobile-header{
-
-    display:none;
-
-}
 
 /* =======================
    RESPONSIVE
 ======================= */
 
+
 @media(max-width:950px){
+
 
 #sidebar{
 
+
     width:100%;
+
 
     position:fixed;
 
+
     left:-100%;
+
 
     top:0;
 
+
     height:100vh;
 
-    z-index:999;
-
-    transition:.35s;
 
 }
 
-#sidebar.show{
-
-    left:0;
-
-}
-
-.mobile-header{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    padding:18px;
-
-    background:rgba(255,255,255,.10);
-
-    backdrop-filter:blur(18px);
-
-}
 
 #mainContent{
 
+
     padding:20px;
 
-}
-
-.page-title{
-
-    font-size:1.8rem;
 
 }
 
-.grid{
 
-    grid-template-columns:1fr;
 
 }
 
-}
+
+
+
 
 @media(max-width:600px){
 
+
+
 .card{
+
 
     padding:20px;
 
-}
-
-.logo{
-
-    font-size:1.5rem;
 
 }
+
+
 
 .button{
 
-    width:100%;
-
-}
-
-table{
-
-    font-size:14px;
-
-}
-
-/* ================================
-   STUDENT PHOTO UPLOAD
-================================ */
-
-.photo-upload{
-
-    margin-top:20px;
-    padding:15px;
-    border-radius:18px;
-    background:#ffffff;
-    border:1px solid #ddd;
-
-}
-
-
-.photo-upload h3{
-
-    margin-bottom:10px;
-    font-size:18px;
-
-}
-
-
-
-.photo-upload input[type="file"]{
 
     width:100%;
-    padding:10px;
-    font-size:14px;
-    border-radius:10px;
+
 
 }
 
 
 
-.photo-upload p{
+.student-card{
 
-    margin-top:8px;
-    font-size:13px;
-    opacity:0.7;
+
+    flex-direction:column;
+
+
+    text-align:center;
+
+
+}
+
 
 }
