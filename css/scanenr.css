@@ -1,0 +1,357 @@
+/* ==========================================================
+   ATTENDANCE CHECKER
+   SCANNER PAGE
+========================================================== */
+
+.scanner-content{
+    flex:1;
+    padding:40px;
+    overflow:auto;
+}
+
+.scanner-content header{
+    margin-bottom:30px;
+}
+
+.scanner-content header h1{
+    color:#fff;
+    font-size:2.2rem;
+    font-weight:700;
+}
+
+/* ==========================
+   SUBJECT SELECTOR
+========================== */
+
+.subject-bar{
+
+    margin-bottom:30px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+    flex-wrap:wrap;
+
+}
+
+.subject-bar label{
+
+    color:#fff;
+
+    font-weight:600;
+
+}
+
+.subject-bar select{
+
+    width:300px;
+
+    padding:14px 18px;
+
+    border:none;
+
+    outline:none;
+
+    border-radius:14px;
+
+    font-family:Poppins;
+
+    font-size:15px;
+
+    background:rgba(255,255,255,.15);
+
+    backdrop-filter:blur(15px);
+
+    color:#fff;
+
+    border:1px solid rgba(255,255,255,.20);
+
+}
+
+.subject-bar option{
+
+    color:#000;
+
+}
+
+/* ==========================
+   LAYOUT
+========================== */
+
+.scanner-layout{
+
+    display:grid;
+
+    grid-template-columns:2fr 1fr;
+
+    gap:30px;
+
+    margin-bottom:35px;
+
+}
+
+/* ==========================
+   CAMERA CARD
+========================== */
+
+.camera-card{
+
+    background:rgba(255,255,255,.15);
+
+    backdrop-filter:blur(20px);
+
+    border:1px solid rgba(255,255,255,.20);
+
+    border-radius:22px;
+
+    padding:25px;
+
+}
+
+.camera-card h2{
+
+    color:#fff;
+
+    margin-bottom:20px;
+
+}
+
+#reader{
+
+    width:100%;
+
+    min-height:520px;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    background:#ffffff;
+
+}
+
+/* ==========================
+   STUDENT CARD
+========================== */
+
+.student-card{
+
+    background:rgba(255,255,255,.15);
+
+    backdrop-filter:blur(20px);
+
+    border:1px solid rgba(255,255,255,.20);
+
+    border-radius:22px;
+
+    padding:30px;
+
+    text-align:center;
+
+}
+
+.student-card img{
+
+    width:170px;
+
+    height:170px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    border:6px solid rgba(255,255,255,.35);
+
+    margin-bottom:25px;
+
+}
+
+.student-card h2{
+
+    color:#fff;
+
+    margin-bottom:10px;
+
+    font-size:1.7rem;
+
+}
+
+.student-card p{
+
+    color:#fff;
+
+    opacity:.9;
+
+    margin-bottom:12px;
+
+    font-size:15px;
+
+}
+
+.status{
+
+    margin-top:25px;
+
+    padding:14px;
+
+    border-radius:12px;
+
+    background:linear-gradient(
+    135deg,
+    #0A6EBD,
+    #5CB8E4);
+
+    color:white;
+
+    font-weight:600;
+
+}
+
+/* ==========================
+   ATTENDANCE TABLE
+========================== */
+
+.attendance-list{
+
+    background:rgba(255,255,255,.15);
+
+    backdrop-filter:blur(20px);
+
+    border:1px solid rgba(255,255,255,.20);
+
+    border-radius:22px;
+
+    padding:30px;
+
+}
+
+.list-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+.list-header h2{
+
+    color:#fff;
+
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+thead{
+
+    background:rgba(255,255,255,.15);
+
+}
+
+th{
+
+    color:#fff;
+
+    padding:16px;
+
+    text-align:left;
+
+    font-weight:600;
+
+}
+
+td{
+
+    color:#fff;
+
+    padding:18px 16px;
+
+    border-bottom:1px solid rgba(255,255,255,.12);
+
+}
+
+tbody tr{
+
+    transition:.30s;
+
+}
+
+tbody tr:hover{
+
+    background:rgba(255,255,255,.08);
+
+}
+
+/* ==========================
+   MOBILE
+========================== */
+
+@media(max-width:1200px){
+
+.scanner-layout{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
+@media(max-width:768px){
+
+.scanner-content{
+
+padding:20px;
+
+}
+
+#reader{
+
+min-height:340px;
+
+}
+
+.student-card img{
+
+width:130px;
+
+height:130px;
+
+}
+
+.subject-bar{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+}
+
+.subject-bar select{
+
+width:100%;
+
+}
+
+table{
+
+display:block;
+
+overflow-x:auto;
+
+white-space:nowrap;
+
+}
+
+}
