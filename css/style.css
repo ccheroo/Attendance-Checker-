@@ -535,3 +535,21 @@ table{
 }
 
 }
+.photo-upload{
+
+    margin-top:20px;
+    margin-bottom:20px;
+    padding:15px;
+    border-radius:15px;
+    background:white;
+    border:1px solid #ddd;
+
+}
+
+
+.photo-upload input{
+
+    margin-top:10px;
+    width:100%;
+
+}
