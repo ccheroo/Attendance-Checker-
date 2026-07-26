@@ -1,7 +1,7 @@
 // ================================
 // ATTENDANCE CHECKER
 // MAIN APPLICATION
-// VERSION 2.8 FIRESTORE ONLY FINAL
+// VERSION 3.0 FIRESTORE CLEAN
 // ================================
 
 
@@ -28,7 +28,6 @@ document.getElementById("mainContent");
 
 const menuButtons =
 document.querySelectorAll(".menu");
-
 
 
 
@@ -87,13 +86,11 @@ function loadPage(page){
             break;
 
 
-
         case "students":
 
             students();
 
             break;
-
 
 
         case "courses":
@@ -103,13 +100,11 @@ function loadPage(page){
             break;
 
 
-
         case "subjects":
 
             placeholder("Subjects");
 
             break;
-
 
 
         case "scanner":
@@ -119,7 +114,6 @@ function loadPage(page){
             break;
 
 
-
         case "attendance":
 
             placeholder("Attendance");
@@ -127,13 +121,11 @@ function loadPage(page){
             break;
 
 
-
         case "reports":
 
             placeholder("Reports");
 
             break;
-
 
 
         case "settings":
@@ -161,8 +153,10 @@ function loadPage(page){
 
 function dashboard(){
 
+
     mainContent.innerHTML =
     loadDashboard();
+
 
 }
 
@@ -178,6 +172,7 @@ function dashboard(){
 // ================================
 
 function students(){
+
 
 
 mainContent.innerHTML = `
@@ -205,6 +200,7 @@ placeholder="Full Name"
 >
 
 
+
 <input
 id="studentID"
 type="text"
@@ -212,11 +208,13 @@ placeholder="Student ID"
 >
 
 
+
 <input
 id="course"
 type="text"
 placeholder="Course"
 >
+
 
 
 <input
@@ -237,6 +235,7 @@ Save Student
 </button>
 
 
+
 </div>
 
 
@@ -244,8 +243,7 @@ Save Student
 
 
 
-<div class="card"
-style="margin-top:25px">
+<div class="card search-card">
 
 
 <input
@@ -262,7 +260,7 @@ placeholder="Search Student..."
 
 <div
 id="studentContainer"
-class="grid">
+class="student-grid">
 
 </div>
 
@@ -276,12 +274,6 @@ class="grid">
 
 
 
-
-// ================================
-// SAVE STUDENT
-// ================================
-
-
 const addButton =
 document.getElementById(
 "addStudentBtn"
@@ -289,80 +281,51 @@ document.getElementById(
 
 
 
-if(!addButton){
-
-console.error(
-"Save button missing"
-);
-
-return;
-
-}
 
 
-
-
-
-addButton.onclick = async ()=>{
-
-
-const fullName =
-document.getElementById("fullName")
-.value.trim();
-
-
-
-const studentID =
-document.getElementById("studentID")
-.value.trim();
-
-
-
-const course =
-document.getElementById("course")
-.value.trim();
-
-
-
-const yearLevel =
-document.getElementById("yearLevel")
-.value.trim();
-
-
-
-
-
-if(
-
-!fullName ||
-!studentID ||
-!course ||
-!yearLevel
-
-){
-
-alert(
-"Please complete all fields."
-);
-
-return;
-
-}
-
-
+addButton.addEventListener(
+"click",
+async()=>{
 
 
 
 const student = {
 
 
-    fullName,
+fullName:
 
-    studentID,
+document
+.getElementById("fullName")
+.value
+.trim(),
 
-    course,
 
-    yearLevel
+
+studentID:
+
+document
+.getElementById("studentID")
+.value
+.trim(),
+
+
+
+course:
+
+document
+.getElementById("course")
+.value
+.trim(),
+
+
+
+yearLevel:
+
+document
+.getElementById("yearLevel")
+.value
+.trim()
+
 
 
 };
@@ -371,41 +334,79 @@ const student = {
 
 
 
+
+if(
+
+!student.fullName ||
+
+!student.studentID ||
+
+!student.course ||
+
+!student.yearLevel
+
+){
+
+
+alert(
+"Please complete all fields."
+);
+
+
+return;
+
+
+}
+
+
+
+
+
+
 try{
 
 
-addButton.disabled = true;
+addButton.disabled=true;
 
-addButton.innerHTML =
+
+addButton.innerText=
 "Saving...";
 
 
 
-
-
-const result =
+const saved =
 await addStudent(student);
 
 
 
+if(saved){
 
 
-if(result){
+document
+.getElementById("fullName")
+.value="";
+
+
+document
+.getElementById("studentID")
+.value="";
+
+
+document
+.getElementById("course")
+.value="";
+
+
+document
+.getElementById("yearLevel")
+.value="";
+
 
 
 alert(
 "Student saved successfully!"
 );
 
-
-
-document.getElementById("fullName").value="";
-
-document.getElementById("studentID").value="";
-
-document.getElementById("course").value="";
-
-document.getElementById("yearLevel").value="";
 
 
 }
@@ -419,18 +420,14 @@ document.getElementById("yearLevel").value="";
 catch(error){
 
 
-console.error(
-"SAVE ERROR:",
-error
-);
+console.error(error);
 
 
 alert(
-"Saving failed: "
+"Error saving student: "
 +
 error.message
 );
-
 
 
 }
@@ -443,7 +440,7 @@ finally{
 addButton.disabled=false;
 
 
-addButton.innerHTML =
+addButton.innerText=
 "Save Student";
 
 
@@ -451,7 +448,7 @@ addButton.innerHTML =
 
 
 
-};
+});
 
 
 
@@ -460,10 +457,7 @@ addButton.innerHTML =
 
 
 
-
-// ================================
 // SEARCH
-// ================================
 
 const searchBox =
 document.getElementById(
@@ -495,31 +489,9 @@ e.target.value
 
 
 
+// LOAD FIRESTORE
 
-
-// ================================
-// LOAD FIRESTORE DATA
-// ================================
-
-
-try{
-
-
-await loadStudents();
-
-
-}
-
-catch(error){
-
-
-console.error(
-"LOAD STUDENTS ERROR:",
-error
-);
-
-
-}
+loadStudents();
 
 
 
@@ -540,7 +512,7 @@ error
 function placeholder(title){
 
 
-mainContent.innerHTML = `
+mainContent.innerHTML=`
 
 
 <h1 class="page-title">
@@ -548,14 +520,11 @@ ${title}
 </h1>
 
 
-
 <div class="card">
-
 
 <h2>
 ${title}
 </h2>
-
 
 
 <p>
