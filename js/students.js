@@ -1,7 +1,7 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // STUDENT MANAGEMENT MODULE
-// VERSION 1.1
+// VERSION 1.2
 // ======================================================
 
 
@@ -14,6 +14,8 @@ export function addStudent(student){
 
     students.push(student);
 
+    console.log("Student Added:", student);
+
     renderStudents();
 
 }
@@ -24,11 +26,16 @@ export function addStudent(student){
 
 export function deleteStudent(id){
 
-    students = students.filter(student => 
+
+    students = students.filter(student =>
+
         student.studentID !== id
+
     );
 
+
     renderStudents();
+
 
 }
 
@@ -38,27 +45,40 @@ export function deleteStudent(id){
 
 export function searchStudents(keyword){
 
+
     keyword = keyword.toLowerCase();
 
 
     const filtered = students.filter(student =>
 
-        student.fullName.toLowerCase().includes(keyword)
+
+        student.fullName
+        .toLowerCase()
+        .includes(keyword)
+
 
         ||
 
-        student.studentID.toLowerCase().includes(keyword)
+        student.studentID
+        .toLowerCase()
+        .includes(keyword)
+
 
         ||
 
-        student.course.toLowerCase().includes(keyword)
+        student.course
+        .toLowerCase()
+        .includes(keyword)
+
 
     );
 
 
     renderStudents(filtered);
 
+
 }
+
 
 
 
@@ -67,38 +87,48 @@ export function searchStudents(keyword){
 export function renderStudents(data = students){
 
 
-    const container = document.getElementById(
-        "studentContainer"
-    );
-
-
-    if(!container) return;
+    const container =
+    document.getElementById("studentContainer");
 
 
 
-    container.innerHTML = "";
+    if(!container){
+
+        console.log("studentContainer not found");
+
+        return;
+
+    }
+
+
+
+    container.innerHTML="";
 
 
 
     if(data.length === 0){
 
-        container.innerHTML = `
+
+        container.innerHTML=`
 
         <div class="card">
 
-        <h2>No Students Added</h2>
+            <h2>No Students Added</h2>
 
-        <p>
-        Add students to create your attendance list.
-        </p>
+            <p>
+            Add students to begin.
+            </p>
 
         </div>
 
         `;
 
+
         return;
 
+
     }
+
 
 
 
@@ -107,49 +137,56 @@ export function renderStudents(data = students){
 
         container.innerHTML += `
 
+
         <div class="card">
 
 
-        <img 
-        src="${student.photo}"
-        style="
-        width:120px;
-        height:120px;
-        border-radius:50%;
-        object-fit:cover;
-        ">
+            <img
+
+            src="${student.photo}"
+
+            style="
+            width:120px;
+            height:120px;
+            border-radius:50%;
+            object-fit:cover;
+            ">
 
 
-        <h2>
-        ${student.fullName}
-        </h2>
+            <h2>
+            ${student.fullName}
+            </h2>
 
 
-        <p>
-        ID: ${student.studentID}
-        </p>
+            <p>
+            ID: ${student.studentID}
+            </p>
 
 
-        <p>
-        ${student.course}
-        </p>
+            <p>
+            Course: ${student.course}
+            </p>
 
 
-        <p>
-        ${student.yearLevel}
-        </p>
+            <p>
+            Year: ${student.yearLevel}
+            </p>
 
 
-        <button 
-        class="button"
-        onclick="removeStudent('${student.studentID}')">
 
-        Delete
+            <button
 
-        </button>
+            class="button"
+
+            onclick="removeStudent('${student.studentID}')">
+
+            Delete
+
+            </button>
 
 
         </div>
+
 
         `;
 
