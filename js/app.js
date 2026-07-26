@@ -1,7 +1,7 @@
 // ================================
 // ATTENDANCE CHECKER
 // MAIN APPLICATION
-// VERSION 3.0 FIRESTORE CLEAN
+// VERSION 3.1 COURSES MODULE ADDED
 // ================================
 
 
@@ -20,6 +20,17 @@ import {
 
 
 
+import {
+
+    addCourse,
+
+    loadCourses
+
+} from "./courses.js";
+
+
+
+
 
 
 const mainContent =
@@ -34,9 +45,12 @@ document.querySelectorAll(".menu");
 
 
 
+
+
 // ================================
 // MENU
 // ================================
+
 
 menuButtons.forEach(button=>{
 
@@ -51,10 +65,13 @@ menuButtons.forEach(button=>{
         });
 
 
+
         button.classList.add("active");
 
 
+
         loadPage(button.dataset.page);
+
 
 
     });
@@ -69,14 +86,18 @@ menuButtons.forEach(button=>{
 
 
 
+
 // ================================
 // PAGE LOADER
 // ================================
 
+
 function loadPage(page){
 
 
+
     switch(page){
+
 
 
         case "dashboard":
@@ -86,6 +107,8 @@ function loadPage(page){
             break;
 
 
+
+
         case "students":
 
             students();
@@ -93,11 +116,15 @@ function loadPage(page){
             break;
 
 
+
+
         case "courses":
 
-            placeholder("Courses");
+            courses();
 
             break;
+
+
 
 
         case "subjects":
@@ -107,11 +134,15 @@ function loadPage(page){
             break;
 
 
+
+
         case "scanner":
 
             placeholder("Scanner");
 
             break;
+
+
 
 
         case "attendance":
@@ -121,11 +152,15 @@ function loadPage(page){
             break;
 
 
+
+
         case "reports":
 
             placeholder("Reports");
 
             break;
+
+
 
 
         case "settings":
@@ -135,7 +170,9 @@ function loadPage(page){
             break;
 
 
+
     }
+
 
 
 }
@@ -147,9 +184,11 @@ function loadPage(page){
 
 
 
+
 // ================================
 // DASHBOARD
 // ================================
+
 
 function dashboard(){
 
@@ -167,9 +206,11 @@ function dashboard(){
 
 
 
+
 // ================================
 // STUDENTS
 // ================================
+
 
 function students(){
 
@@ -226,7 +267,6 @@ placeholder="Year Level"
 
 
 <button
-type="button"
 class="button"
 id="addStudentBtn">
 
@@ -273,7 +313,6 @@ class="student-grid">
 
 
 
-
 const addButton =
 document.getElementById(
 "addStudentBtn"
@@ -282,49 +321,27 @@ document.getElementById(
 
 
 
-
-addButton.addEventListener(
-"click",
-async()=>{
+addButton.onclick = async()=>{
 
 
 
-const student = {
+const student={
 
 
 fullName:
-
-document
-.getElementById("fullName")
-.value
-.trim(),
-
+document.getElementById("fullName").value.trim(),
 
 
 studentID:
-
-document
-.getElementById("studentID")
-.value
-.trim(),
-
+document.getElementById("studentID").value.trim(),
 
 
 course:
-
-document
-.getElementById("course")
-.value
-.trim(),
-
+document.getElementById("course").value.trim(),
 
 
 yearLevel:
-
-document
-.getElementById("yearLevel")
-.value
-.trim()
+document.getElementById("yearLevel").value.trim()
 
 
 
@@ -334,15 +351,11 @@ document
 
 
 
-
 if(
 
 !student.fullName ||
-
 !student.studentID ||
-
 !student.course ||
-
 !student.yearLevel
 
 ){
@@ -362,15 +375,11 @@ return;
 
 
 
-
-try{
-
-
 addButton.disabled=true;
 
+addButton.innerText="Saving...";
 
-addButton.innerText=
-"Saving...";
+
 
 
 
@@ -379,28 +388,18 @@ await addStudent(student);
 
 
 
+
+
 if(saved){
 
 
-document
-.getElementById("fullName")
-.value="";
+document.getElementById("fullName").value="";
 
+document.getElementById("studentID").value="";
 
-document
-.getElementById("studentID")
-.value="";
+document.getElementById("course").value="";
 
-
-document
-.getElementById("course")
-.value="";
-
-
-document
-.getElementById("yearLevel")
-.value="";
-
+document.getElementById("yearLevel").value="";
 
 
 alert(
@@ -408,56 +407,25 @@ alert(
 );
 
 
-
 }
 
 
 
-}
-
-
-
-catch(error){
-
-
-console.error(error);
-
-
-alert(
-"Error saving student: "
-+
-error.message
-);
-
-
-}
-
-
-
-finally{
 
 
 addButton.disabled=false;
 
-
-addButton.innerText=
-"Save Student";
-
-
-}
+addButton.innerText="Save Student";
 
 
 
-});
+};
 
 
 
 
 
 
-
-
-// SEARCH
 
 const searchBox =
 document.getElementById(
@@ -486,12 +454,231 @@ e.target.value
 
 
 
-
-
-
-// LOAD FIRESTORE
-
 loadStudents();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ================================
+// COURSES MODULE
+// ================================
+
+
+function courses(){
+
+
+
+mainContent.innerHTML=`
+
+
+<h1 class="page-title">
+
+Courses
+
+</h1>
+
+
+
+
+
+<div class="card">
+
+
+<h2>
+
+Add Course
+
+</h2>
+
+
+
+
+<input
+
+id="courseName"
+
+placeholder="Course Name"
+
+>
+
+
+
+<input
+
+id="courseCode"
+
+placeholder="Course Code"
+
+>
+
+
+
+
+<button
+
+class="button"
+
+id="addCourseBtn">
+
+Save Course
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div
+
+id="courseContainer"
+
+class="student-grid">
+
+</div>
+
+
+
+`;
+
+
+
+
+
+
+
+
+const button =
+document.getElementById(
+"addCourseBtn"
+);
+
+
+
+
+
+button.onclick = async()=>{
+
+
+
+const course={
+
+
+name:
+
+document
+.getElementById("courseName")
+.value
+.trim(),
+
+
+
+code:
+
+document
+.getElementById("courseCode")
+.value
+.trim()
+
+
+
+};
+
+
+
+
+
+
+if(
+
+!course.name ||
+!course.code
+
+){
+
+
+alert(
+"Please complete all fields."
+);
+
+
+return;
+
+
+}
+
+
+
+
+
+
+
+button.disabled=true;
+
+button.innerText="Saving...";
+
+
+
+
+
+
+const saved =
+await addCourse(course);
+
+
+
+
+
+
+if(saved){
+
+
+document.getElementById("courseName").value="";
+
+
+document.getElementById("courseCode").value="";
+
+
+
+alert(
+"Course saved successfully!"
+);
+
+
+
+}
+
+
+
+
+
+button.disabled=false;
+
+button.innerText="Save Course";
+
+
+
+};
+
+
+
+
+
+loadCourses();
 
 
 
@@ -509,6 +696,7 @@ loadStudents();
 // PLACEHOLDER
 // ================================
 
+
 function placeholder(title){
 
 
@@ -516,23 +704,34 @@ mainContent.innerHTML=`
 
 
 <h1 class="page-title">
+
 ${title}
+
 </h1>
+
 
 
 <div class="card">
 
+
 <h2>
+
 ${title}
+
 </h2>
 
 
+
 <p>
+
 This module will be built next.
+
 </p>
 
 
+
 </div>
+
 
 
 `;
@@ -547,10 +746,10 @@ This module will be built next.
 
 
 
-
 console.log(
 "🔥 ATTENDANCE CHECKER READY"
 );
+
 
 
 
