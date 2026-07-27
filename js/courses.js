@@ -1,130 +1,79 @@
 // ======================================================
 // ATTENDANCE CHECKER
-// FIRESTORE COURSE MANAGEMENT
-// VERSION 2.0 STABLE
+// COURSES MANAGEMENT
+// VERSION 5.0
 // ======================================================
-
 
 import { db } from "./firebase.js";
 
-
 import {
-
     collection,
     addDoc,
     getDocs,
     deleteDoc,
     doc,
-    serverTimestamp
-
+    serverTimestamp,
+    orderBy,
+    query
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-
-
-
+const courseCollection = collection(db, "courses");
 
 let courses = [];
 
 
 
-const courseCollection =
-collection(db,"courses");
-
-
-
-
-
-
-
-// ================================
+// ======================================
 // LOAD COURSES
-// ================================
+// ======================================
 
-export async function loadCourses(){
+export async function loadCourses() {
 
+    try {
 
-    try{
+        const snapshot = await getDocs(
+            query(
+                courseCollection,
+                orderBy("college"),
+                orderBy("course")
+            )
+        );
 
+        courses = [];
 
-        const snapshot =
-        await getDocs(courseCollection);
-
-
-
-        courses=[];
-
-
-
-        snapshot.forEach(item=>{
-
+        snapshot.forEach(docItem => {
 
             courses.push({
 
-                id:item.id,
+                id: docItem.id,
 
-                ...item.data()
+                ...docItem.data()
 
             });
 
-
         });
-
-
-
-
-        console.log(
-            "Courses loaded:",
-            courses.length
-        );
-
-
 
         renderCourses();
 
-
-
     }
 
+    catch (error) {
 
-    catch(error){
-
-
-        console.error(
-            "LOAD COURSES ERROR:",
-            error
-        );
-
+        console.error(error);
 
     }
-
 
 }
 
 
 
-
-
-
-
-
-
-// ================================
+// ======================================
 // ADD COURSE
-// ================================
+// ======================================
 
-export async function addCourse(course){
+export async function addCourse(course) {
 
-
-
-    try{
-
-
-        console.log(
-            "Saving course:",
-            course
-        );
-
-
+    try {
 
         await addDoc(
 
@@ -132,321 +81,250 @@ export async function addCourse(course){
 
             {
 
+                college: course.college,
 
-                name:
-                course.name || "",
+                course: course.course,
 
+                code: course.code,
 
-
-                code:
-                course.code || "",
-
-
-
-                createdAt:
-                serverTimestamp()
-
+                createdAt: serverTimestamp()
 
             }
 
         );
 
-
-
-
         await loadCourses();
-
-
-
 
         return true;
 
-
-
     }
 
+    catch (error) {
 
+        console.error(error);
 
-    catch(error){
-
-
-        console.error(
-            "ADD COURSE ERROR:",
-            error
-        );
-
-
-
-        alert(
-            "Course save failed: "
-            +
-            error.message
-        );
-
-
+        alert(error.message);
 
         return false;
 
-
-
     }
-
-
 
 }
 
 
 
-
-
-
-
-
-
-// ================================
+// ======================================
 // DELETE COURSE
-// ================================
+// ======================================
 
-export async function deleteCourse(id){
+export async function deleteCourse(id) {
 
+    if (!confirm("Delete this course?")) return;
 
-
-    try{
-
-
-        const confirmDelete =
-        confirm(
-            "Delete this course?"
-        );
-
-
-
-        if(!confirmDelete)
-        return;
-
-
+    try {
 
         await deleteDoc(
 
-            doc(
-                db,
-                "courses",
-                id
-            )
+            doc(db, "courses", id)
 
         );
-
-
-
 
         await loadCourses();
 
+    }
 
+    catch (error) {
 
+        console.error(error);
 
-        alert(
-            "Course deleted!"
-        );
-
-
+        alert(error.message);
 
     }
 
-
-
-    catch(error){
+}
 
 
 
-        console.error(
-            "DELETE COURSE ERROR:",
-            error
+// ======================================
+// GET COURSES
+// ======================================
+
+export function getCourses() {
+
+    return courses;
+
+}
+
+
+
+// ======================================
+// GET COURSES BY COLLEGE
+// ======================================
+
+export function getCoursesByCollege(college) {
+
+    return courses.filter(item => item.college === college);
+
+}
+
+
+
+// ======================================
+// GET COLLEGES
+// ======================================
+
+export function getColleges() {
+
+    return [...new Set(
+
+        courses.map(item => item.college)
+
+    )];
+
+}
+
+
+
+// ======================================
+// SEARCH
+// ======================================
+
+export function searchCourses(keyword) {
+
+    keyword = keyword.toLowerCase();
+
+    const filtered = courses.filter(item => {
+
+        return (
+
+            item.course.toLowerCase().includes(keyword)
+
+            ||
+
+            item.code.toLowerCase().includes(keyword)
+
+            ||
+
+            item.college.toLowerCase().includes(keyword)
+
         );
 
+    });
+
+    renderCourses(filtered);
+
+}
 
 
-        alert(
-            error.message
-        );
 
+// ======================================
+// DISPLAY
+// ======================================
+
+export function renderCourses(data = courses) {
+
+    const container = document.getElementById("courseContainer");
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    if (data.length === 0) {
+
+        container.innerHTML = `
+
+        <div class="empty-card">
+
+            <h2>No Courses</h2>
+
+            <p>Add your first course.</p>
+
+        </div>
+
+        `;
+
+        return;
 
     }
 
+    let grouped = {};
 
+    data.forEach(course => {
+
+        if (!grouped[course.college]) {
+
+            grouped[course.college] = [];
+
+        }
+
+        grouped[course.college].push(course);
+
+    });
+
+    Object.keys(grouped).forEach(college => {
+
+        container.innerHTML += `
+
+        <div class="card">
+
+            <h2>🏫 ${college}</h2>
+
+            <div id="college-${college.replace(/\s/g,'')}"></div>
+
+        </div>
+
+        `;
+
+        const collegeBox = document.getElementById(
+
+            `college-${college.replace(/\s/g,'')}`
+
+        );
+
+        grouped[college].forEach(course => {
+
+            collegeBox.innerHTML += `
+
+            <div class="student-card">
+
+                <div class="student-avatar">
+
+                    📘
+
+                </div>
+
+                <div class="student-info">
+
+                    <h2>${course.course}</h2>
+
+                    <p>
+
+                        <strong>Code:</strong>
+
+                        ${course.code}
+
+                    </p>
+
+                    <button
+                        class="delete-btn"
+                        onclick="removeCourse('${course.id}')">
+
+                        Delete
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            `;
+
+        });
+
+    });
 
 }
 
+window.removeCourse = deleteCourse;
 
-
-
-
-
-
-
-
-// ================================
-// DISPLAY COURSES
-// ================================
-
-export function renderCourses(){
-
-
-
-const container =
-document.getElementById(
-"courseContainer"
-);
-
-
-
-if(!container)
-return;
-
-
-
-
-
-container.innerHTML="";
-
-
-
-
-
-
-if(courses.length === 0){
-
-
-
-container.innerHTML=`
-
-
-<div class="empty-card">
-
-
-<h2>
-No Courses Yet
-</h2>
-
-
-<p>
-Add your first course.
-</p>
-
-
-</div>
-
-
-`;
-
-
-
-return;
-
-
-
-}
-
-
-
-
-
-
-courses.forEach(course=>{
-
-
-
-const letter =
-(course.name || "C")
-.charAt(0)
-.toUpperCase();
-
-
-
-
-
-container.innerHTML += `
-
-
-
-<div class="student-card">
-
-
-
-<div class="student-avatar">
-
-${letter}
-
-</div>
-
-
-
-
-
-<div class="student-info">
-
-
-<h2>
-
-${course.name || "Unnamed Course"}
-
-</h2>
-
-
-
-
-<p>
-
-<strong>
-Code:
-</strong>
-
-${course.code || "N/A"}
-
-</p>
-
-
-
-
-
-<button
-
-class="delete-btn"
-
-onclick="removeCourse('${course.id}')">
-
-
-Delete
-
-
-</button>
-
-
-
-
-</div>
-
-
-
-</div>
-
-
-
-`;
-
-
-
-});
-
-
-
-}
-
-
-
-
-
-
-
-
-window.removeCourse =
-deleteCourse;
+console.log("📚 Courses Module Ready");
