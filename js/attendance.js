@@ -54,7 +54,7 @@ collection(
 // ================================
 
 
-export async function recordAttendance(student){
+export async function recordAttendance(
 student,
 subject
 ){
@@ -182,8 +182,6 @@ const attendanceData = {
 
     createdAt:
     serverTimestamp()
-
-};
 
 };
 
