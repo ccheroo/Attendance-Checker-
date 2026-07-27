@@ -55,15 +55,13 @@ collection(
 
 
 export async function recordAttendance(student){
-
-
-    try{
-
-
-        if(!student){
-
-            console.error(
-                "No student data."
+student,
+subject
+){
+try{
+if(!student){
+console.error(
+ "No student data."
             );
 
             return false;
