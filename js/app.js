@@ -260,56 +260,53 @@ function dashboard(){
 // STUDENTS MODULE
 // ================================
 
-
 function students(){
-
-
 
 mainContent.innerHTML = `
 
-
 <h1 class="page-title">
+
 Students
+
 </h1>
-
-
 
 <div class="card">
 
-
 <h2>
+
 Register Student
+
 </h2>
-
-
 
 <input
 id="fullName"
 placeholder="Full Name"
 >
 
-
-
 <input
 id="studentID"
 placeholder="Student ID"
 >
 
-
+<input
+id="college"
+placeholder="College (ex. College of Education)"
+>
 
 <input
 id="course"
-placeholder="Course"
+placeholder="Course (ex. Bachelor of Secondary Education)"
 >
-
-
 
 <input
 id="yearLevel"
 placeholder="Year Level"
 >
 
-
+<input
+id="section"
+placeholder="Section"
+>
 
 <button
 class="button"
@@ -319,28 +316,17 @@ Save Student
 
 </button>
 
-
-
 </div>
 
-
-
-
-
 <div class="card">
-
 
 <input
 id="searchStudent"
 placeholder="Search Student..."
+
 >
 
-
 </div>
-
-
-
-
 
 <div
 id="studentContainer"
@@ -348,209 +334,7 @@ class="student-grid">
 
 </div>
 
-
-
 `;
-
-
-
-
-
-
-
-const button =
-document.getElementById(
-"addStudentBtn"
-);
-
-
-
-
-button.onclick = async()=>{
-
-
-const student = {
-
-
-fullName:
-
-document
-.getElementById("fullName")
-.value
-.trim(),
-
-
-
-studentID:
-
-document
-.getElementById("studentID")
-.value
-.trim(),
-
-
-
-course:
-
-document
-.getElementById("course")
-.value
-.trim(),
-
-
-
-yearLevel:
-
-document
-.getElementById("yearLevel")
-.value
-.trim()
-
-
-
-};
-
-
-
-
-
-
-if(
-
-!student.fullName ||
-
-!student.studentID ||
-
-!student.course ||
-
-!student.yearLevel
-
-){
-
-
-alert(
-"Please complete all fields."
-);
-
-
-return;
-
-
-}
-
-
-
-
-
-
-
-button.disabled=true;
-
-button.innerText=
-"Saving...";
-
-
-
-
-
-
-const saved =
-await addStudent(student);
-
-
-
-
-
-
-
-if(saved){
-
-
-document
-.getElementById("fullName")
-.value="";
-
-
-
-document
-.getElementById("studentID")
-.value="";
-
-
-
-document
-.getElementById("course")
-.value="";
-
-
-
-document
-.getElementById("yearLevel")
-.value="";
-
-
-
-alert(
-"Student saved successfully!"
-);
-
-
-
-}
-
-
-
-
-
-button.disabled=false;
-
-button.innerText=
-"Save Student";
-
-
-};
-
-
-
-
-
-
-
-
-const search =
-document.getElementById(
-"searchStudent"
-);
-
-
-
-
-if(search){
-
-
-search.addEventListener(
-"input",
-(e)=>{
-
-
-searchStudents(
-e.target.value
-);
-
-
-});
-
-
-}
-
-
-
-loadStudents();
-
-
-
-}
-
 
 // ================================
 // COURSES MODULE
