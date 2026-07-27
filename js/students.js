@@ -119,108 +119,18 @@ export async function addStudent(student){
     try{
 
 
-        const data = {
-
-
-            fullName:
-            student.fullName,
-
-
-
-            studentID:
-            student.studentID,
-
-
-
-            qrCode:
-
-            student.qrCode ||
-            student.studentID,
-
-
-
-            course:
-            student.course,
-
-
-
-            yearLevel:
-            student.yearLevel,
-
-
-
-            photo:
-
-            student.photo || "",
-
-
-
-            createdAt:
-            serverTimestamp()
-
-
-
-        };
-
-
-
-
-
-        await addDoc(
-
-            studentCollection,
-
-            data
-
-        );
-
-
-
-
-        await loadStudents();
-
-
-
-        return true;
-
-
-
-    }
-
-
-
-    catch(error){
-
-
-        console.error(
-            "Add student error:",
-            error
-        );
-
-
-
-        alert(
-            "Saving failed: "
-            +
-            error.message
-        );
-
-
-
-        return false;
-
-
-    }
-
-
-}
-
-
-
-
-
-
-
+const data = {
+    fullName: student.fullName, 
+    studentID: student.studentID,
+    qrCode: student.qrCode || student.studentID,
+    college: student.college,
+    course: student.course,
+    yearLevel: student.yearLevel,
+    section: student.section,
+    photo: student.photo || "",
+    createdAt: serverTimestamp()
+
+};
 
 
 // ================================
@@ -570,11 +480,27 @@ ${student.studentID || "N/A"}
 
 <p>
 
-<strong>
-Course:
-</strong>
+<strong>College:</strong>
+
+${student.college || "N/A"}
+
+<br><br>
+
+<strong>Course:</strong>
 
 ${student.course || "N/A"}
+
+<br><br>
+
+<strong>Year:</strong>
+
+${student.yearLevel || "N/A"}
+
+<br><br>
+
+<strong>Section:</strong>
+
+${student.section || "N/A"}
 
 </p>
 
