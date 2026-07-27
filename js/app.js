@@ -4,8 +4,6 @@
 // VERSION 6.0
 // PART 1
 // ======================================================
-
-
 // ================================
 // IMPORTS
 // ================================
@@ -40,25 +38,14 @@ import {
     loadAttendance
 } from "./attendance.js";
 
+import { db } from "./firebase.js";
 
+import {
 
-// ================================
-// GLOBALS
-// ================================
+    collection,
+    getDocs
 
-const mainContent =
-document.getElementById(
-"mainContent"
-);
-
-const menuButtons =
-document.querySelectorAll(
-".menu"
-);
-
-let selectedSubject = null;
-
-
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ================================
 // MENU
@@ -774,86 +761,88 @@ Waiting...
 
 
 
-// ===================================
-// LOAD SUBJECTS TO DROPDOWN
-// ===================================
+// ================================
+// LOAD SUBJECTS
+// ================================
 
-const select =
-document.getElementById(
-"attendanceSubject"
-);
+const subjectSelect =
+document.getElementById("attendanceSubject");
 
-getSubjects().forEach(subject=>{
+const subjectList =
+getSubjects();
 
-select.innerHTML += `
+subjectList.forEach(subject=>{
 
-<option value="${subject.id}">
+    const option =
+    document.createElement("option");
 
-${subject.code} - ${subject.name}
+    option.value =
+    subject.id;
 
-</option>
+    option.textContent =
+    subject.name;
 
-`;
+    option.dataset.code =
+    subject.code;
+
+    option.dataset.instructor =
+    subject.instructor || "";
+
+    subjectSelect.appendChild(option);
 
 });
 
 
 
-// ===================================
+// ================================
 // START ATTENDANCE
-// ===================================
-
-const startButton =
-document.getElementById(
-"startAttendanceBtn"
-);
-
-startButton.onclick = ()=>{
-
-if(select.value===""){
-
-alert(
-"Please select a subject first."
-);
-
-return;
-
-}
-
-selectedSubject = select.value;
+// ================================
 
 document
-.getElementById("reader")
-.style.display="block";
+.getElementById("startAttendanceBtn")
+.onclick = ()=>{
 
-document
-.getElementById("scanResult")
-.innerHTML=`
+    if(!subjectSelect.value){
 
-<b>
+        alert(
+        "Please select a subject first."
+        );
 
-Attendance Started
+        return;
 
-</b>
+    }
 
-<br><br>
+    const selectedOption =
+    subjectSelect.options[
+        subjectSelect.selectedIndex
+    ];
 
-Now scanning...
+    const selectedSubject = {
 
-`;
+        id:
+        subjectSelect.value,
 
-openScanner(selectedSubject);
+        name:
+        selectedOption.textContent,
 
-startButton.disabled=true;
+        code:
+        selectedOption.dataset.code,
 
-startButton.innerText=
-"Attendance Running";
+        instructor:
+        selectedOption.dataset.instructor
 
-select.disabled=true;
+    };
+
+    document
+    .getElementById("reader")
+    .style.display="block";
+
+    openScanner(
+        selectedSubject
+    );
 
 };
-
-}
+    
 // ================================
 // ATTENDANCE MODULE
 // ================================
