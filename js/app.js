@@ -1,9 +1,11 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // MAIN APPLICATION
-// VERSION 6.0
+// VERSION 7.0 FINAL
 // PART 1
 // ======================================================
+
+
 // ================================
 // IMPORTS
 // ================================
@@ -47,31 +49,51 @@ import {
 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+
+
 // ================================
-// MENU
+// GLOBAL VARIABLES
+// ================================
+
+const mainContent =
+document.getElementById(
+    "mainContent"
+);
+
+const menuButtons =
+document.querySelectorAll(
+    ".menu"
+);
+
+let selectedSubject = null;
+
+
+
+// ================================
+// MENU SYSTEM
 // ================================
 
 menuButtons.forEach(button=>{
 
-button.addEventListener("click",()=>{
+    button.addEventListener("click",()=>{
 
-menuButtons.forEach(btn=>{
+        menuButtons.forEach(btn=>{
 
-btn.classList.remove(
-"active"
-);
+            btn.classList.remove(
+                "active"
+            );
 
-});
+        });
 
-button.classList.add(
-"active"
-);
+        button.classList.add(
+            "active"
+        );
 
-loadPage(
-button.dataset.page
-);
+        loadPage(
+            button.dataset.page
+        );
 
-});
+    });
 
 });
 
@@ -83,65 +105,44 @@ button.dataset.page
 
 function loadPage(page){
 
-switch(page){
+    switch(page){
 
-case "dashboard":
+        case "dashboard":
+            dashboard();
+        break;
 
-dashboard();
+        case "students":
+            students();
+        break;
 
-break;
+        case "courses":
+            courses();
+        break;
 
-case "students":
+        case "subjects":
+            subjects();
+        break;
 
-students();
+        case "scanner":
+            scannerPage();
+        break;
 
-break;
+        case "attendance":
+            attendance();
+        break;
 
-case "courses":
+        case "reports":
+            placeholder("Reports");
+        break;
 
-courses();
+        case "settings":
+            placeholder("Settings");
+        break;
 
-break;
+        default:
+            dashboard();
 
-case "subjects":
-
-subjects();
-
-break;
-
-case "scanner":
-
-scannerPage();
-
-break;
-
-case "attendance":
-
-attendance();
-
-break;
-
-case "reports":
-
-placeholder(
-"Reports"
-);
-
-break;
-
-case "settings":
-
-placeholder(
-"Settings"
-);
-
-break;
-
-default:
-
-dashboard();
-
-}
+    }
 
 }
 
@@ -153,8 +154,8 @@ dashboard();
 
 function dashboard(){
 
-mainContent.innerHTML =
-loadDashboard();
+    mainContent.innerHTML =
+    loadDashboard();
 
 }
 // ================================
@@ -166,17 +167,13 @@ function students(){
 mainContent.innerHTML = `
 
 <h1 class="page-title">
-
 Students
-
 </h1>
 
 <div class="card">
 
 <h2>
-
 Register Student
-
 </h2>
 
 <input
@@ -210,9 +207,7 @@ placeholder="Section"
 >
 
 <button
-
 class="button"
-
 id="addStudentBtn">
 
 Save Student
@@ -224,9 +219,7 @@ Save Student
 <div class="card">
 
 <input
-
 id="searchStudent"
-
 placeholder="Search Student..."
 
 >
@@ -234,9 +227,7 @@ placeholder="Search Student..."
 </div>
 
 <div
-
 id="studentContainer"
-
 class="student-grid">
 
 </div>
@@ -244,7 +235,6 @@ class="student-grid">
 `;
 
 const button =
-
 document.getElementById(
 "addStudentBtn"
 );
@@ -292,17 +282,14 @@ if(
 
 ){
 
-alert(
-"Please complete all fields."
-);
+alert("Please complete all fields.");
 
 return;
 
 }
 
-button.disabled=true;
-
-button.innerText="Saving...";
+button.disabled = true;
+button.innerText = "Saving...";
 
 const saved =
 await addStudent(student);
@@ -316,28 +303,22 @@ document.getElementById("course").value="";
 document.getElementById("yearLevel").value="";
 document.getElementById("section").value="";
 
-alert(
-"Student saved successfully!"
-);
+alert("Student saved successfully!");
 
 }
 
-button.disabled=false;
-
-button.innerText="Save Student";
+button.disabled = false;
+button.innerText = "Save Student";
 
 };
 
 const search =
-
 document.getElementById(
 "searchStudent"
 );
 
 search.addEventListener(
-
 "input",
-
 e=>{
 
 searchStudents(
@@ -345,7 +326,6 @@ e.target.value
 );
 
 }
-
 );
 
 loadStudents();
@@ -389,9 +369,7 @@ placeholder="Course Code"
 >
 
 <button
-
 class="button"
-
 id="addCourseBtn">
 
 Save Course
@@ -403,19 +381,14 @@ Save Course
 <div class="card">
 
 <input
-
 id="searchCourse"
-
 placeholder="Search Course..."
-
 >
 
 </div>
 
 <div
-
 id="courseContainer"
-
 class="student-grid">
 
 </div>
@@ -469,11 +442,11 @@ return;
 
 }
 
-button.disabled=true;
+button.disabled = true;
 
-button.innerText="Saving...";
+button.innerText = "Saving...";
 
-const saved=
+const saved =
 await addCourse(course);
 
 if(saved){
@@ -496,21 +469,21 @@ alert(
 
 }
 
-button.disabled=false;
+button.disabled = false;
 
-button.innerText="Save Course";
+button.innerText = "Save Course";
 
 };
 
-const searchBox=
+const searchBox =
 document.getElementById(
 "searchCourse"
 );
 
+if(searchBox){
+
 searchBox.addEventListener(
-
 "input",
-
 e=>{
 
 searchCourses(
@@ -518,14 +491,16 @@ e.target.value
 );
 
 }
-
 );
+
+}
 
 loadCourses();
 
 }
 // ================================
 // SUBJECTS MODULE
+// VERSION 7.0
 // ================================
 
 function subjects(){
@@ -633,9 +608,9 @@ return;
 
 }
 
-button.disabled=true;
+button.disabled = true;
 
-button.innerText="Saving...";
+button.innerText = "Saving...";
 
 const saved =
 await addSubject(subject);
@@ -660,18 +635,117 @@ alert(
 
 }
 
-button.disabled=false;
+button.disabled = false;
 
-button.innerText="Save Subject";
+button.innerText = "Save Subject";
 
 };
+
+const search =
+document.getElementById(
+"searchSubject"
+);
+
+if(search){
+
+search.addEventListener(
+"input",
+e=>{
+
+const keyword =
+e.target.value
+.toLowerCase();
+
+const filtered =
+getSubjects().filter(subject=>{
+
+return (
+
+(subject.name || "")
+.toLowerCase()
+.includes(keyword)
+
+||
+
+(subject.code || "")
+.toLowerCase()
+.includes(keyword)
+
+||
+
+(subject.instructor || "")
+.toLowerCase()
+.includes(keyword)
+
+);
+
+});
+
+const container =
+document.getElementById(
+"subjectContainer"
+);
+
+if(container){
+
+container.innerHTML="";
+
+filtered.forEach(subject=>{
+
+container.innerHTML += `
+
+<div class="student-card">
+
+<div class="student-avatar">
+
+${subject.code.charAt(0)}
+
+</div>
+
+<div class="student-info">
+
+<h2>
+
+${subject.name}
+
+</h2>
+
+<p>
+
+<strong>Code:</strong>
+
+${subject.code}
+
+</p>
+
+<p>
+
+<strong>Instructor:</strong>
+
+${subject.instructor || "Not Assigned"}
+
+</p>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+});
+
+}
 
 loadSubjects();
 
 }
 // ================================
 // QR SCANNER MODULE
-// SUBJECT ATTENDANCE
+// VERSION 7.0
 // ================================
 
 async function scannerPage(){
@@ -715,9 +789,7 @@ Select Subject
 <br><br>
 
 <button
-
 class="button"
-
 id="startAttendanceBtn">
 
 Start Attendance
@@ -738,10 +810,12 @@ Scanner
 
 id="reader"
 
-style="display:none;
+style="
+display:none;
 width:100%;
 max-width:500px;
-margin:auto;">
+margin:auto;
+">
 
 </div>
 
@@ -751,7 +825,7 @@ id="scanResult"
 
 style="margin-top:20px;">
 
-Waiting...
+Waiting for subject selection...
 
 </div>
 
@@ -760,38 +834,41 @@ Waiting...
 `;
 
 
-
 // ================================
-// LOAD SUBJECTS
+// LOAD SUBJECT DROPDOWN
 // ================================
 
 const subjectSelect =
-document.getElementById("attendanceSubject");
+document.getElementById(
+"attendanceSubject"
+);
 
 const subjectList =
 getSubjects();
 
 subjectList.forEach(subject=>{
 
-    const option =
-    document.createElement("option");
+const option =
+document.createElement("option");
 
-    option.value =
-    subject.id;
+option.value =
+subject.id;
 
-    option.textContent =
-    subject.name;
+option.textContent =
+`${subject.code} - ${subject.name}`;
 
-    option.dataset.code =
-    subject.code;
+option.dataset.name =
+subject.name;
 
-    option.dataset.instructor =
-    subject.instructor || "";
+option.dataset.code =
+subject.code;
 
-    subjectSelect.appendChild(option);
+option.dataset.instructor =
+subject.instructor || "";
+
+subjectSelect.appendChild(option);
 
 });
-
 
 
 // ================================
@@ -802,47 +879,83 @@ document
 .getElementById("startAttendanceBtn")
 .onclick = ()=>{
 
-    if(!subjectSelect.value){
+if(!subjectSelect.value){
 
-        alert(
-        "Please select a subject first."
-        );
+alert(
+"Please select a subject first."
+);
 
-        return;
+return;
 
-    }
+}
 
-    const selectedOption =
-    subjectSelect.options[
-        subjectSelect.selectedIndex
-    ];
+const option =
+subjectSelect.options[
+subjectSelect.selectedIndex
+];
 
-    const selectedSubject = {
+selectedSubject = {
 
-        id:
-        subjectSelect.value,
+id:
+subjectSelect.value,
 
-        name:
-        selectedOption.textContent,
+name:
+option.dataset.name,
 
-        code:
-        selectedOption.dataset.code,
+code:
+option.dataset.code,
 
-        instructor:
-        selectedOption.dataset.instructor
-
-    };
-
-    document
-    .getElementById("reader")
-    .style.display="block";
-
-    openScanner(
-        selectedSubject
-    );
+instructor:
+option.dataset.instructor
 
 };
-    
+
+document
+.getElementById("reader")
+.style.display="block";
+
+document
+.getElementById("scanResult")
+.innerHTML = `
+
+<div class="card">
+
+<h2>
+
+${selectedSubject.code}
+
+</h2>
+
+<p>
+
+${selectedSubject.name}
+
+</p>
+
+<p>
+
+Instructor:
+${selectedSubject.instructor}
+
+</p>
+
+<p>
+
+Ready to scan student QR codes.
+
+</p>
+
+</div>
+
+`;
+
+openScanner(
+selectedSubject
+);
+
+};
+
+}
 // ================================
 // ATTENDANCE MODULE
 // ================================
@@ -853,7 +966,7 @@ mainContent.innerHTML = `
 
 <h1 class="page-title">
 
-Attendance
+Attendance Records
 
 </h1>
 
@@ -861,21 +974,15 @@ Attendance
 
 <h2>
 
-Attendance Records
+Today's Attendance
 
 </h2>
 
-<p>
-
-Attendance history will appear here.
-
-</p>
-
 <div
-
 id="attendanceContainer"
-
 class="student-grid">
+
+Loading attendance...
 
 </div>
 
@@ -890,7 +997,7 @@ loadAttendance();
 
 
 // ================================
-// PLACEHOLDER
+// PLACEHOLDER MODULES
 // ================================
 
 function placeholder(title){
@@ -957,7 +1064,7 @@ console.clear();
 
 console.log(
 
-"🚀 ATTENDANCE CHECKER v6.0 READY"
+"🚀 ATTENDANCE CHECKER VERSION 7.0 READY"
 
 );
 
