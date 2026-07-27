@@ -1,15 +1,13 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // FIRESTORE STUDENT MANAGEMENT
-// VERSION 4.1 QR READY CLEAN
+// VERSION 5.0 STABLE
+// PART 1
 // ======================================================
-
 
 import { db } from "./firebase.js";
 
-
 import {
-
     collection,
     addDoc,
     getDocs,
@@ -17,23 +15,11 @@ import {
     updateDoc,
     doc,
     serverTimestamp
-
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-
-
-
 
 let students = [];
 
-
-
-const studentCollection =
-collection(db,"students");
-
-
-
-
+const studentCollection = collection(db, "students");
 
 
 
@@ -43,21 +29,13 @@ collection(db,"students");
 
 export async function loadStudents(){
 
-
     try{
 
+        const snapshot = await getDocs(studentCollection);
 
-        const snapshot =
-        await getDocs(studentCollection);
-
-
-
-        students=[];
-
-
+        students = [];
 
         snapshot.forEach(item=>{
-
 
             students.push({
 
@@ -67,45 +45,27 @@ export async function loadStudents(){
 
             });
 
-
         });
 
-
-
         console.log(
-            "Students loaded:",
+            "Students Loaded:",
             students.length
         );
 
-
-
         renderStudents();
 
-
-
     }
-
-
 
     catch(error){
 
-
         console.error(
-            "Load students error:",
+            "Load Students Error:",
             error
         );
 
-
     }
 
-
 }
-
-
-
-
-
-
 
 
 
@@ -115,33 +75,75 @@ export async function loadStudents(){
 
 export async function addStudent(student){
 
-
     try{
 
+        await addDoc(
 
-const data = {
-    fullName: student.fullName, 
-    studentID: student.studentID,
-    qrCode: student.qrCode || student.studentID,
-    college: student.college,
-    course: student.course,
-    yearLevel: student.yearLevel,
-    section: student.section,
-    photo: student.photo || "",
-    createdAt: serverTimestamp()
+            studentCollection,
 
-};
+            {
 
+                fullName:
+                student.fullName,
 
+                studentID:
+                student.studentID,
+
+                qrCode:
+                student.qrCode ||
+                student.studentID,
+
+                college:
+                student.college,
+
+                course:
+                student.course,
+
+                yearLevel:
+                student.yearLevel,
+
+                section:
+                student.section,
+
+                photo:
+                student.photo || "",
+
+                createdAt:
+                serverTimestamp()
+
+            }
+
+        );
+
+        await loadStudents();
+
+        return true;
+
+    }
+
+    catch(error){
+
+        console.error(
+            "Save Student Error:",
+            error
+        );
+
+        alert(
+            error.message
+        );
+
+        return false;
+
+    }
+
+}
 // ================================
 // UPDATE STUDENT
 // ================================
 
 export async function updateStudent(id,data){
 
-
     try{
-
 
         await updateDoc(
 
@@ -153,61 +155,37 @@ export async function updateStudent(id,data){
 
             {
 
-
                 ...data,
-
 
                 updatedAt:
                 serverTimestamp()
 
-
             }
 
-
         );
-
-
 
         await loadStudents();
 
-
-
         return true;
-
-
 
     }
 
-
-
     catch(error){
 
-
         console.error(
-            "Update error:",
+            "Update Student Error:",
             error
         );
-
 
         alert(
             error.message
         );
 
-
         return false;
-
 
     }
 
-
-
 }
-
-
-
-
-
-
 
 
 
@@ -217,524 +195,318 @@ export async function updateStudent(id,data){
 
 export async function deleteStudent(id){
 
-
     const confirmDelete =
     confirm(
         "Delete this student?"
     );
 
-
-
     if(!confirmDelete)
     return;
 
-
-
-
     try{
-
 
         await deleteDoc(
 
             doc(
-
                 db,
-
                 "students",
-
                 id
-
             )
 
         );
 
-
-
         await loadStudents();
 
-
-
         alert(
-            "Student deleted!"
+            "Student deleted successfully."
         );
 
-
-
     }
-
-
 
     catch(error){
 
+        console.error(
+            "Delete Student Error:",
+            error
+        );
 
         alert(
-            "Delete failed: "
-            +
             error.message
         );
 
-
     }
-
-
 
 }
 
 
 
-
-
-
-
-
-
 // ================================
-// SEARCH
+// SEARCH STUDENTS
 // ================================
 
 export function searchStudents(keyword){
-
-
 
     keyword =
     keyword
     .toLowerCase()
     .trim();
 
-
-
-
-    const result =
-
+    const filtered =
     students.filter(student=>{
 
+        return(
 
-        const name =
-        (student.fullName || "")
-        .toLowerCase();
-
-
-
-        const id =
-        (student.studentID || "")
-        .toLowerCase();
-
-
-
-        const course =
-        (student.course || "")
-        .toLowerCase();
-
-
-
-
-        return (
-
-            name.includes(keyword)
+            (student.fullName || "")
+            .toLowerCase()
+            .includes(keyword)
 
             ||
 
-            id.includes(keyword)
+            (student.studentID || "")
+            .toLowerCase()
+            .includes(keyword)
 
             ||
 
-            course.includes(keyword)
+            (student.college || "")
+            .toLowerCase()
+            .includes(keyword)
+
+            ||
+
+            (student.course || "")
+            .toLowerCase()
+            .includes(keyword)
+
+            ||
+
+            (student.section || "")
+            .toLowerCase()
+            .includes(keyword)
 
         );
 
-
     });
 
-
-
-    renderStudents(result);
-
-
+    renderStudents(filtered);
 
 }
-
 // ================================
 // DISPLAY STUDENTS
 // ================================
 
 export function renderStudents(data = students){
 
+    const container =
+    document.getElementById("studentContainer");
 
+    if(!container) return;
 
-const container =
-document.getElementById(
-"studentContainer"
-);
+    container.innerHTML = "";
 
+    if(data.length === 0){
 
+        container.innerHTML = `
 
-if(!container)
-return;
+        <div class="empty-card">
 
+            <h2>No Students Yet</h2>
 
+            <p>Register your first student.</p>
 
+        </div>
 
-container.innerHTML="";
+        `;
 
+        return;
 
+    }
 
+    data.forEach(student=>{
 
+        const initial =
+        (student.fullName || "?")
+        .charAt(0)
+        .toUpperCase();
 
+        container.innerHTML += `
 
-if(data.length===0){
+        <div class="student-card">
 
+            <div class="student-avatar">
 
-container.innerHTML=`
+                ${initial}
 
+            </div>
 
-<div class="empty-card">
+            <div
+                class="qr-box"
+                id="qr-${student.id}">
+            </div>
 
-<h2>
-No Students Yet
-</h2>
+            <div class="student-info">
 
+                <h2>
 
-<p>
-Register your first student.
-</p>
+                    ${student.fullName}
 
+                </h2>
 
-</div>
+                <p>
 
+                    <strong>ID:</strong>
 
-`;
+                    ${student.studentID}
 
-return;
+                </p>
 
+                <p>
+
+                    <strong>College:</strong>
+
+                    ${student.college || "N/A"}
+
+                </p>
+
+                <p>
+
+                    <strong>Course:</strong>
+
+                    ${student.course || "N/A"}
+
+                </p>
+
+                <p>
+
+                    <strong>Year:</strong>
+
+                    ${student.yearLevel || "N/A"}
+
+                </p>
+
+                <p>
+
+                    <strong>Section:</strong>
+
+                    ${student.section || "N/A"}
+
+                </p>
+
+                <button
+
+                    class="delete-btn"
+
+                    onclick="removeStudent('${student.id}')">
+
+                    Delete
+
+                </button>
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+    // ==========================
+    // QR CODE GENERATOR
+    // ==========================
+
+    setTimeout(()=>{
+
+        data.forEach(student=>{
+
+            const qrBox =
+            document.getElementById(
+                "qr-" + student.id
+            );
+
+            if(!qrBox) return;
+
+            qrBox.innerHTML = "";
+
+            new QRCode(qrBox,{
+
+                text:
+                student.qrCode ||
+                student.studentID,
+
+                width:120,
+
+                height:120
+
+            });
+
+        });
+
+    },200);
 
 }
-
-
-
-
-
-
-
-data.forEach(student=>{
-
-
-const name =
-student.fullName ||
-"Unknown Student";
-
-
-
-const initial =
-name
-.charAt(0)
-.toUpperCase();
-
-
-
-
-
-container.innerHTML += `
-
-
-<div class="student-card">
-
-
-<div class="student-avatar">
-
-${initial}
-
-</div>
-
-
-
-<div 
-class="qr-box"
-id="qr-${student.id}">
-</div>
-
-
-
-
-<div class="student-info">
-
-
-<h2>
-
-${name}
-
-</h2>
-
-
-
-<p>
-
-<strong>
-ID:
-</strong>
-
-${student.studentID || "N/A"}
-
-</p>
-
-
-
-<p>
-
-<strong>College:</strong>
-
-${student.college || "N/A"}
-
-<br><br>
-
-<strong>Course:</strong>
-
-${student.course || "N/A"}
-
-<br><br>
-
-<strong>Year:</strong>
-
-${student.yearLevel || "N/A"}
-
-<br><br>
-
-<strong>Section:</strong>
-
-${student.section || "N/A"}
-
-</p>
-
-
-
-<p>
-
-<strong>
-Year:
-</strong>
-
-${student.yearLevel || "N/A"}
-
-</p>
-
-
-
-<button
-
-class="delete-btn"
-
-onclick="removeStudent('${student.id}')">
-
-
-Delete
-
-
-</button>
-
-
-
-</div>
-
-
-
-</div>
-
-
-`;
-
-
-
-});
-
-
 
 
 
 // ================================
-// GENERATE QR CODES
-// ================================
-
-
-setTimeout(()=>{
-
-
-data.forEach(student=>{
-
-
-const qrBox =
-document.getElementById(
-"qr-"+student.id
-);
-
-
-
-if(qrBox){
-
-
-qrBox.innerHTML="";
-
-
-
-new QRCode(
-
-qrBox,
-
-{
-
-text:
-
-student.qrCode ||
-
-student.studentID,
-
-
-width:120,
-
-
-height:120
-
-
-}
-
-);
-
-
-
-}
-
-
-});
-
-
-},300);
-
-
-
-
-
-}
-
-// ================================
-// GET STUDENT
+// GETTERS
 // ================================
 
 export function getStudent(id){
 
+    return students.find(
 
-return students.find(
-student =>
-student.id === id
-);
+        student => student.id === id
 
-
-}
-
-
-
-
-
-
-
-
-// ================================
-// COUNT STUDENTS
-// ================================
-
-export function getStudentCount(){
-
-
-return students.length;
-
+    );
 
 }
 
 
-
-
-
-
-
-
-// ================================
-// FILTER COURSE
-// ================================
-
-export function filterStudentsByCourse(course){
-
-
-const result =
-
-students.filter(student=>{
-
-
-return student.course === course;
-
-
-});
-
-
-
-renderStudents(result);
-
-
-
-}
-
-
-
-
-
-
-
-
-// ================================
-// GET ALL STUDENTS
-// ================================
 
 export function getStudents(){
 
-
-return students;
-
+    return students;
 
 }
 
 
 
+export function getStudentCount(){
+
+    return students.length;
+
+}
 
 
 
+export function filterStudentsByCourse(course){
+
+    renderStudents(
+
+        students.filter(
+
+            student => student.course === course
+
+        )
+
+    );
+
+}
 
 
-// ================================
-// RESET SEARCH
-// ================================
 
 export function resetStudentSearch(){
 
-
-renderStudents();
-
+    renderStudents();
 
 }
 
 
 
+// ================================
+// GLOBALS
+// ================================
 
+window.removeStudent = deleteStudent;
 
-
-
-console.log(
-"👨‍🎓 Student Module Ready"
-);
-
-
-
-
-
-
-
-
-// GLOBAL DELETE BUTTON
-
-window.removeStudent =
-deleteStudent;
+console.log("👨‍🎓 Student Module Ready");
