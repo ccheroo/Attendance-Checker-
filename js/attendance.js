@@ -86,33 +86,31 @@ console.error(
 
         // CHECK IF ALREADY PRESENT
 
+const checkQuery =
 
-        const checkQuery =
+query(
 
-        query(
+attendanceCollection,
 
-            attendanceCollection,
+where(
+"studentID",
+"==",
+student.studentID
+),
 
+where(
+"subjectID",
+"==",
+subject.id
+),
 
-            where(
-                "studentID",
-                "==",
-                student.studentID
-            ),
+where(
+"date",
+"==",
+today
+)
 
-
-            where(
-                "date",
-                "==",
-                today
-            )
-
-        );
-
-
-
-
-
+);
 
 
         const existing =
@@ -143,8 +141,6 @@ console.error(
 
 
         }
-
-
 
 const attendanceData = {
 
@@ -186,6 +182,8 @@ const attendanceData = {
 
     createdAt:
     serverTimestamp()
+
+};
 
 };
 
