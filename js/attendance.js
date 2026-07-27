@@ -146,71 +146,48 @@ console.error(
 
 
 
+const attendanceData = {
 
+    studentID:
+    student.studentID,
 
+    fullName:
+    student.fullName,
 
+    college:
+    student.college || "",
 
+    course:
+    student.course || "",
 
+    yearLevel:
+    student.yearLevel || "",
 
-        const attendanceData = {
+    section:
+    student.section || "",
 
+    qrCode:
+    student.qrCode || student.studentID,
 
-            studentID:
-            student.studentID,
+    subjectID:
+    subject.id,
 
+    subjectName:
+    subject.name,
 
+    date:
+    today,
 
-            fullName:
-            student.fullName,
+    time:
+    new Date().toLocaleTimeString(),
 
+    status:
+    "Present",
 
+    createdAt:
+    serverTimestamp()
 
-            course:
-            student.course || "",
-
-
-
-            yearLevel:
-            student.yearLevel || "",
-
-
-
-            qrCode:
-            student.qrCode || student.studentID,
-
-
-
-            date:
-            today,
-
-
-
-            time:
-
-            new Date()
-            .toLocaleTimeString(),
-
-
-
-            status:
-            "Present",
-
-
-
-            createdAt:
-            serverTimestamp()
-
-
-
-        };
-
-
-
-
-
-
-
-
+};
 
         await addDoc(
 
