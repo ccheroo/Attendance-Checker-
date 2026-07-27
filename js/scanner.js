@@ -40,7 +40,7 @@ let audioContext = null;
 
 export function openScanner(subjectId){
 
-currentSubject = subjectId;
+currentSubject = subject;
 
 const result =
 
@@ -60,8 +60,7 @@ startScanner(result);
 // SOUND
 // ================================
 
-function playBeep(type="success"){
-
+export function openScanner(subject){
 try{
 
 if(!audioContext){
