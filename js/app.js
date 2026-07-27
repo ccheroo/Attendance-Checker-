@@ -364,3 +364,612 @@ e.target.value
 loadStudents();
 
 }
+// ================================
+// COURSES MODULE
+// ================================
+
+function courses(){
+
+mainContent.innerHTML = `
+
+<h1 class="page-title">
+
+Courses
+
+</h1>
+
+<div class="card">
+
+<h2>
+
+Add Course
+
+</h2>
+
+<input
+id="collegeName"
+placeholder="College Name"
+>
+
+<input
+id="courseName"
+placeholder="Course Name"
+>
+
+<input
+id="courseCode"
+placeholder="Course Code"
+>
+
+<button
+
+class="button"
+
+id="addCourseBtn">
+
+Save Course
+
+</button>
+
+</div>
+
+<div class="card">
+
+<input
+
+id="searchCourse"
+
+placeholder="Search Course..."
+
+>
+
+</div>
+
+<div
+
+id="courseContainer"
+
+class="student-grid">
+
+</div>
+
+`;
+
+const button =
+document.getElementById(
+"addCourseBtn"
+);
+
+button.onclick = async()=>{
+
+const course={
+
+college:
+document
+.getElementById("collegeName")
+.value
+.trim(),
+
+course:
+document
+.getElementById("courseName")
+.value
+.trim(),
+
+code:
+document
+.getElementById("courseCode")
+.value
+.trim()
+
+};
+
+if(
+
+!course.college ||
+
+!course.course ||
+
+!course.code
+
+){
+
+alert(
+"Please complete all fields."
+);
+
+return;
+
+}
+
+button.disabled=true;
+
+button.innerText="Saving...";
+
+const saved=
+await addCourse(course);
+
+if(saved){
+
+document
+.getElementById("collegeName")
+.value="";
+
+document
+.getElementById("courseName")
+.value="";
+
+document
+.getElementById("courseCode")
+.value="";
+
+alert(
+"Course saved successfully!"
+);
+
+}
+
+button.disabled=false;
+
+button.innerText="Save Course";
+
+};
+
+const searchBox=
+document.getElementById(
+"searchCourse"
+);
+
+searchBox.addEventListener(
+
+"input",
+
+e=>{
+
+searchCourses(
+e.target.value
+);
+
+}
+
+);
+
+loadCourses();
+
+}
+// ================================
+// SUBJECTS MODULE
+// ================================
+
+function subjects(){
+
+mainContent.innerHTML = `
+
+<h1 class="page-title">
+
+Subjects
+
+</h1>
+
+<div class="card">
+
+<h2>
+
+Add Subject
+
+</h2>
+
+<input
+id="subjectName"
+placeholder="Subject Name"
+>
+
+<input
+id="subjectCode"
+placeholder="Subject Code"
+>
+
+<input
+id="subjectInstructor"
+placeholder="Instructor Name"
+>
+
+<button
+class="button"
+id="addSubjectBtn">
+
+Save Subject
+
+</button>
+
+</div>
+
+<div class="card">
+
+<input
+id="searchSubject"
+placeholder="Search Subject..."
+>
+
+</div>
+
+<div
+id="subjectContainer"
+class="student-grid">
+
+</div>
+
+`;
+
+const button =
+document.getElementById(
+"addSubjectBtn"
+);
+
+button.onclick = async()=>{
+
+const subject={
+
+name:
+document
+.getElementById("subjectName")
+.value
+.trim(),
+
+code:
+document
+.getElementById("subjectCode")
+.value
+.trim(),
+
+instructor:
+document
+.getElementById("subjectInstructor")
+.value
+.trim()
+
+};
+
+if(
+
+!subject.name ||
+
+!subject.code
+
+){
+
+alert(
+"Please complete all fields."
+);
+
+return;
+
+}
+
+button.disabled=true;
+
+button.innerText="Saving...";
+
+const saved =
+await addSubject(subject);
+
+if(saved){
+
+document
+.getElementById("subjectName")
+.value="";
+
+document
+.getElementById("subjectCode")
+.value="";
+
+document
+.getElementById("subjectInstructor")
+.value="";
+
+alert(
+"Subject saved successfully!"
+);
+
+}
+
+button.disabled=false;
+
+button.innerText="Save Subject";
+
+};
+
+loadSubjects();
+
+}
+// ================================
+// QR SCANNER MODULE
+// SUBJECT ATTENDANCE
+// ================================
+
+async function scannerPage(){
+
+await loadSubjects();
+
+mainContent.innerHTML = `
+
+<h1 class="page-title">
+
+QR Attendance
+
+</h1>
+
+<div class="card">
+
+<h2>
+
+Start Attendance
+
+</h2>
+
+<p>
+
+Select the subject before scanning.
+
+</p>
+
+<select
+id="attendanceSubject"
+class="input">
+
+<option value="">
+
+Select Subject
+
+</option>
+
+</select>
+
+<br><br>
+
+<button
+
+class="button"
+
+id="startAttendanceBtn">
+
+Start Attendance
+
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>
+
+Scanner
+
+</h2>
+
+<div
+
+id="reader"
+
+style="display:none;
+width:100%;
+max-width:500px;
+margin:auto;">
+
+</div>
+
+<div
+
+id="scanResult"
+
+style="margin-top:20px;">
+
+Waiting...
+
+</div>
+
+</div>
+
+`;
+
+
+
+// ===================================
+// LOAD SUBJECTS TO DROPDOWN
+// ===================================
+
+const select =
+document.getElementById(
+"attendanceSubject"
+);
+
+getSubjects().forEach(subject=>{
+
+select.innerHTML += `
+
+<option value="${subject.id}">
+
+${subject.code} - ${subject.name}
+
+</option>
+
+`;
+
+});
+
+
+
+// ===================================
+// START ATTENDANCE
+// ===================================
+
+const startButton =
+document.getElementById(
+"startAttendanceBtn"
+);
+
+startButton.onclick = ()=>{
+
+if(select.value===""){
+
+alert(
+"Please select a subject first."
+);
+
+return;
+
+}
+
+selectedSubject = select.value;
+
+document
+.getElementById("reader")
+.style.display="block";
+
+document
+.getElementById("scanResult")
+.innerHTML=`
+
+<b>
+
+Attendance Started
+
+</b>
+
+<br><br>
+
+Now scanning...
+
+`;
+
+openScanner(selectedSubject);
+
+startButton.disabled=true;
+
+startButton.innerText=
+"Attendance Running";
+
+select.disabled=true;
+
+};
+
+}
+// ================================
+// ATTENDANCE MODULE
+// ================================
+
+function attendance(){
+
+mainContent.innerHTML = `
+
+<h1 class="page-title">
+
+Attendance
+
+</h1>
+
+<div class="card">
+
+<h2>
+
+Attendance Records
+
+</h2>
+
+<p>
+
+Attendance history will appear here.
+
+</p>
+
+<div
+
+id="attendanceContainer"
+
+class="student-grid">
+
+</div>
+
+</div>
+
+`;
+
+loadAttendance();
+
+}
+
+
+
+// ================================
+// PLACEHOLDER
+// ================================
+
+function placeholder(title){
+
+mainContent.innerHTML = `
+
+<h1 class="page-title">
+
+${title}
+
+</h1>
+
+<div class="card">
+
+<h2>
+
+${title}
+
+</h2>
+
+<p>
+
+This module is under development.
+
+</p>
+
+</div>
+
+`;
+
+}
+
+
+
+// ================================
+// CURRENT SUBJECT
+// ================================
+
+export function getSelectedSubject(){
+
+return selectedSubject;
+
+}
+
+
+
+// ================================
+// RESET SUBJECT
+// ================================
+
+export function clearSelectedSubject(){
+
+selectedSubject = null;
+
+}
+
+
+
+// ================================
+// APPLICATION START
+// ================================
+
+console.clear();
+
+console.log(
+
+"🚀 ATTENDANCE CHECKER v6.0 READY"
+
+);
+
+loadPage("dashboard");
