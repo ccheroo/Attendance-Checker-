@@ -1,7 +1,7 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // COURSES MANAGEMENT
-// VERSION 5.0
+// VERSION 5.1 STABLE
 // ======================================================
 
 import { db } from "./firebase.js";
@@ -12,9 +12,7 @@ import {
     getDocs,
     deleteDoc,
     doc,
-    serverTimestamp,
-    orderBy,
-    query
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const courseCollection = collection(db, "courses");
@@ -27,39 +25,35 @@ let courses = [];
 // LOAD COURSES
 // ======================================
 
-export async function loadCourses() {
+export async function loadCourses(){
 
-    try {
+    try{
 
-        const snapshot = await getDocs(
-            query(
-                courseCollection,
-                orderBy("college"),
-                orderBy("course")
-            )
-        );
+        const snapshot = await getDocs(courseCollection);
 
         courses = [];
 
-        snapshot.forEach(docItem => {
+        snapshot.forEach(item=>{
 
             courses.push({
 
-                id: docItem.id,
+                id:item.id,
 
-                ...docItem.data()
+                ...item.data()
 
             });
 
         });
 
+        console.log("Courses Loaded:", courses);
+
         renderCourses();
 
     }
 
-    catch (error) {
+    catch(error){
 
-        console.error(error);
+        console.error("Load Courses Error:", error);
 
     }
 
@@ -71,27 +65,21 @@ export async function loadCourses() {
 // ADD COURSE
 // ======================================
 
-export async function addCourse(course) {
+export async function addCourse(course){
 
-    try {
+    try{
 
-        await addDoc(
+        await addDoc(courseCollection,{
 
-            courseCollection,
+            college:course.college,
 
-            {
+            course:course.course,
 
-                college: course.college,
+            code:course.code,
 
-                course: course.course,
+            createdAt:serverTimestamp()
 
-                code: course.code,
-
-                createdAt: serverTimestamp()
-
-            }
-
-        );
+        });
 
         await loadCourses();
 
@@ -99,7 +87,7 @@ export async function addCourse(course) {
 
     }
 
-    catch (error) {
+    catch(error){
 
         console.error(error);
 
@@ -117,15 +105,15 @@ export async function addCourse(course) {
 // DELETE COURSE
 // ======================================
 
-export async function deleteCourse(id) {
+export async function deleteCourse(id){
 
-    if (!confirm("Delete this course?")) return;
+    if(!confirm("Delete this course?")) return;
 
-    try {
+    try{
 
         await deleteDoc(
 
-            doc(db, "courses", id)
+            doc(db,"courses",id)
 
         );
 
@@ -133,7 +121,7 @@ export async function deleteCourse(id) {
 
     }
 
-    catch (error) {
+    catch(error){
 
         console.error(error);
 
@@ -146,66 +134,32 @@ export async function deleteCourse(id) {
 
 
 // ======================================
-// GET COURSES
-// ======================================
-
-export function getCourses() {
-
-    return courses;
-
-}
-
-
-
-// ======================================
-// GET COURSES BY COLLEGE
-// ======================================
-
-export function getCoursesByCollege(college) {
-
-    return courses.filter(item => item.college === college);
-
-}
-
-
-
-// ======================================
-// GET COLLEGES
-// ======================================
-
-export function getColleges() {
-
-    return [...new Set(
-
-        courses.map(item => item.college)
-
-    )];
-
-}
-
-
-
-// ======================================
 // SEARCH
 // ======================================
 
-export function searchCourses(keyword) {
+export function searchCourses(keyword){
 
-    keyword = keyword.toLowerCase();
+    keyword = keyword.toLowerCase().trim();
 
-    const filtered = courses.filter(item => {
+    const filtered = courses.filter(item=>{
 
-        return (
+        return(
 
-            item.course.toLowerCase().includes(keyword)
-
-            ||
-
-            item.code.toLowerCase().includes(keyword)
+            (item.college || "")
+            .toLowerCase()
+            .includes(keyword)
 
             ||
 
-            item.college.toLowerCase().includes(keyword)
+            (item.course || "")
+            .toLowerCase()
+            .includes(keyword)
+
+            ||
+
+            (item.code || "")
+            .toLowerCase()
+            .includes(keyword)
 
         );
 
@@ -218,24 +172,60 @@ export function searchCourses(keyword) {
 
 
 // ======================================
+// GETTERS
+// ======================================
+
+export function getCourses(){
+
+    return courses;
+
+}
+
+
+
+export function getColleges(){
+
+    return [...new Set(
+
+        courses.map(item=>item.college)
+
+    )];
+
+}
+
+
+
+export function getCoursesByCollege(college){
+
+    return courses.filter(
+
+        item=>item.college===college
+
+    );
+
+}
+
+
+
+// ======================================
 // DISPLAY
 // ======================================
 
-export function renderCourses(data = courses) {
+export function renderCourses(data = courses){
 
     const container = document.getElementById("courseContainer");
 
-    if (!container) return;
+    if(!container) return;
 
     container.innerHTML = "";
 
-    if (data.length === 0) {
+    if(data.length===0){
 
-        container.innerHTML = `
+        container.innerHTML=`
 
         <div class="empty-card">
 
-            <h2>No Courses</h2>
+            <h2>No Courses Yet</h2>
 
             <p>Add your first course.</p>
 
@@ -247,13 +237,13 @@ export function renderCourses(data = courses) {
 
     }
 
-    let grouped = {};
+    const grouped = {};
 
-    data.forEach(course => {
+    data.forEach(course=>{
 
-        if (!grouped[course.college]) {
+        if(!grouped[course.college]){
 
-            grouped[course.college] = [];
+            grouped[course.college]=[];
 
         }
 
@@ -261,7 +251,7 @@ export function renderCourses(data = courses) {
 
     });
 
-    Object.keys(grouped).forEach(college => {
+    Object.keys(grouped).forEach(college=>{
 
         container.innerHTML += `
 
@@ -269,21 +259,21 @@ export function renderCourses(data = courses) {
 
             <h2>🏫 ${college}</h2>
 
-            <div id="college-${college.replace(/\s/g,'')}"></div>
+            <div class="course-group" id="college-${college.replace(/\s+/g,"-")}"></div>
 
         </div>
 
         `;
 
-        const collegeBox = document.getElementById(
+        const groupContainer = document.getElementById(
 
-            `college-${college.replace(/\s/g,'')}`
+            `college-${college.replace(/\s+/g,"-")}`
 
         );
 
-        grouped[college].forEach(course => {
+        grouped[college].forEach(course=>{
 
-            collegeBox.innerHTML += `
+            groupContainer.innerHTML += `
 
             <div class="student-card">
 
@@ -299,14 +289,16 @@ export function renderCourses(data = courses) {
 
                     <p>
 
-                        <strong>Code:</strong>
+                        <strong>Course Code:</strong>
 
                         ${course.code}
 
                     </p>
 
                     <button
+
                         class="delete-btn"
+
                         onclick="removeCourse('${course.id}')">
 
                         Delete
