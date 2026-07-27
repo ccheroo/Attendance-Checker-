@@ -232,3 +232,399 @@ result
 );
 
 }
+// ================================
+// FIND STUDENT
+// ================================
+
+async function findStudent(qr,result){
+
+try{
+
+const q = query(
+
+collection(db,"students"),
+
+where(
+"qrCode",
+"==",
+qr
+)
+
+);
+
+let snapshot =
+await getDocs(q);
+
+
+// Fallback using Student ID
+
+if(snapshot.empty){
+
+const oldQuery = query(
+
+collection(db,"students"),
+
+where(
+"studentID",
+"==",
+qr
+)
+
+);
+
+snapshot =
+await getDocs(oldQuery);
+
+}
+
+
+if(snapshot.empty){
+
+playBeep("error");
+
+vibrate();
+
+showMessage(
+
+result,
+
+"❌ Student Not Found",
+
+`
+QR Code:
+
+<br>
+
+<strong>${qr}</strong>
+
+<br><br>
+
+Please register this student first.
+
+`,
+
+"error"
+
+);
+
+processing=false;
+
+try{
+
+scanner.resume();
+
+}
+
+catch(e){}
+
+return;
+
+}
+
+
+let student=null;
+
+snapshot.forEach(doc=>{
+
+student={
+
+id:doc.id,
+
+...doc.data()
+
+};
+
+});
+
+
+const subject={
+
+id:currentSubject,
+
+name:
+document
+.getElementById("attendanceSubject")
+.options[
+document
+.getElementById("attendanceSubject")
+.selectedIndex
+].text
+
+};
+
+
+const saved =
+await recordAttendance(
+
+student,
+
+subject
+
+);
+
+
+if(saved){
+
+playBeep("success");
+
+vibrate();
+
+showMessage(
+
+result,
+
+"✅ Attendance Recorded",
+
+`
+
+<strong style="font-size:22px">
+
+${student.fullName}
+
+</strong>
+
+<br><br>
+
+Student ID:
+
+${student.studentID}
+
+<br>
+
+Course:
+
+${student.course}
+
+<br>
+
+Year:
+
+${student.yearLevel}
+
+<br><br>
+
+<span style="color:green;font-size:20px;font-weight:bold;">
+
+PRESENT
+
+</span>
+
+`,
+
+"success"
+
+);
+
+}
+
+else{
+
+playBeep("warning");
+
+vibrate();
+
+showMessage(
+
+result,
+
+"⚠ Already Checked In",
+
+`
+
+<strong>
+
+${student.fullName}
+
+</strong>
+
+<br><br>
+
+Attendance already recorded today.
+
+`,
+
+"warning"
+
+);
+
+}
+
+}
+
+catch(error){
+
+console.error(error);
+
+playBeep("error");
+
+showMessage(
+
+result,
+
+"❌ Error",
+
+error.message,
+
+"error"
+
+);
+
+}
+
+processing=false;
+
+try{
+
+scanner.resume();
+
+}
+
+catch(e){}
+
+}
+// ================================
+// MESSAGE DISPLAY
+// ================================
+
+function showMessage(
+
+container,
+title,
+message,
+type
+
+){
+
+container.innerHTML = `
+
+<div class="card scan-${type}">
+
+<h2>
+
+${title}
+
+</h2>
+
+<p>
+
+${message}
+
+</p>
+
+<br>
+
+<button
+
+id="scanAgainBtn"
+
+class="button">
+
+📷 Scan Another QR Code
+
+</button>
+
+</div>
+
+`;
+
+const button =
+
+document.getElementById(
+"scanAgainBtn"
+);
+
+if(button){
+
+button.onclick = ()=>{
+
+processing = false;
+
+container.innerHTML = `
+
+<div class="card">
+
+<h2>
+
+📷 Ready to Scan
+
+</h2>
+
+<p>
+
+Place another QR code inside the scanner.
+
+</p>
+
+</div>
+
+`;
+
+try{
+
+scanner.resume();
+
+}
+
+catch(error){
+
+console.log(error);
+
+}
+
+};
+
+}
+
+}
+
+
+
+// ================================
+// CLOSE SCANNER
+// ================================
+
+export async function closeScanner(){
+
+try{
+
+if(scanner){
+
+await scanner.clear();
+
+scanner = null;
+
+}
+
+}
+
+catch(error){
+
+console.log(error);
+
+}
+
+processing = false;
+
+currentSubject = null;
+
+}
+
+
+
+// ================================
+// GET CURRENT SUBJECT
+// ================================
+
+export function getCurrentSubject(){
+
+return currentSubject;
+
+}
+
+
+
+console.log(
+
+"📷 Scanner Module Ready"
+
+);
