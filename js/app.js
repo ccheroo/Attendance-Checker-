@@ -31,8 +31,8 @@ import {
 import {
 
     addCourse,
-
-    loadCourses
+    loadCourses,
+    searchCourses
 
 } from "./courses.js";
 
@@ -554,45 +554,38 @@ loadStudents();
 
 // ================================
 // COURSES MODULE
+// VERSION 5.0
 // ================================
-
 
 function courses(){
 
-
-
 mainContent.innerHTML = `
 
-
 <h1 class="page-title">
+
 Courses
+
 </h1>
-
-
 
 
 <div class="card">
 
+<h2>Add Course</h2>
 
-<h2>
-Add Course
-</h2>
-
-
+<input
+id="collegeName"
+placeholder="College Name (ex. College of Education)"
+>
 
 <input
 id="courseName"
-placeholder="Course Name"
+placeholder="Course Name (ex. Bachelor of Secondary Education)"
 >
-
-
 
 <input
 id="courseCode"
-placeholder="Course Code"
+placeholder="Course Code (ex. BSED)"
 >
-
-
 
 <button
 class="button"
@@ -602,23 +595,17 @@ Save Course
 
 </button>
 
-
-
 </div>
-
-
-
-
-
 
 
 <div class="card">
 
+<input
+id="searchCourse"
+placeholder="Search Course..."
+>
 
-<h2>
-Course List
-</h2>
-
+</div>
 
 
 <div
@@ -627,16 +614,7 @@ class="student-grid">
 
 </div>
 
-
-
-</div>
-
-
-
 `;
-
-
-
 
 
 
@@ -647,73 +625,55 @@ document.getElementById(
 
 
 
-
-
-
 button.onclick = async()=>{
 
+const course={
 
+college:
+document
+.getElementById("collegeName")
+.value
+.trim(),
 
-const course = {
-
-
-name:
-
+course:
 document
 .getElementById("courseName")
 .value
 .trim(),
 
-
-
 code:
-
 document
 .getElementById("courseCode")
 .value
 .trim()
 
-
-
 };
-
-
-
 
 
 
 if(
 
-!course.name ||
+!course.college ||
+
+!course.course ||
 
 !course.code
 
 ){
 
-
 alert(
 "Please complete all fields."
 );
 
-
 return;
-
 
 }
 
 
 
-
-
-
-
 button.disabled=true;
 
-button.innerText=
-"Saving...";
-
-
-
+button.innerText="Saving...";
 
 
 
@@ -722,62 +682,51 @@ await addCourse(course);
 
 
 
-
-
-
 if(saved){
 
+document.getElementById("collegeName").value="";
 
+document.getElementById("courseName").value="";
 
-document
-.getElementById("courseName")
-.value="";
+document.getElementById("courseCode").value="";
 
-
-
-document
-.getElementById("courseCode")
-.value="";
-
-
-
-alert(
-"Course saved successfully!"
-);
-
-
+alert("Course saved successfully!");
 
 }
-
 
 
 
 button.disabled=false;
 
-button.innerText=
-"Save Course";
-
-
+button.innerText="Save Course";
 
 };
 
 
 
+const searchBox =
+document.getElementById(
+"searchCourse"
+);
 
+
+
+searchBox.addEventListener(
+"input",
+e=>{
+
+searchCourses(
+e.target.value
+);
+
+}
+);
 
 
 
 loadCourses();
 
-
-
 }
-
-
-
-
-
-
 
 
 
