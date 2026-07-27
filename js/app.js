@@ -629,41 +629,75 @@ QR Scanner
 
 <h2>
 
-Attendance Scanner
+Start Attendance
 
 </h2>
 
-<p>
+<label>
 
-Scan student QR code.
+Subject
 
-</p>
+</label>
+
+<select id="attendanceSubject">
+
+<option value="">
+
+Select Subject
+
+</option>
+
+</select>
+
+<br><br>
+
+<button
+
+class="button"
+
+id="startAttendanceBtn">
+
+Start Attendance
+
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>
+
+QR Scanner
+
+</h2>
 
 <div
+
 id="reader"
+
 style="
 width:100%;
 max-width:500px;
 margin:auto;
+display:none;
 ">
 
 </div>
 
 <div
+
 id="scanResult"
+
 style="margin-top:20px;">
 
-Ready to scan...
+Select a subject first.
 
 </div>
 
 </div>
 
 `;
-
-openScanner();
-
-}
+    
 // ================================
 // ATTENDANCE MODULE
 // ================================
