@@ -387,8 +387,15 @@ Delete
 
 
 
+// ================================
+// GET ALL SUBJECTS
+// ================================
 
+export function getSubjects(){
 
+    return subjects;
+
+}
 
 
 window.removeSubject =
