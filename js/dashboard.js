@@ -36,10 +36,7 @@ import {
 export function loadDashboard(){
 
 
-    setTimeout(()=>{
-
-
-    loadStudentCount();
+loadStudentCount();
 
 loadSubjectCount();
 
@@ -47,8 +44,9 @@ loadPresentToday();
 
 loadRecentAttendance();
 
-setupQuickActions();
+loadAttendanceChart();
 
+setupQuickActions();
 
 
     },100);
@@ -841,6 +839,104 @@ console.error(
 "Recent Attendance Error:",
 error
 );
+
+}
+
+}
+
+// ================================
+// ATTENDANCE CHART
+// ================================
+
+async function loadAttendanceChart(){
+
+try{
+
+const snapshot =
+await getDocs(
+collection(db,"attendance")
+);
+
+const totals = {};
+
+snapshot.forEach(doc=>{
+
+const record = doc.data();
+
+const subject =
+record.subjectName || "Unknown";
+
+totals[subject] =
+(totals[subject] || 0) + 1;
+
+});
+
+const labels =
+Object.keys(totals);
+
+const values =
+Object.values(totals);
+
+const canvas =
+document.getElementById(
+"attendanceChart"
+);
+
+if(!canvas) return;
+
+new Chart(canvas,{
+
+type:"bar",
+
+data:{
+
+labels:labels,
+
+datasets:[{
+
+label:"Attendance",
+
+data:values,
+
+borderWidth:1
+
+}]
+
+},
+
+options:{
+
+responsive:true,
+
+plugins:{
+
+legend:{
+
+display:false
+
+}
+
+},
+
+scales:{
+
+y:{
+
+beginAtZero:true
+
+}
+
+}
+
+}
+
+});
+
+}
+
+catch(error){
+
+console.log(error);
 
 }
 
