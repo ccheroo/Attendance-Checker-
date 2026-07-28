@@ -1,40 +1,154 @@
 // ======================================================
 // ATTENDANCE CHECKER
-// DASHBOARD
-// VERSION 2.1 QUICK ACTIONS FUNCTIONAL
+// DASHBOARD MODULE
+// VERSION 7.0
+// PART 1
 // ======================================================
 
+// ================================
+// IMPORTS
+// ================================
 
 import { db } from "./firebase.js";
 
-
 import {
 
-    collection,
-
-    onSnapshot,
-
-    getDocs,
-
-    query,
-
-    where,
-
-    orderBy,
-
-    limit
+collection,
+getDocs,
+query,
+where,
+orderBy,
+limit,
+onSnapshot
 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
 
-
 // ================================
-// LOAD DASHBOARD
+// DASHBOARD HTML
 // ================================
 
 export function loadDashboard(){
 
+return `
+
+<h1 class="page-title">
+
+Dashboard
+
+</h1>
+
+<div class="dashboard-grid">
+
+<div class="card dashboard-card">
+
+<h2>
+
+👨‍🎓 Total Students
+
+</h2>
+
+<h1 id="studentCount">
+
+0
+
+</h1>
+
+</div>
+
+<div class="card dashboard-card">
+
+<h2>
+
+📖 Total Subjects
+
+</h2>
+
+<h1 id="subjectCount">
+
+0
+
+</h1>
+
+</div>
+
+<div class="card dashboard-card">
+
+<h2>
+
+✅ Present Today
+
+</h2>
+
+<h1 id="presentToday">
+
+0
+
+</h1>
+
+</div>
+
+<div class="card dashboard-card">
+
+<h2>
+
+📈 Attendance Rate
+
+</h2>
+
+<h1 id="attendanceRate">
+
+0%
+
+</h1>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>
+
+🟢 Recent Attendance
+
+</h2>
+
+<div id="recentAttendance">
+
+Loading...
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>
+
+📊 Attendance Analytics
+
+</h2>
+
+<canvas
+
+id="attendanceChart"
+
+height="120">
+
+</canvas>
+
+</div>
+
+`;
+
+}
+// ================================
+// INITIALIZE DASHBOARD
+// ================================
+
+export function initDashboard(){
 
 loadStudentCount();
 
@@ -46,552 +160,86 @@ loadRecentAttendance();
 
 loadAttendanceChart();
 
-setupQuickActions();
-
-
-    },100);
-
-
-
-
-
-    const today = new Date();
-
-
-
-    const date = today.toLocaleDateString(
-        "en-US",
-        {
-
-        weekday:"long",
-
-        year:"numeric",
-
-        month:"long",
-
-        day:"numeric"
-
-        }
-    );
-
-
-
-    const time = today.toLocaleTimeString(
-        "en-US",
-        {
-
-        hour:"2-digit",
-
-        minute:"2-digit"
-
-        }
-    );
-
-
-
-
-
-return `
-
-
-<h1 class="page-title">
-
-Dashboard
-
-</h1>
-
-
-
-
-<p class="dashboard-date">
-
-${date} • ${time}
-
-</p>
-
-
-
-
-
-<div class="grid">
-
-
-
-<div class="card stat-card">
-
-
-<h3>
-Total Students
-</h3>
-
-
-<h1 id="totalStudents">
-
-Loading...
-
-</h1>
-
-
-</div>
-
-
-
-
-
-<div class="card stat-card">
-
-
-<h3>
-Present Today
-</h3>
-
-
-<h1 id="presentToday">
-0
-</h1>
-
-
-</div>
-
-
-
-
-
-<div class="card stat-card">
-
-
-<h3>
-Subjects
-</h3>
-
-
-<h1 id="totalSubjects">
-0
-</h1>
-
-
-</div>
-
-
-
-
-
-<div class="card stat-card">
-
-
-<h3>
-Attendance Rate
-</h3>
-
-
-<h1 id="attendanceRate">
-0%
-</h1>
-
-
-</div>
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<div
-
-style="
-
-margin-top:35px;
-
-display:grid;
-
-grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-
-gap:25px;
-
-">
-
-
-
-
-
-<div class="card">
-
-
-<h2>
-Quick Actions
-</h2>
-
-
-
-
-<button
-
-class="button"
-
-id="openStudents">
-
-
-Student Management
-
-</button>
-
-
-
-
-<br><br>
-
-
-
-
-<button
-
-class="button"
-
-id="openScanner">
-
-
-Open QR Scanner
-
-</button>
-
-
-
-
-<br><br>
-
-
-
-
-<button
-
-class="button"
-
-id="openReports">
-
-
-Download Reports
-
-</button>
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<div class="card">
-
-
-<h2>
-Recent Attendance
-</h2>
-
-
-
-<div id="recentAttendance">
-
-No attendance records yet.
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-</div>
-
-
-
-
-`;
-
-
-
 }
-
-
-
-
-
-
-
-
-
 // ================================
-// QUICK ACTIONS
+// LOAD STUDENT COUNT
 // ================================
 
-
-function setupQuickActions(){
-
-
-
-const studentBtn =
-document.getElementById(
-"openStudents"
-);
-
-
-
-const scannerBtn =
-document.getElementById(
-"openScanner"
-);
-
-
-
-const reportsBtn =
-document.getElementById(
-"openReports"
-);
-
-
-
-
-
-if(studentBtn){
-
-
-studentBtn.onclick = ()=>{
-
-
-const menu =
-document.querySelector(
-'[data-page="students"]'
-);
-
-
-
-if(menu){
-
-menu.click();
-
-}
-
-
-
-};
-
-
-}
-
-
-
-
-
-
-
-if(scannerBtn){
-
-
-scannerBtn.onclick = ()=>{
-
-
-const menu =
-document.querySelector(
-'[data-page="scanner"]'
-);
-
-
-
-if(menu){
-
-menu.click();
-
-}
-
-
-
-};
-
-
-}
-
-
-
-
-
-
-
-if(reportsBtn){
-
-
-reportsBtn.onclick = ()=>{
-
-
-const menu =
-document.querySelector(
-'[data-page="reports"]'
-);
-
-
-
-if(menu){
-
-menu.click();
-
-}
-
-
-
-};
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// ================================
-// STUDENT COUNT
-// ================================
-
-
-function loadStudentCount(){
-
-
-
-const studentRef =
-collection(db,"students");
-
-
-
-onSnapshot(
-
-studentRef,
-
-(snapshot)=>{
-
-
-const counter =
-document.getElementById(
-"totalStudents"
-);
-
-
-
-if(counter){
-
-
-counter.innerHTML =
-snapshot.size;
-
-
-}
-
-
-
-}
-
-
-);
-
-
-
-}
-
-
-
-
-
-
-
-
-// ================================
-// SUBJECT COUNT
-// ================================
-
-
-async function loadSubjectCount(){
-
-
+async function loadStudentCount(){
 
 try{
 
+const snapshot =
+await getDocs(
+collection(db,"students")
+);
+
+const element =
+document.getElementById(
+"studentCount"
+);
+
+if(element){
+
+element.textContent =
+snapshot.size;
+
+}
+
+}
+
+catch(error){
+
+console.error(
+"Student Count:",
+error
+);
+
+}
+
+}
+
+
+
+// ================================
+// LOAD SUBJECT COUNT
+// ================================
+
+async function loadSubjectCount(){
+
+try{
 
 const snapshot =
 await getDocs(
 collection(db,"subjects")
 );
 
-
-
-const counter =
+const element =
 document.getElementById(
-"totalSubjects"
+"subjectCount"
 );
 
+if(element){
 
-
-if(counter){
-
-
-counter.innerHTML =
+element.textContent =
 snapshot.size;
 
+}
 
 }
 
+catch(error){
 
-
-}
-
-
-
-
-
-
-const counter =
-document.getElementById(
-"totalSubjects"
+console.error(
+"Subject Count:",
+error
 );
 
-
-
-if(counter){
-
-counter.innerHTML = 0;
-
 }
 
-
 }
-
-
-
-}
-
 // ================================
-// PRESENT TODAY (REALTIME)
+// PRESENT TODAY
 // ================================
 
 function loadPresentToday(){
@@ -627,7 +275,7 @@ document.getElementById(
 
 if(present){
 
-present.innerHTML =
+present.textContent =
 snapshot.size;
 
 }
@@ -646,7 +294,7 @@ if(rate){
 
 if(students.size===0){
 
-rate.innerHTML="0%";
+rate.textContent="0%";
 
 }
 
@@ -659,194 +307,23 @@ Math.round(
 
 );
 
-rate.innerHTML =
+rate.textContent =
 percent + "%";
-
+loadAttendanceChart();
 }
 
 }
-
-// Refresh recent attendance automatically
-loadRecentAttendance();
 
 }
 
 );
 
 }
-
 // ================================
-// RECENT ATTENDANCE
+// ATTENDANCE ANALYTICS
 // ================================
 
-function loadRecentAttendance(){
-
-try{
-
-const attendanceQuery = query(
-
-collection(db,"attendance"),
-
-orderBy(
-"createdAt",
-"desc"
-),
-
-limit(5)
-
-);
-
-onSnapshot(
-
-attendanceQuery,
-
-(snapshot)=>{
-
-const container =
-document.getElementById(
-"recentAttendance"
-);
-
-if(!container) return;
-
-container.innerHTML="";
-
-if(snapshot.empty){
-
-container.innerHTML=`
-
-<p>
-
-No attendance records yet.
-
-</p>
-
-`;
-
-return;
-
-}
-
-snapshot.forEach(doc=>{
-
-const record = doc.data();
-
-container.innerHTML += `
-
-<div class="recent-item">
-
-<strong>
-
-${record.fullName}
-
-</strong>
-
-<br>
-
-<small>
-
-${record.subjectName || "No Subject"}
-
-</small>
-
-<br>
-
-<small>
-
-${record.time || ""}
-
-</small>
-
-<hr>
-
-</div>
-
-`;
-
-});
-
-}
-
-);
-const container =
-document.getElementById(
-"recentAttendance"
-);
-
-if(!container) return;
-
-container.innerHTML = "";
-
-if(snapshot.empty){
-
-container.innerHTML = `
-
-<p>
-
-No attendance records yet.
-
-</p>
-
-`;
-
-return;
-
-}
-
-snapshot.forEach(doc=>{
-
-const record = doc.data();
-
-container.innerHTML += `
-
-<div class="recent-item">
-
-<strong>
-
-${record.fullName}
-
-</strong>
-
-<br>
-
-<small>
-
-${record.subjectName || "No Subject"}
-
-</small>
-
-<br>
-
-<small>
-
-${record.time || ""}
-
-</small>
-
-<hr>
-
-</div>
-
-`;
-
-});
-
-}
-
-catch(error){
-
-console.error(
-"Recent Attendance Error:",
-error
-);
-
-}
-
-}
-
-// ================================
-// ATTENDANCE CHART
-// ================================
+let attendanceChart = null;
 
 async function loadAttendanceChart(){
 
@@ -884,13 +361,22 @@ document.getElementById(
 
 if(!canvas) return;
 
-new Chart(canvas,{
+const ctx =
+canvas.getContext("2d");
+
+if(attendanceChart){
+
+attendanceChart.destroy();
+
+}
+
+attendanceChart = new Chart(ctx,{
 
 type:"bar",
 
 data:{
 
-labels:labels,
+labels,
 
 datasets:[{
 
@@ -898,7 +384,20 @@ label:"Attendance",
 
 data:values,
 
-borderWidth:1
+backgroundColor:[
+"#2563eb",
+"#10b981",
+"#f59e0b",
+"#ef4444",
+"#8b5cf6",
+"#06b6d4",
+"#ec4899",
+"#14b8a6"
+],
+
+borderRadius:8,
+
+maxBarThickness:50
 
 }]
 
@@ -908,11 +407,21 @@ options:{
 
 responsive:true,
 
+maintainAspectRatio:false,
+
 plugins:{
 
 legend:{
 
 display:false
+
+},
+
+title:{
+
+display:true,
+
+text:"Attendance Per Subject"
 
 }
 
@@ -922,7 +431,13 @@ scales:{
 
 y:{
 
-beginAtZero:true
+beginAtZero:true,
+
+ticks:{
+
+precision:0
+
+}
 
 }
 
@@ -936,7 +451,13 @@ beginAtZero:true
 
 catch(error){
 
-console.log(error);
+console.error(
+
+"Attendance Chart:",
+
+error
+
+);
 
 }
 
