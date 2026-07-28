@@ -588,13 +588,13 @@ export function renderAttendance(records){
 
                 <p>
 
-                <strong>
-                Course:
-                </strong>
+<strong>
+Subject:
+</strong>
 
-                ${record.course || "N/A"}
+${record.subjectName || "N/A"}
 
-                </p>
+</p>
 
 
 
@@ -610,7 +610,15 @@ export function renderAttendance(records){
 
                 </p>
 
+<p>
 
+<strong>
+Section:
+</strong>
+
+${record.section || "N/A"}
+
+</p>
 
 
 
