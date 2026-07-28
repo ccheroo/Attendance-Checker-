@@ -11,7 +11,8 @@
 // ================================
 
 import {
-    loadDashboard
+    loadDashboard,
+    initDashboard
 } from "./dashboard.js";
 
 import {
