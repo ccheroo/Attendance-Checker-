@@ -483,3 +483,244 @@ ${record.status || "Present"}
 );
 
 }
+// ================================
+// ATTENDANCE CHART
+// ================================
+
+let attendanceChart = null;
+
+function loadAttendanceChart(){
+
+const attendanceQuery =
+
+query(
+
+collection(db,"attendance")
+
+);
+
+onSnapshot(
+
+attendanceQuery,
+
+(snapshot)=>{
+
+const totals = {};
+
+snapshot.forEach(doc=>{
+
+const record = doc.data();
+
+const subject =
+
+record.subjectCode ||
+
+record.subjectName ||
+
+"Unknown";
+
+totals[subject] =
+
+(totals[subject] || 0) + 1;
+
+});
+
+const labels =
+Object.keys(totals);
+
+const values =
+Object.values(totals);
+
+const canvas =
+document.getElementById(
+"attendanceChart"
+);
+
+if(!canvas) return;
+
+// Prevent Chart.js error
+if(typeof Chart === "undefined"){
+
+console.warn(
+"Chart.js not loaded."
+);
+
+return;
+
+}
+
+const ctx =
+canvas.getContext("2d");
+
+if(attendanceChart){
+
+attendanceChart.destroy();
+
+}
+
+attendanceChart =
+new Chart(ctx,{
+
+type:"bar",
+
+data:{
+
+labels,
+
+datasets:[{
+
+label:"Attendance",
+
+data:values,
+
+backgroundColor:[
+
+"#2563EB",
+"#10B981",
+"#F59E0B",
+"#EF4444",
+"#8B5CF6",
+"#06B6D4",
+"#EC4899",
+"#14B8A6",
+"#84CC16",
+"#F97316"
+
+],
+
+borderRadius:8,
+
+maxBarThickness:45
+
+}]
+
+},
+
+options:{
+
+responsive:true,
+
+maintainAspectRatio:false,
+
+plugins:{
+
+legend:{
+
+display:false
+
+},
+
+title:{
+
+display:true,
+
+text:"Attendance Per Subject"
+
+}
+
+},
+
+scales:{
+
+y:{
+
+beginAtZero:true,
+
+ticks:{
+
+precision:0
+
+}
+
+}
+
+}
+
+}
+
+});
+
+}
+
+);
+
+}
+// ================================
+// DASHBOARD DATE
+// ================================
+
+function updateDashboardDate(){
+
+const element =
+document.getElementById(
+"dashboardDate"
+);
+
+if(!element) return;
+
+element.textContent =
+new Date().toLocaleDateString(
+
+"en-PH",
+
+{
+
+weekday:"long",
+
+year:"numeric",
+
+month:"long",
+
+day:"numeric"
+
+}
+
+);
+
+}
+
+
+
+// ================================
+// DASHBOARD AUTO REFRESH
+// ================================
+
+let dashboardTimer = null;
+
+export function startDashboardRefresh(){
+
+stopDashboardRefresh();
+
+dashboardTimer =
+
+setInterval(()=>{
+
+loadStudentCount();
+
+loadSubjectCount();
+
+loadPresentToday();
+
+},60000);
+
+}
+
+
+
+// ================================
+// STOP REFRESH
+// ================================
+
+export function stopDashboardRefresh(){
+
+if(dashboardTimer){
+
+clearInterval(
+dashboardTimer
+);
+
+dashboardTimer = null;
+
+}
+
+}
