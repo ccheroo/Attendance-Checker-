@@ -14,10 +14,17 @@ import {
 
     onSnapshot,
 
-    getDocs
+    getDocs,
+
+    query,
+
+    where,
+
+    orderBy,
+
+    limit
 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
 
 
 
@@ -32,13 +39,15 @@ export function loadDashboard(){
     setTimeout(()=>{
 
 
-        loadStudentCount();
+    loadStudentCount();
 
+loadSubjectCount();
 
-        loadSubjectCount();
+loadPresentToday();
 
+loadRecentAttendance();
 
-        setupQuickActions();
+setupQuickActions();
 
 
 
@@ -560,7 +569,7 @@ snapshot.size;
 
 
 
-catch(error){
+
 
 
 const counter =
@@ -580,5 +589,259 @@ counter.innerHTML = 0;
 }
 
 
+
+}
+
+// ================================
+// PRESENT TODAY (REALTIME)
+// ================================
+
+function loadPresentToday(){
+
+const today =
+new Date()
+.toISOString()
+.split("T")[0];
+
+const attendanceQuery =
+query(
+
+collection(db,"attendance"),
+
+where(
+"date",
+"==",
+today
+)
+
+);
+
+onSnapshot(
+
+attendanceQuery,
+
+async(snapshot)=>{
+
+const present =
+document.getElementById(
+"presentToday"
+);
+
+if(present){
+
+present.innerHTML =
+snapshot.size;
+
+}
+
+const students =
+await getDocs(
+collection(db,"students")
+);
+
+const rate =
+document.getElementById(
+"attendanceRate"
+);
+
+if(rate){
+
+if(students.size===0){
+
+rate.innerHTML="0%";
+
+}
+
+else{
+
+const percent =
+Math.round(
+
+(snapshot.size / students.size) * 100
+
+);
+
+rate.innerHTML =
+percent + "%";
+
+}
+
+}
+
+// Refresh recent attendance automatically
+loadRecentAttendance();
+
+}
+
+);
+
+}
+
+// ================================
+// RECENT ATTENDANCE
+// ================================
+
+function loadRecentAttendance(){
+
+try{
+
+const attendanceQuery = query(
+
+collection(db,"attendance"),
+
+orderBy(
+"createdAt",
+"desc"
+),
+
+limit(5)
+
+);
+
+onSnapshot(
+
+attendanceQuery,
+
+(snapshot)=>{
+
+const container =
+document.getElementById(
+"recentAttendance"
+);
+
+if(!container) return;
+
+container.innerHTML="";
+
+if(snapshot.empty){
+
+container.innerHTML=`
+
+<p>
+
+No attendance records yet.
+
+</p>
+
+`;
+
+return;
+
+}
+
+snapshot.forEach(doc=>{
+
+const record = doc.data();
+
+container.innerHTML += `
+
+<div class="recent-item">
+
+<strong>
+
+${record.fullName}
+
+</strong>
+
+<br>
+
+<small>
+
+${record.subjectName || "No Subject"}
+
+</small>
+
+<br>
+
+<small>
+
+${record.time || ""}
+
+</small>
+
+<hr>
+
+</div>
+
+`;
+
+});
+
+}
+
+);
+const container =
+document.getElementById(
+"recentAttendance"
+);
+
+if(!container) return;
+
+container.innerHTML = "";
+
+if(snapshot.empty){
+
+container.innerHTML = `
+
+<p>
+
+No attendance records yet.
+
+</p>
+
+`;
+
+return;
+
+}
+
+snapshot.forEach(doc=>{
+
+const record = doc.data();
+
+container.innerHTML += `
+
+<div class="recent-item">
+
+<strong>
+
+${record.fullName}
+
+</strong>
+
+<br>
+
+<small>
+
+${record.subjectName || "No Subject"}
+
+</small>
+
+<br>
+
+<small>
+
+${record.time || ""}
+
+</small>
+
+<hr>
+
+</div>
+
+`;
+
+});
+
+}
+
+catch(error){
+
+console.error(
+"Recent Attendance Error:",
+error
+);
+
+}
 
 }
