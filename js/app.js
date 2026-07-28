@@ -158,6 +158,8 @@ function dashboard(){
     mainContent.innerHTML =
     loadDashboard();
 
+    initDashboard();
+
 }
 // ================================
 // STUDENTS MODULE
