@@ -660,6 +660,7 @@ console.log(
 "📷 Scanner Module Version 7 Ready"
 
 );
+
 // ======================================================
 // SCANNER MODULE END
 // VERSION 7.0 FINAL
