@@ -899,3 +899,46 @@ textarea::placeholder{
 
 
 }
+.dashboard-row{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+
+gap:20px;
+
+margin-top:20px;
+
+margin-bottom:20px;
+
+}
+
+.dashboard-card{
+
+text-align:center;
+
+}
+
+.dashboard-card h1{
+
+font-size:42px;
+
+margin:10px 0;
+
+color:var(--primary);
+
+}
+
+.recent-item{
+
+padding:12px;
+
+border-bottom:1px solid #eee;
+
+}
+
+.recent-item:last-child{
+
+border-bottom:none;
+
+}
