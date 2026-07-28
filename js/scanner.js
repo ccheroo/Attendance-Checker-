@@ -1,28 +1,27 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // QR SCANNER MODULE
-// VERSION 6.0
+// VERSION 7.0 CLEAN
 // PART 1
 // ======================================================
 
 import {
-
 collection,
 getDocs,
 query,
 where
-
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import { db } from "./firebase.js";
 
 import {
-
 recordAttendance
-
 } from "./attendance.js";
 
 
+// ================================
+// GLOBAL VARIABLES
+// ================================
 
 let scanner = null;
 
@@ -33,17 +32,15 @@ let currentSubject = null;
 let audioContext = null;
 
 
-
 // ================================
 // OPEN SCANNER
 // ================================
 
-export function openScanner(subjectId){
+export function openScanner(subject){
 
 currentSubject = subject;
 
 const result =
-
 document.getElementById(
 "scanResult"
 );
@@ -55,12 +52,12 @@ startScanner(result);
 }
 
 
-
 // ================================
-// SOUND
+// PLAY BEEP
 // ================================
 
-export function openScanner(subject){
+function playBeep(type="success"){
+
 try{
 
 if(!audioContext){
@@ -91,7 +88,7 @@ break;
 
 case "warning":
 
-oscillator.frequency.value=600;
+oscillator.frequency.value=650;
 
 break;
 
@@ -128,9 +125,8 @@ console.log(error);
 }
 
 
-
 // ================================
-// VIBRATE
+// VIBRATION
 // ================================
 
 function vibrate(){
@@ -226,7 +222,11 @@ result
 
 },
 
-()=>{}
+(error)=>{
+
+// Ignore scanner errors
+
+}
 
 );
 
@@ -255,7 +255,9 @@ let snapshot =
 await getDocs(q);
 
 
-// Fallback using Student ID
+// ================================
+// FALLBACK USING STUDENT ID
+// ================================
 
 if(snapshot.empty){
 
@@ -276,6 +278,10 @@ await getDocs(oldQuery);
 
 }
 
+
+// ================================
+// STUDENT NOT FOUND
+// ================================
 
 if(snapshot.empty){
 
@@ -321,6 +327,10 @@ return;
 }
 
 
+// ================================
+// GET STUDENT DATA
+// ================================
+
 let student=null;
 
 snapshot.forEach(doc=>{
@@ -336,31 +346,23 @@ id:doc.id,
 });
 
 
-const subject={
-
-id:currentSubject,
-
-name:
-document
-.getElementById("attendanceSubject")
-.options[
-document
-.getElementById("attendanceSubject")
-.selectedIndex
-].text
-
-};
-
+// ================================
+// SAVE ATTENDANCE
+// ================================
 
 const saved =
 await recordAttendance(
 
 student,
 
-subject
+currentSubject
 
 );
 
+
+// ================================
+// SUCCESS
+// ================================
 
 if(saved){
 
@@ -392,17 +394,31 @@ ${student.studentID}
 
 Course:
 
-${student.course}
+${student.course || "N/A"}
 
 <br>
 
-Year:
+Year Level:
 
-${student.yearLevel}
+${student.yearLevel || "N/A"}
+
+<br>
+
+Subject:
+
+${currentSubject.code}
+
+ - 
+
+${currentSubject.name}
 
 <br><br>
 
-<span style="color:green;font-size:20px;font-weight:bold;">
+<span style="
+color:green;
+font-size:20px;
+font-weight:bold;
+">
 
 PRESENT
 
@@ -415,6 +431,11 @@ PRESENT
 );
 
 }
+
+
+// ================================
+// ALREADY RECORDED
+// ================================
 
 else{
 
@@ -438,7 +459,15 @@ ${student.fullName}
 
 <br><br>
 
-Attendance already recorded today.
+Attendance already recorded for
+
+<strong>
+
+${currentSubject.code}
+
+</strong>
+
+today.
 
 `,
 
@@ -622,8 +651,111 @@ return currentSubject;
 
 
 
+// ================================
+// MODULE READY
+// ================================
+
 console.log(
 
-"📷 Scanner Module Ready"
+"📷 Scanner Module Version 7 Ready"
 
+);
+// ======================================================
+// SCANNER MODULE END
+// VERSION 7.0 FINAL
+// ======================================================
+
+
+// ================================
+// RESET SCANNER
+// ================================
+
+export function resetScanner(){
+
+processing = false;
+
+try{
+
+if(scanner){
+
+scanner.resume();
+
+}
+
+}
+
+catch(error){
+
+console.log(error);
+
+}
+
+}
+
+
+
+// ================================
+// STOP SCANNER
+// ================================
+
+export async function stopScanner(){
+
+try{
+
+if(scanner){
+
+await scanner.clear();
+
+scanner = null;
+
+}
+
+}
+
+catch(error){
+
+console.log(error);
+
+}
+
+processing = false;
+
+currentSubject = null;
+
+}
+
+
+
+// ================================
+// CHECK IF SCANNER RUNNING
+// ================================
+
+export function scannerRunning(){
+
+return scanner !== null;
+
+}
+
+
+
+// ================================
+// CURRENT SUBJECT
+// ================================
+
+export function getCurrentSubject(){
+
+return currentSubject;
+
+}
+
+
+
+// ================================
+// READY
+// ================================
+
+console.clear();
+
+console.log(
+"✅ Scanner Module Version 7 Loaded Successfully"
 );
