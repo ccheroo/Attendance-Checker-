@@ -963,3 +963,92 @@ transform:translateY(-5px);
 box-shadow:0 12px 30px rgba(0,0,0,.12);
 
 }
+/* ================================
+RECENT ATTENDANCE
+================================ */
+
+.recent-item{
+
+display:flex;
+
+align-items:center;
+
+justify-content:space-between;
+
+padding:15px;
+
+border-bottom:1px solid #eee;
+
+gap:15px;
+
+}
+
+.recent-avatar{
+
+width:48px;
+
+height:48px;
+
+border-radius:50%;
+
+background:#2563eb;
+
+color:#fff;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-weight:bold;
+
+font-size:18px;
+
+flex-shrink:0;
+
+}
+
+.recent-info{
+
+flex:1;
+
+}
+
+.recent-info h4{
+
+margin:0;
+
+font-size:16px;
+
+}
+
+.recent-info p{
+
+margin:4px 0;
+
+font-size:14px;
+
+color:#666;
+
+}
+
+.recent-status{
+
+font-weight:bold;
+
+}
+
+.status-present{
+
+background:#10b981;
+
+color:#fff;
+
+padding:6px 12px;
+
+border-radius:20px;
+
+font-size:12px;
+
+}
