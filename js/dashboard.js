@@ -1,8 +1,8 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // DASHBOARD MODULE
-// VERSION 7.0
-// PART 1
+// VERSION 7.0 FINAL
+// PART 1 OF 6
 // ======================================================
 
 // ================================
@@ -26,7 +26,7 @@ onSnapshot
 
 
 // ================================
-// DASHBOARD HTML
+// DASHBOARD PAGE
 // ================================
 
 export function loadDashboard(){
@@ -45,7 +45,7 @@ Dashboard
 
 <h2>
 
-👨‍🎓 Total Students
+👨‍🎓 Students
 
 </h2>
 
@@ -55,13 +55,19 @@ Dashboard
 
 </h1>
 
+<p>
+
+Registered Students
+
+</p>
+
 </div>
 
 <div class="card dashboard-card">
 
 <h2>
 
-📖 Total Subjects
+📚 Subjects
 
 </h2>
 
@@ -70,6 +76,12 @@ Dashboard
 0
 
 </h1>
+
+<p>
+
+Available Subjects
+
+</p>
 
 </div>
 
@@ -87,6 +99,12 @@ Dashboard
 
 </h1>
 
+<p>
+
+Today's Attendance
+
+</p>
+
 </div>
 
 <div class="card dashboard-card">
@@ -103,9 +121,19 @@ Dashboard
 
 </h1>
 
+<p>
+
+Overall Attendance
+
+</p>
+
 </div>
 
 </div>
+
+
+
+<div class="dashboard-row">
 
 <div class="card">
 
@@ -123,6 +151,8 @@ Loading...
 
 </div>
 
+
+
 <div class="card">
 
 <h2>
@@ -131,19 +161,26 @@ Loading...
 
 </h2>
 
+<div
+style="height:320px">
+
 <canvas
-
-id="attendanceChart"
-
-height="120">
+id="attendanceChart">
 
 </canvas>
+
+</div>
+
+</div>
 
 </div>
 
 `;
 
 }
+
+
+
 // ================================
 // INITIALIZE DASHBOARD
 // ================================
@@ -238,6 +275,9 @@ error
 }
 
 }
+
+
+
 // ================================
 // PRESENT TODAY
 // ================================
@@ -250,6 +290,7 @@ new Date()
 .split("T")[0];
 
 const attendanceQuery =
+
 query(
 
 collection(db,"attendance"),
@@ -309,7 +350,7 @@ Math.round(
 
 rate.textContent =
 percent + "%";
-loadAttendanceChart();
+
 }
 
 }
@@ -320,145 +361,125 @@ loadAttendanceChart();
 
 }
 // ================================
-// ATTENDANCE ANALYTICS
+// RECENT ATTENDANCE
 // ================================
 
-let attendanceChart = null;
+function loadRecentAttendance(){
 
-async function loadAttendanceChart(){
+const attendanceQuery =
 
-try{
+query(
 
-const snapshot =
-await getDocs(
-collection(db,"attendance")
+collection(db,"attendance"),
+
+orderBy(
+"createdAt",
+"desc"
+),
+
+limit(10)
+
 );
 
-const totals = {};
+onSnapshot(
+
+attendanceQuery,
+
+(snapshot)=>{
+
+const container =
+
+document.getElementById(
+"recentAttendance"
+);
+
+if(!container) return;
+
+container.innerHTML = "";
+
+if(snapshot.empty){
+
+container.innerHTML = `
+
+<div class="empty-card">
+
+<h3>
+
+No Attendance Yet
+
+</h3>
+
+<p>
+
+No student has scanned today.
+
+</p>
+
+</div>
+
+`;
+
+return;
+
+}
 
 snapshot.forEach(doc=>{
 
-const record = doc.data();
+const record =
+doc.data();
 
-const subject =
-record.subjectName || "Unknown";
+container.innerHTML += `
 
-totals[subject] =
-(totals[subject] || 0) + 1;
+<div class="recent-item">
 
-});
+<div class="recent-avatar">
 
-const labels =
-Object.keys(totals);
+${(record.fullName || "?")
+.charAt(0)
+.toUpperCase()}
 
-const values =
-Object.values(totals);
+</div>
 
-const canvas =
-document.getElementById(
-"attendanceChart"
-);
+<div class="recent-info">
 
-if(!canvas) return;
+<h4>
 
-const ctx =
-canvas.getContext("2d");
+${record.fullName}
 
-if(attendanceChart){
+</h4>
 
-attendanceChart.destroy();
+<p>
 
-}
+${record.subjectName || "Unknown Subject"}
 
-attendanceChart = new Chart(ctx,{
+</p>
 
-type:"bar",
+<small>
 
-data:{
+${record.time || ""}
 
-labels,
+</small>
 
-datasets:[{
+</div>
 
-label:"Attendance",
+<div class="recent-status">
 
-data:values,
+<span class="status-present">
 
-backgroundColor:[
-"#2563eb",
-"#10b981",
-"#f59e0b",
-"#ef4444",
-"#8b5cf6",
-"#06b6d4",
-"#ec4899",
-"#14b8a6"
-],
+${record.status || "Present"}
 
-borderRadius:8,
+</span>
 
-maxBarThickness:50
+</div>
 
-}]
+</div>
 
-},
-
-options:{
-
-responsive:true,
-
-maintainAspectRatio:false,
-
-plugins:{
-
-legend:{
-
-display:false
-
-},
-
-title:{
-
-display:true,
-
-text:"Attendance Per Subject"
-
-}
-
-},
-
-scales:{
-
-y:{
-
-beginAtZero:true,
-
-ticks:{
-
-precision:0
-
-}
-
-}
-
-}
-
-}
+`;
 
 });
 
 }
 
-catch(error){
-
-console.error(
-
-"Attendance Chart:",
-
-error
-
 );
-
-}
 
 }
