@@ -5,6 +5,23 @@
 // PART 1 OF 6
 // ======================================================
 
+// ================================
+// PDF IMPORTS
+// ================================
+
+import {
+
+jsPDF
+
+}
+
+from
+
+"https://cdn.jsdelivr.net/npm/jspdf@2.5.1/+esm";
+
+import
+
+"https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/+esm";
 
 // ================================
 // IMPORTS
@@ -139,12 +156,10 @@ class="input">
 <br><br>
 
 <button
-
 class="button"
-
 id="generateReportBtn">
 
-Generate Report
+📄 Generate PDF Report
 
 </button>
 
@@ -292,11 +307,9 @@ document.getElementById(
 
 if(generateButton){
 
-generateButton.onclick =
+generateButton.onclick = ()=>{
 
-()=>{
-
-generateReport();
+generatePDFReport();
 
 };
 
@@ -468,6 +481,592 @@ ${error.message}
 
 }
 
+// ================================
+// GENERATE PDF REPORT
+// ================================
+
+function generatePDFReport(){
+
+const records =
+
+getFilteredReports();
+
+if(records.length===0){
+
+alert(
+
+"No attendance records found."
+
+);
+
+return;
+
+}
+
+const doc =
+
+new jsPDF({
+
+orientation:"landscape",
+
+unit:"mm",
+
+format:"a4"
+
+});
+
+
+
+// ==================================
+// HEADER
+// ==================================
+
+doc.setFont(
+
+"helvetica",
+
+"bold"
+
+);
+
+doc.setFontSize(18);
+
+doc.text(
+
+"ATTENDANCE REPORT",
+
+148,
+
+18,
+
+{
+
+align:"center"
+
+}
+
+);
+
+doc.setFontSize(10);
+
+doc.setFont(
+
+"helvetica",
+
+"normal"
+
+);
+
+doc.text(
+
+`Date Generated: ${new Date().toLocaleString()}`,
+
+14,
+
+28
+
+);
+
+
+
+// ==================================
+// FILTERS
+// ==================================
+
+const subject =
+
+document.getElementById(
+
+"reportSubject"
+
+)?.value || "All Subjects";
+
+const date =
+
+document.getElementById(
+
+"reportDate"
+
+)?.value || "All Dates";
+
+doc.text(
+
+`Subject: ${subject}`,
+
+14,
+
+35
+
+);
+
+doc.text(
+
+`Date Filter: ${date}`,
+
+110,
+
+35
+
+);
+
+// ==================================
+// SUMMARY
+// ==================================
+
+const totalRecords = records.length;
+
+const totalPresent =
+
+records.filter(record=>
+
+(record.status || "Present")
+.toLowerCase() === "present"
+
+).length;
+
+const totalLate =
+
+records.filter(record=>
+
+(record.status || "")
+.toLowerCase() === "late"
+
+).length;
+
+const totalAbsent =
+
+records.filter(record=>
+
+(record.status || "")
+.toLowerCase() === "absent"
+
+).length;
+
+const attendanceRate =
+
+totalRecords === 0
+
+? 0
+
+: Math.round(
+
+(totalPresent / totalRecords) * 100
+
+);
+
+doc.setFont(
+
+"helvetica",
+
+"bold"
+
+);
+
+doc.setFontSize(12);
+
+doc.text(
+
+"ATTENDANCE SUMMARY",
+
+14,
+
+48
+
+);
+
+doc.setFont(
+
+"helvetica",
+
+"normal"
+
+);
+
+doc.setFontSize(10);
+
+doc.text(
+
+`Total Records : ${totalRecords}`,
+
+18,
+
+56
+
+);
+
+doc.text(
+
+`Present : ${totalPresent}`,
+
+18,
+
+63
+
+);
+
+doc.text(
+
+`Late : ${totalLate}`,
+
+18,
+
+70
+
+);
+
+doc.text(
+
+`Absent : ${totalAbsent}`,
+
+18,
+
+77
+
+);
+
+doc.text(
+
+`Attendance Rate : ${attendanceRate}%`,
+
+18,
+
+84
+
+);
+
+// Divider line
+
+doc.setDrawColor(180);
+
+doc.line(
+
+14,
+
+90,
+
+283,
+
+90
+
+);
+
+// ==================================
+// ATTENDANCE TABLE
+// ==================================
+
+const tableData = records.map(record => [
+
+    record.studentID || "-",
+
+    record.fullName || "-",
+
+    record.subjectName || "-",
+
+    record.date || "-",
+
+    record.time || "-",
+
+    record.status || "Present"
+
+]);
+
+doc.autoTable({
+
+    startY: 96,
+
+    head: [[
+
+        "Student ID",
+
+        "Student Name",
+
+        "Subject",
+
+        "Date",
+
+        "Time",
+
+        "Status"
+
+    ]],
+
+    body: tableData,
+
+    theme: "grid",
+
+    styles: {
+
+        font: "helvetica",
+
+        fontSize: 9,
+
+        cellPadding: 2,
+
+        valign: "middle",
+
+        halign: "center",
+
+        lineWidth: 0.2
+
+    },
+
+    headStyles: {
+
+        fillColor: [41, 128, 185],
+
+        textColor: [255,255,255],
+
+        fontStyle: "bold",
+
+        halign: "center"
+
+    },
+
+    alternateRowStyles: {
+
+        fillColor: [245,245,245]
+
+    },
+
+    columnStyles: {
+
+        0: {
+
+            cellWidth: 30
+
+        },
+
+        1: {
+
+            cellWidth: 70,
+
+            halign: "left"
+
+        },
+
+        2: {
+
+            cellWidth: 55,
+
+            halign: "left"
+
+        },
+
+        3: {
+
+            cellWidth: 35
+
+        },
+
+        4: {
+
+            cellWidth: 30
+
+        },
+
+        5: {
+
+            cellWidth: 35
+
+        }
+
+    },
+
+    margin: {
+
+        left: 14,
+
+        right: 14
+
+    }
+
+});
+
+// ==================================
+// FOOTER
+// ==================================
+
+const pageCount =
+
+doc.getNumberOfPages();
+
+for(
+
+let page = 1;
+
+page <= pageCount;
+
+page++
+
+){
+
+doc.setPage(page);
+
+doc.setFont(
+
+"helvetica",
+
+"normal"
+
+);
+
+doc.setFontSize(9);
+
+// Left Footer
+
+doc.text(
+
+"Generated by Attendance Checker System",
+
+14,
+
+200
+
+);
+
+// Right Footer
+
+doc.text(
+
+`Page ${page} of ${pageCount}`,
+
+283,
+
+200,
+
+{
+
+align:"right"
+
+}
+
+);
+
+// Bottom Divider
+
+doc.setDrawColor(180);
+
+doc.line(
+
+14,
+
+194,
+
+283,
+
+194
+
+);
+
+}
+
+
+
+// ==================================
+// FILE NAME
+// ==================================
+
+const today =
+
+new Date()
+
+.toISOString()
+
+.split("T")[0];
+
+const filename =
+
+`Attendance_Report_${today}.pdf`;
+
+
+
+// ==================================
+// DOWNLOAD PDF
+// ==================================
+
+doc.save(filename);
+
+// ==================================
+// FORMAT DATE
+// ==================================
+
+function formatReportDate(dateValue){
+
+if(!dateValue) return "-";
+
+try{
+
+return new Date(dateValue)
+
+.toLocaleDateString(
+
+"en-US",
+
+{
+
+year:"numeric",
+
+month:"long",
+
+day:"numeric"
+
+}
+
+);
+
+}
+
+catch{
+
+return dateValue;
+
+}
+
+}
+
+
+
+// ==================================
+// FORMAT TIME
+// ==================================
+
+function formatReportTime(timeValue){
+
+if(!timeValue) return "-";
+
+return timeValue;
+
+}
+
+
+
+// ==================================
+// FORMAT STATUS
+// ==================================
+
+function formatStatus(status){
+
+if(!status) return "Present";
+
+return status.charAt(0).toUpperCase()
+
++
+
+status.slice(1).toLowerCase();
+
+}
+
+
+
+// ==================================
+// PDF MODULE READY
+// ==================================
+
+console.log(
+
+"📄 PDF Report Generator Ready"
+
+);
 
 
 // ================================
