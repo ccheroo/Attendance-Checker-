@@ -133,13 +133,13 @@ function loadPage(page){
         break;
 
         case "reports":
-            placeholder();
-        break;
+    await loadReports();
+    break;
 
-        case "settings":
-            placeholder();
-        break;
-
+case "settings":
+    await loadSettings();
+    break;
+            
         default:
             dashboard();
 
