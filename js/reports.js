@@ -1,15 +1,22 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // REPORTS MODULE
-// VERSION 8.0 FINAL
-// PART 1 OF 3
+// VERSION 9.0 FINAL
+// PART 1 OF 6
 // ======================================================
+
 
 // ================================
 // IMPORTS
 // ================================
 
-import { db } from "./firebase.js";
+import {
+
+db
+
+}
+
+from "./firebase.js";
 
 import {
 
@@ -18,26 +25,45 @@ getDocs,
 query,
 orderBy
 
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+}
+
+from
+
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
 
 // ================================
-// GLOBAL VARIABLES
+// REPORT DATA
 // ================================
-
-const mainContent =
-document.getElementById("mainContent");
 
 let reportData = [];
 
 
 
 // ================================
-// LOAD REPORTS PAGE
+// LOAD REPORTS
 // ================================
 
 export async function loadReports(){
+
+const mainContent =
+
+document.getElementById(
+"mainContent"
+);
+
+if(!mainContent){
+
+console.error(
+
+"mainContent not found."
+
+);
+
+return;
+
+}
 
 mainContent.innerHTML = `
 
@@ -51,19 +77,45 @@ Attendance Reports
 
 <h2>
 
+Attendance Summary
+
+</h2>
+
+<div
+id="reportSummary">
+
+Loading summary...
+
+</div>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>
+
 Filters
 
 </h2>
 
-<div class="report-filters">
-
 <input
-type="date"
-id="reportDate"
-class="input">
+
+id="reportSearch"
+
+class="input"
+
+placeholder="Search Student"
+
+>
+
+<br><br>
 
 <select
+
 id="reportSubject"
+
 class="input">
 
 <option value="">
@@ -74,25 +126,22 @@ All Subjects
 
 </select>
 
+<br><br>
+
 <input
-type="text"
-id="reportSearch"
-class="input"
-placeholder="Search Student...">
 
-</div>
+type="date"
 
-<br>
+id="reportDate"
 
-<div
-style="
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-">
+class="input">
+
+<br><br>
 
 <button
+
 class="button"
+
 id="generateReportBtn">
 
 Generate Report
@@ -100,30 +149,14 @@ Generate Report
 </button>
 
 <button
+
 class="button"
-id="printReportBtn">
 
-Print
-
-</button>
-
-<button
-class="button"
-id="excelReportBtn">
+id="exportCSVBtn">
 
 Export CSV
 
 </button>
-
-</div>
-
-</div>
-
-
-
-<div
-id="reportSummary"
-class="dashboard-grid">
 
 </div>
 
@@ -138,6 +171,7 @@ Attendance Records
 </h2>
 
 <div
+
 id="reportContainer">
 
 Loading...
@@ -148,21 +182,18 @@ Loading...
 
 `;
 
-await loadSubjects();
+await loadSubjectFilter();
 
-initializeEvents();
+initializeReportEvents();
 
 await generateReport();
 
 }
-
-
-
 // ================================
-// LOAD SUBJECTS
+// LOAD SUBJECT FILTER
 // ================================
 
-async function loadSubjects(){
+async function loadSubjectFilter(){
 
 const select =
 
@@ -187,17 +218,17 @@ db,
 
 snapshot.forEach(doc=>{
 
-const data =
+const subject =
 doc.data();
 
 const option =
 document.createElement("option");
 
 option.value =
-data.name;
+subject.name || "";
 
 option.textContent =
-data.name;
+`${subject.code || ""} - ${subject.name || ""}`;
 
 select.appendChild(option);
 
@@ -209,7 +240,7 @@ catch(error){
 
 console.error(
 
-"Reports:",
+"Load Subjects:",
 
 error
 
@@ -225,49 +256,71 @@ error
 // INITIALIZE EVENTS
 // ================================
 
-function initializeEvents(){
+function initializeReportEvents(){
 
-document
+const generateButton =
 
-.getElementById("generateReportBtn")
+document.getElementById(
+"generateReportBtn"
+);
 
-.onclick = ()=>{
+const exportButton =
+
+document.getElementById(
+"exportCSVBtn"
+);
+
+const searchBox =
+
+document.getElementById(
+"reportSearch"
+);
+
+const subjectFilter =
+
+document.getElementById(
+"reportSubject"
+);
+
+const dateFilter =
+
+document.getElementById(
+"reportDate"
+);
+
+
+
+if(generateButton){
+
+generateButton.onclick =
+
+()=>{
 
 generateReport();
 
 };
 
-
-
-document
-
-.getElementById("printReportBtn")
-
-.onclick = ()=>{
-
-window.print();
-
-};
+}
 
 
 
-document
+if(exportButton){
 
-.getElementById("excelReportBtn")
+exportButton.onclick =
 
-.onclick = ()=>{
+()=>{
 
 exportCSV();
 
 };
 
+}
 
 
-document
 
-.getElementById("reportSearch")
+if(searchBox){
 
-.addEventListener(
+searchBox.addEventListener(
 
 "input",
 
@@ -281,13 +334,13 @@ updateSummary();
 
 );
 
+}
 
 
-document
 
-.getElementById("reportSubject")
+if(subjectFilter){
 
-.addEventListener(
+subjectFilter.addEventListener(
 
 "change",
 
@@ -301,13 +354,13 @@ updateSummary();
 
 );
 
+}
 
 
-document
 
-.getElementById("reportDate")
+if(dateFilter){
 
-.addEventListener(
+dateFilter.addEventListener(
 
 "change",
 
@@ -320,6 +373,8 @@ updateSummary();
 }
 
 );
+
+}
 
 }
 
@@ -333,13 +388,21 @@ try{
 
 const attendanceQuery = query(
 
-collection(db,"attendance"),
+collection(
+db,
+"attendance"
+),
 
-orderBy("createdAt","desc")
+orderBy(
+"createdAt",
+"desc"
+)
 
 );
 
-const snapshot = await getDocs(attendanceQuery);
+const snapshot =
+
+await getDocs(attendanceQuery);
 
 reportData = [];
 
@@ -385,7 +448,7 @@ container.innerHTML = `
 
 <h2>
 
-Unable to load reports
+Unable to load attendance records
 
 </h2>
 
@@ -408,20 +471,12 @@ ${error.message}
 
 
 // ================================
-// DISPLAY REPORTS
+// GET FILTERED DATA
 // ================================
 
-function displayReports(){
+function getFilteredReports(){
 
-const container =
-
-document.getElementById(
-"reportContainer"
-);
-
-if(!container) return;
-
-const search =
+const keyword =
 
 document
 .getElementById("reportSearch")
@@ -440,39 +495,45 @@ document
 .getElementById("reportDate")
 .value;
 
-const filtered = reportData.filter(record=>{
+return reportData.filter(record=>{
 
-const matchSearch =
+const studentName =
 
 (record.fullName || "")
-.toLowerCase()
-.includes(search)
+.toLowerCase();
+
+const studentID =
+
+(record.studentID || "")
+.toLowerCase();
+
+const matchKeyword =
+
+studentName.includes(keyword)
 
 ||
 
-(record.studentID || "")
-.toLowerCase()
-.includes(search);
+studentID.includes(keyword);
 
 const matchSubject =
 
-subject === ""
+subject===""
 
 ||
 
-record.subjectName === subject;
+record.subjectName===subject;
 
 const matchDate =
 
-date === ""
+date===""
 
 ||
 
-record.date === date;
+record.date===date;
 
-return (
+return(
 
-matchSearch &&
+matchKeyword &&
 
 matchSubject &&
 
@@ -482,7 +543,27 @@ matchDate
 
 });
 
-if(filtered.length===0){
+}
+
+// ================================
+// DISPLAY REPORTS
+// ================================
+
+function displayReports(){
+
+const container =
+
+document.getElementById(
+"reportContainer"
+);
+
+if(!container) return;
+
+const records =
+
+getFilteredReports();
+
+if(records.length===0){
 
 container.innerHTML = `
 
@@ -490,13 +571,13 @@ container.innerHTML = `
 
 <h2>
 
-No Records Found
+No Attendance Records
 
 </h2>
 
 <p>
 
-There are no attendance records that match your filters.
+No matching attendance records were found.
 
 </p>
 
@@ -516,17 +597,41 @@ let html = `
 
 <tr>
 
-<th>Student ID</th>
+<th>
 
-<th>Name</th>
+Student ID
 
-<th>Subject</th>
+</th>
 
-<th>Date</th>
+<th>
 
-<th>Time</th>
+Student Name
 
-<th>Status</th>
+</th>
+
+<th>
+
+Subject
+
+</th>
+
+<th>
+
+Date
+
+</th>
+
+<th>
+
+Time
+
+</th>
+
+<th>
+
+Status
+
+</th>
 
 </tr>
 
@@ -536,23 +641,51 @@ let html = `
 
 `;
 
-filtered.forEach(record=>{
+records.forEach(record=>{
 
 html += `
 
 <tr>
 
-<td>${record.studentID || "-"}</td>
+<td>
 
-<td>${record.fullName || "-"}</td>
+${record.studentID || "-"}
 
-<td>${record.subjectName || "-"}</td>
+</td>
 
-<td>${record.date || "-"}</td>
+<td>
 
-<td>${record.time || "-"}</td>
+${record.fullName || "-"}
 
-<td>${record.status || "Present"}</td>
+</td>
+
+<td>
+
+${record.subjectName || "-"}
+
+</td>
+
+<td>
+
+${record.date || "-"}
+
+</td>
+
+<td>
+
+${record.time || "-"}
+
+</td>
+
+<td>
+
+<span class="status-badge">
+
+${record.status || "Present"}
+
+</span>
+
+</td>
 
 </tr>
 
@@ -588,23 +721,35 @@ document.getElementById(
 
 if(!summary) return;
 
-const total = reportData.length;
+const records =
 
-const present = reportData.filter(r=>
+getFilteredReports();
+
+const total =
+
+records.length;
+
+const present =
+
+records.filter(r=>
 
 (r.status || "Present")
 .toLowerCase()==="present"
 
 ).length;
 
-const late = reportData.filter(r=>
+const late =
+
+records.filter(r=>
 
 (r.status || "")
 .toLowerCase()==="late"
 
 ).length;
 
-const absent = reportData.filter(r=>
+const absent =
+
+records.filter(r=>
 
 (r.status || "")
 .toLowerCase()==="absent"
@@ -625,7 +770,9 @@ total===0
 
 summary.innerHTML = `
 
-<div class="card dashboard-card">
+<div class="dashboard-grid">
+
+<div class="dashboard-card">
 
 <h3>Total Records</h3>
 
@@ -633,7 +780,7 @@ summary.innerHTML = `
 
 </div>
 
-<div class="card dashboard-card">
+<div class="dashboard-card">
 
 <h3>Present</h3>
 
@@ -641,7 +788,7 @@ summary.innerHTML = `
 
 </div>
 
-<div class="card dashboard-card">
+<div class="dashboard-card">
 
 <h3>Late</h3>
 
@@ -649,7 +796,7 @@ summary.innerHTML = `
 
 </div>
 
-<div class="card dashboard-card">
+<div class="dashboard-card">
 
 <h3>Absent</h3>
 
@@ -657,7 +804,7 @@ summary.innerHTML = `
 
 </div>
 
-<div class="card dashboard-card">
+<div class="dashboard-card">
 
 <h3>Attendance Rate</h3>
 
@@ -665,19 +812,26 @@ summary.innerHTML = `
 
 </div>
 
+</div>
+
 `;
 
 }
-
-// ======================================================
+// ================================
 // EXPORT CSV
-// ======================================================
+// ================================
 
 function exportCSV(){
 
-if(reportData.length===0){
+const records = getFilteredReports();
 
-alert("No attendance data found.");
+if(records.length===0){
+
+alert(
+
+"No attendance records to export."
+
+);
 
 return;
 
@@ -687,7 +841,7 @@ let csv =
 
 "Student ID,Student Name,Subject,Date,Time,Status\n";
 
-reportData.forEach(record=>{
+records.forEach(record=>{
 
 csv += `"${record.studentID || ""}",`;
 
@@ -717,7 +871,9 @@ type:"text/csv;charset=utf-8;"
 
 );
 
-const url = URL.createObjectURL(blob);
+const url =
+
+URL.createObjectURL(blob);
 
 const link =
 
@@ -738,6 +894,24 @@ link.click();
 document.body.removeChild(link);
 
 URL.revokeObjectURL(url);
+
+alert(
+
+"Attendance report exported successfully."
+
+);
+
+}
+
+
+
+// ================================
+// PRINT REPORT
+// ================================
+
+function printReport(){
+
+window.print();
 
 }
 
@@ -761,13 +935,102 @@ await generateReport();
 
 export function clearReports(){
 
-reportData=[];
+reportData = [];
 
-const summary =
+const reportContainer =
+
+document.getElementById(
+"reportContainer"
+);
+
+const summaryContainer =
 
 document.getElementById(
 "reportSummary"
 );
+
+if(reportContainer){
+
+reportContainer.innerHTML = "";
+
+}
+
+if(summaryContainer){
+
+summaryContainer.innerHTML = "";
+
+}
+
+}
+// ================================
+// INITIALIZER
+// ================================
+
+export async function initializeReports(){
+
+try{
+
+await loadReports();
+
+console.log(
+
+"📄 Reports initialized successfully."
+
+);
+
+}
+
+catch(error){
+
+console.error(
+
+"Reports Initialization:",
+
+error
+
+);
+
+}
+
+}
+
+
+
+// ================================
+// RELOAD REPORTS
+// ================================
+
+export async function reloadReports(){
+
+try{
+
+await generateReport();
+
+}
+
+catch(error){
+
+console.error(
+
+"Reload Reports:",
+
+error
+
+);
+
+}
+
+}
+
+
+
+// ================================
+// DESTROY REPORTS
+// ================================
+
+export function destroyReports(){
+
+reportData = [];
 
 const container =
 
@@ -775,29 +1038,23 @@ document.getElementById(
 "reportContainer"
 );
 
-if(summary){
+const summary =
 
-summary.innerHTML="";
-
-}
+document.getElementById(
+"reportSummary"
+);
 
 if(container){
 
-container.innerHTML="";
+container.innerHTML = "";
 
 }
 
+if(summary){
+
+summary.innerHTML = "";
+
 }
-
-
-
-// ================================
-// INITIALIZER
-// ================================
-
-export async function initializeReports(){
-
-await loadReports();
 
 }
 
@@ -809,6 +1066,6 @@ await loadReports();
 
 console.log(
 
-"📄 Reports Module v8 Ready"
+"📄 Reports Module v9.0 Ready"
 
 );
