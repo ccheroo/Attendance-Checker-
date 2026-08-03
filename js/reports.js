@@ -807,89 +807,53 @@ ${new Date().toLocaleString()}
 
 }
 
-// ================================
-// EXPORT PDF
-// ================================
-
 async function exportPDF(){
 
-const report =
-
-document.getElementById(
-"pdfReport"
-);
+const report = document.getElementById("pdfReport");
 
 if(!report){
 
-alert(
-
-"Report container not found."
-
-);
+alert("Report not found.");
 
 return;
 
 }
 
-const originalBackground =
+// Hintayin munang matapos ang rendering
+await new Promise(resolve=>requestAnimationFrame(resolve));
+await new Promise(resolve=>setTimeout(resolve,300));
 
-report.style.background;
+const options={
 
-report.style.background = "#ffffff";
+margin:10,
 
-const filename =
-
-`Attendance_Report_${
-new Date()
-.toISOString()
-.split("T")[0]
-}.pdf`;
-
-const options = {
-
-margin:[10,10,10,10],
-
-filename:filename,
+filename:`Attendance_Report_${
+new Date().toISOString().split("T")[0]
+}.pdf`,
 
 image:{
-
 type:"jpeg",
-
 quality:1
-
 },
 
 html2canvas:{
-
 scale:2,
-
 useCORS:true,
-
-backgroundColor:"#ffffff"
-
+logging:false,
+backgroundColor:"#ffffff",
+scrollX:0,
+scrollY:0
 },
 
 jsPDF:{
-
 unit:"mm",
-
 format:"a4",
-
 orientation:"landscape"
-
-},
-
-pagebreak:{
-
-mode:["css","legacy"]
-
 }
 
 };
 
-try{
-
-await window.html2pdf()
+window.html2pdf()
 
 .set(options)
 
@@ -899,33 +863,6 @@ await window.html2pdf()
 
 }
 
-catch(error){
-
-console.error(
-
-"Export PDF:",
-
-error
-
-);
-
-alert(
-
-"Failed to export PDF."
-
-);
-
-}
-
-finally{
-
-report.style.background =
-
-originalBackground;
-
-}
-
-}
 // ================================
 // REFRESH REPORTS
 // ================================
