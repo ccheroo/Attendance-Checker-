@@ -1008,39 +1008,27 @@ loadAttendance();
 
 
 // ================================
-// PLACEHOLDER MODULES
+// ================================
+// REPORTS MODULE
 // ================================
 
-function placeholder(title){
+function reports(){
 
-mainContent.innerHTML = `
-
-<h1 class="page-title">
-
-${title}
-
-</h1>
-
-<div class="card">
-
-<h2>
-
-${title}
-
-</h2>
-
-<p>
-
-This module is under development.
-
-</p>
-
-</div>
-
-`;
+    loadReports();
 
 }
 
+
+
+// ================================
+// SETTINGS MODULE
+// ================================
+
+function settings(){
+
+    loadSettings();
+
+}
 
 
 // ================================
