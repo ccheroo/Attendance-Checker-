@@ -1,227 +1,950 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // MAIN APPLICATION
-// VERSION 8.0 FINAL
-// PART 1 OF 6
+// VERSION 7.0 FINAL
+// PART 1
 // ======================================================
 
 
 // ================================
-// IMPORT MODULES
+// IMPORTS
 // ================================
 
 import {
-
-loadDashboard
-
+    loadDashboard,
+    initDashboard
 } from "./dashboard.js";
 
-
-
 import {
-
-loadStudents
-
+    addStudent,
+    searchStudents,
+    loadStudents
 } from "./students.js";
 
-
-
 import {
-
-loadCourses
-
+    addCourse,
+    loadCourses,
+    searchCourses
 } from "./courses.js";
 
-
-
 import {
-
-loadSubjects
-
+    addSubject,
+    loadSubjects,
+    getSubjects
 } from "./subjects.js";
 
-
-
 import {
-
-loadScanner
-
+    openScanner
 } from "./scanner.js";
 
-
-
 import {
-
-loadAttendance
-
+    loadAttendance
 } from "./attendance.js";
 
-
-
-import {
-
-loadReports
-
-} from "./reports.js";
-
-
+import { db } from "./firebase.js";
 
 import {
 
-loadSettings
+    collection,
+    getDocs
 
-} from "./settings.js";
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
 
 // ================================
-// GLOBAL ELEMENTS
+// GLOBAL VARIABLES
 // ================================
 
 const mainContent =
-
 document.getElementById(
-"mainContent"
+    "mainContent"
 );
 
-const sidebar =
-
-document.getElementById(
-"sidebar"
+const menuButtons =
+document.querySelectorAll(
+    ".menu"
 );
 
-
-
-// ================================
-// CURRENT PAGE
-// ================================
-
-let currentPage =
-
-"dashboard";
+let selectedSubject = null;
 
 
 
 // ================================
-// PAGE LOADER
+// MENU SYSTEM
 // ================================
 
-export async function loadPage(page){
+menuButtons.forEach(button=>{
 
-currentPage = page;
+    button.addEventListener("click",()=>{
 
-await router(page);
+        menuButtons.forEach(btn=>{
 
-highlightMenu(page);
+            btn.classList.remove(
+                "active"
+            );
+
+        });
+
+        button.classList.add(
+            "active"
+        );
+
+        loadPage(
+            button.dataset.page
+        );
+
+    });
+
+});
+
+
+
+// ================================
+// ROUTER
+// ================================
+
+function loadPage(page){
+
+    switch(page){
+
+        case "dashboard":
+            dashboard();
+        break;
+
+        case "students":
+            students();
+        break;
+
+        case "courses":
+            courses();
+        break;
+
+        case "subjects":
+            subjects();
+        break;
+
+        case "scanner":
+            scannerPage();
+        break;
+
+        case "attendance":
+            attendance();
+        break;
+
+        case "reports":
+            placeholder("Reports");
+        break;
+
+        case "settings":
+            placeholder("Settings");
+        break;
+
+        default:
+            dashboard();
+
+    }
+
+}
+
+
+
+// ================================
+// DASHBOARD
+// ================================
+
+function dashboard(){
+
+    mainContent.innerHTML =
+    loadDashboard();
+
+    initDashboard();
 
 }
 // ================================
-// APPLICATION ROUTER
+// STUDENTS MODULE
 // ================================
 
-async function router(page){
+function students(){
 
-try{
+mainContent.innerHTML = `
 
-switch(page){
+<h1 class="page-title">
+Students
+</h1>
 
-case "dashboard":
+<div class="card">
 
-await loadDashboard();
+<h2>
+Register Student
+</h2>
 
-break;
+<input
+id="fullName"
+placeholder="Full Name"
+>
 
+<input
+id="studentID"
+placeholder="Student ID"
+>
 
+<input
+id="college"
+placeholder="College"
+>
 
-case "students":
+<input
+id="course"
+placeholder="Course"
+>
 
-await loadStudents();
+<input
+id="yearLevel"
+placeholder="Year Level"
+>
 
-break;
+<input
+id="section"
+placeholder="Section"
+>
 
+<button
+class="button"
+id="addStudentBtn">
 
+Save Student
 
-case "courses":
+</button>
 
-await loadCourses();
+</div>
 
-break;
+<div class="card">
 
+<input
+id="searchStudent"
+placeholder="Search Student..."
 
+>
 
-case "subjects":
+</div>
+
+<div
+id="studentContainer"
+class="student-grid">
+
+</div>
+
+`;
+
+const button =
+document.getElementById(
+"addStudentBtn"
+);
+
+button.onclick = async()=>{
+
+const student={
+
+fullName:
+document.getElementById("fullName").value.trim(),
+
+studentID:
+document.getElementById("studentID").value.trim(),
+
+college:
+document.getElementById("college").value.trim(),
+
+course:
+document.getElementById("course").value.trim(),
+
+yearLevel:
+document.getElementById("yearLevel").value.trim(),
+
+section:
+document.getElementById("section").value.trim(),
+
+qrCode:
+document.getElementById("studentID").value.trim()
+
+};
+
+if(
+
+!student.fullName ||
+
+!student.studentID ||
+
+!student.college ||
+
+!student.course ||
+
+!student.yearLevel ||
+
+!student.section
+
+){
+
+alert("Please complete all fields.");
+
+return;
+
+}
+
+button.disabled = true;
+button.innerText = "Saving...";
+
+const saved =
+await addStudent(student);
+
+if(saved){
+
+document.getElementById("fullName").value="";
+document.getElementById("studentID").value="";
+document.getElementById("college").value="";
+document.getElementById("course").value="";
+document.getElementById("yearLevel").value="";
+document.getElementById("section").value="";
+
+alert("Student saved successfully!");
+
+}
+
+button.disabled = false;
+button.innerText = "Save Student";
+
+};
+
+const search =
+document.getElementById(
+"searchStudent"
+);
+
+search.addEventListener(
+"input",
+e=>{
+
+searchStudents(
+e.target.value
+);
+
+}
+);
+
+loadStudents();
+
+}
+// ================================
+// COURSES MODULE
+// ================================
+
+function courses(){
+
+mainContent.innerHTML = `
+
+<h1 class="page-title">
+
+Courses
+
+</h1>
+
+<div class="card">
+
+<h2>
+
+Add Course
+
+</h2>
+
+<input
+id="collegeName"
+placeholder="College Name"
+>
+
+<input
+id="courseName"
+placeholder="Course Name"
+>
+
+<input
+id="courseCode"
+placeholder="Course Code"
+>
+
+<button
+class="button"
+id="addCourseBtn">
+
+Save Course
+
+</button>
+
+</div>
+
+<div class="card">
+
+<input
+id="searchCourse"
+placeholder="Search Course..."
+>
+
+</div>
+
+<div
+id="courseContainer"
+class="student-grid">
+
+</div>
+
+`;
+
+const button =
+document.getElementById(
+"addCourseBtn"
+);
+
+button.onclick = async()=>{
+
+const course={
+
+college:
+document
+.getElementById("collegeName")
+.value
+.trim(),
+
+course:
+document
+.getElementById("courseName")
+.value
+.trim(),
+
+code:
+document
+.getElementById("courseCode")
+.value
+.trim()
+
+};
+
+if(
+
+!course.college ||
+
+!course.course ||
+
+!course.code
+
+){
+
+alert(
+"Please complete all fields."
+);
+
+return;
+
+}
+
+button.disabled = true;
+
+button.innerText = "Saving...";
+
+const saved =
+await addCourse(course);
+
+if(saved){
+
+document
+.getElementById("collegeName")
+.value="";
+
+document
+.getElementById("courseName")
+.value="";
+
+document
+.getElementById("courseCode")
+.value="";
+
+alert(
+"Course saved successfully!"
+);
+
+}
+
+button.disabled = false;
+
+button.innerText = "Save Course";
+
+};
+
+const searchBox =
+document.getElementById(
+"searchCourse"
+);
+
+if(searchBox){
+
+searchBox.addEventListener(
+"input",
+e=>{
+
+searchCourses(
+e.target.value
+);
+
+}
+);
+
+}
+
+loadCourses();
+
+}
+// ================================
+// SUBJECTS MODULE
+// VERSION 7.0
+// ================================
+
+function subjects(){
+
+mainContent.innerHTML = `
+
+<h1 class="page-title">
+
+Subjects
+
+</h1>
+
+<div class="card">
+
+<h2>
+
+Add Subject
+
+</h2>
+
+<input
+id="subjectName"
+placeholder="Subject Name"
+>
+
+<input
+id="subjectCode"
+placeholder="Subject Code"
+>
+
+<input
+id="subjectInstructor"
+placeholder="Instructor Name"
+>
+
+<button
+class="button"
+id="addSubjectBtn">
+
+Save Subject
+
+</button>
+
+</div>
+
+<div class="card">
+
+<input
+id="searchSubject"
+placeholder="Search Subject..."
+>
+
+</div>
+
+<div
+id="subjectContainer"
+class="student-grid">
+
+</div>
+
+`;
+
+const button =
+document.getElementById(
+"addSubjectBtn"
+);
+
+button.onclick = async()=>{
+
+const subject={
+
+name:
+document
+.getElementById("subjectName")
+.value
+.trim(),
+
+code:
+document
+.getElementById("subjectCode")
+.value
+.trim(),
+
+instructor:
+document
+.getElementById("subjectInstructor")
+.value
+.trim()
+
+};
+
+if(
+
+!subject.name ||
+
+!subject.code
+
+){
+
+alert(
+"Please complete all fields."
+);
+
+return;
+
+}
+
+button.disabled = true;
+
+button.innerText = "Saving...";
+
+const saved =
+await addSubject(subject);
+
+if(saved){
+
+document
+.getElementById("subjectName")
+.value="";
+
+document
+.getElementById("subjectCode")
+.value="";
+
+document
+.getElementById("subjectInstructor")
+.value="";
+
+alert(
+"Subject saved successfully!"
+);
+
+}
+
+button.disabled = false;
+
+button.innerText = "Save Subject";
+
+};
+
+const search =
+document.getElementById(
+"searchSubject"
+);
+
+if(search){
+
+search.addEventListener(
+"input",
+e=>{
+
+const keyword =
+e.target.value
+.toLowerCase();
+
+const filtered =
+getSubjects().filter(subject=>{
+
+return (
+
+(subject.name || "")
+.toLowerCase()
+.includes(keyword)
+
+||
+
+(subject.code || "")
+.toLowerCase()
+.includes(keyword)
+
+||
+
+(subject.instructor || "")
+.toLowerCase()
+.includes(keyword)
+
+);
+
+});
+
+const container =
+document.getElementById(
+"subjectContainer"
+);
+
+if(container){
+
+container.innerHTML="";
+
+filtered.forEach(subject=>{
+
+container.innerHTML += `
+
+<div class="student-card">
+
+<div class="student-avatar">
+
+${subject.code.charAt(0)}
+
+</div>
+
+<div class="student-info">
+
+<h2>
+
+${subject.name}
+
+</h2>
+
+<p>
+
+<strong>Code:</strong>
+
+${subject.code}
+
+</p>
+
+<p>
+
+<strong>Instructor:</strong>
+
+${subject.instructor || "Not Assigned"}
+
+</p>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+});
+
+}
+
+loadSubjects();
+
+}
+// ================================
+// QR SCANNER MODULE
+// VERSION 7.0
+// ================================
+
+async function scannerPage(){
 
 await loadSubjects();
 
-break;
-
-
-
-case "scanner":
-
-await loadScanner();
-
-break;
-
-
-
-case "attendance":
-
-await loadAttendance();
-
-break;
-
-
-
-case "reports":
-
-await loadReports();
-
-break;
-
-
-
-case "settings":
-
-await loadSettings();
-
-break;
-
-
-
-default:
-
-await loadDashboard();
-
-break;
-
-}
-
-}
-
-catch(error){
-
-console.error(
-
-"Router Error:",
-
-error
-
-);
-
 mainContent.innerHTML = `
+
+<h1 class="page-title">
+
+QR Attendance
+
+</h1>
 
 <div class="card">
 
 <h2>
 
-⚠ Module Error
+Start Attendance
 
 </h2>
 
 <p>
 
-${error.message}
+Select the subject before scanning.
+
+</p>
+
+<select
+id="attendanceSubject"
+class="input">
+
+<option value="">
+
+Select Subject
+
+</option>
+
+</select>
+
+<br><br>
+
+<button
+class="button"
+id="startAttendanceBtn">
+
+Start Attendance
+
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>
+
+Scanner
+
+</h2>
+
+<div
+
+id="reader"
+
+style="
+display:none;
+width:100%;
+max-width:500px;
+margin:auto;
+">
+
+</div>
+
+<div
+
+id="scanResult"
+
+style="margin-top:20px;">
+
+Waiting for subject selection...
+
+</div>
+
+</div>
+
+`;
+
+
+// ================================
+// LOAD SUBJECT DROPDOWN
+// ================================
+
+const subjectSelect =
+document.getElementById(
+"attendanceSubject"
+);
+
+const subjectList =
+getSubjects();
+
+subjectList.forEach(subject=>{
+
+const option =
+document.createElement("option");
+
+option.value =
+subject.id;
+
+option.textContent =
+`${subject.code} - ${subject.name}`;
+
+option.dataset.name =
+subject.name;
+
+option.dataset.code =
+subject.code;
+
+option.dataset.instructor =
+subject.instructor || "";
+
+subjectSelect.appendChild(option);
+
+});
+
+
+// ================================
+// START ATTENDANCE
+// ================================
+
+document
+.getElementById("startAttendanceBtn")
+.onclick = ()=>{
+
+if(!subjectSelect.value){
+
+alert(
+"Please select a subject first."
+);
+
+return;
+
+}
+
+const option =
+subjectSelect.options[
+subjectSelect.selectedIndex
+];
+
+selectedSubject = {
+
+id:
+subjectSelect.value,
+
+name:
+option.dataset.name,
+
+code:
+option.dataset.code,
+
+instructor:
+option.dataset.instructor
+
+};
+
+document
+.getElementById("reader")
+.style.display="block";
+
+document
+.getElementById("scanResult")
+.innerHTML = `
+
+<div class="card">
+
+<h2>
+
+${selectedSubject.code}
+
+</h2>
+
+<p>
+
+${selectedSubject.name}
+
+</p>
+
+<p>
+
+Instructor:
+${selectedSubject.instructor}
+
+</p>
+
+<p>
+
+Ready to scan student QR codes.
 
 </p>
 
@@ -229,366 +952,78 @@ ${error.message}
 
 `;
 
-}
-
-}
-
-
-
-// ================================
-// MENU HIGHLIGHT
-// ================================
-
-function highlightMenu(page){
-
-const items =
-
-document.querySelectorAll(
-
-"[data-page]"
-
+openScanner(
+selectedSubject
 );
-
-items.forEach(item=>{
-
-item.classList.remove("active");
-
-if(
-
-item.dataset.page===page
-
-){
-
-item.classList.add("active");
-
-}
-
-});
-
-}
-
-// ================================
-// SIDEBAR NAVIGATION
-// ================================
-
-function initializeNavigation(){
-
-const menuItems =
-
-document.querySelectorAll(
-
-"[data-page]"
-
-);
-
-menuItems.forEach(item=>{
-
-item.addEventListener(
-
-"click",
-
-async()=>{
-
-const page =
-
-item.dataset.page;
-
-if(!page) return;
-
-await loadPage(page);
-
-}
-
-);
-
-});
-
-}
-
-
-
-// ================================
-// MOBILE SIDEBAR
-// ================================
-
-function initializeSidebar(){
-
-const menuButton =
-
-document.getElementById(
-"menuButton"
-);
-
-const closeButton =
-
-document.getElementById(
-"closeSidebar"
-);
-
-if(menuButton){
-
-menuButton.onclick = ()=>{
-
-sidebar.classList.add("show");
 
 };
 
 }
-
-if(closeButton){
-
-closeButton.onclick = ()=>{
-
-sidebar.classList.remove("show");
-
-};
-
-}
-
-document.addEventListener(
-
-"click",
-
-(event)=>{
-
-if(
-
-window.innerWidth <= 768 &&
-
-sidebar.classList.contains("show") &&
-
-!sidebar.contains(event.target) &&
-
-event.target !== menuButton
-
-){
-
-sidebar.classList.remove("show");
-
-}
-
-}
-
-);
-
-}
-
-
-
 // ================================
-// INITIALIZE APPLICATION
+// ATTENDANCE MODULE
 // ================================
 
-export async function initializeApp(){
-
-initializeNavigation();
-
-initializeSidebar();
-
-await loadPage("dashboard");
-
-}
-
-// ================================
-// DOM READY
-// ================================
-
-document.addEventListener(
-
-"DOMContentLoaded",
-
-async()=>{
-
-try{
-
-await initializeApp();
-
-}
-
-catch(error){
-
-console.error(
-
-"Application Startup Error:",
-
-error
-
-);
+function attendance(){
 
 mainContent.innerHTML = `
+
+<h1 class="page-title">
+
+Attendance Records
+
+</h1>
 
 <div class="card">
 
 <h2>
 
-⚠ Application Error
+Today's Attendance
 
 </h2>
 
-<p>
+<div
+id="attendanceContainer"
+class="student-grid">
 
-${error.message}
+Loading attendance...
 
-</p>
+</div>
 
 </div>
 
 `;
 
-}
-
-});
-
-
-
-// ================================
-// WINDOW RESIZE
-// ================================
-
-window.addEventListener(
-
-"resize",
-
-()=>{
-
-if(
-
-window.innerWidth > 768
-
-){
-
-sidebar.classList.remove("show");
-
-}
-
-});
-
-
-
-// ================================
-// RELOAD CURRENT PAGE
-// ================================
-
-export async function reloadCurrentPage(){
-
-await loadPage(
-
-currentPage
-
-);
+loadAttendance();
 
 }
 
 
 
 // ================================
-// GO TO DASHBOARD
+// PLACEHOLDER MODULES
 // ================================
 
-export async function goDashboard(){
-
-await loadPage(
-
-"dashboard"
-
-);
-
-}
-// ================================
-// LOGOUT
-// ================================
-
-function initializeLogout(){
-
-const logoutButton =
-
-document.getElementById(
-"logoutButton"
-);
-
-if(!logoutButton) return;
-
-logoutButton.addEventListener(
-
-"click",
-
-()=>{
-
-const confirmed = confirm(
-
-"Are you sure you want to logout?"
-
-);
-
-if(!confirmed) return;
-
-location.reload();
-
-}
-
-);
-
-}
-
-
-
-// ================================
-// PAGE TITLE
-// ================================
-
-export function setPageTitle(title){
-
-document.title =
-
-`${title} | Attendance Checker`;
-
-}
-
-
-
-// ================================
-// LOADING SCREEN
-// ================================
-
-export function showLoading(message="Loading..."){
+function placeholder(title){
 
 mainContent.innerHTML = `
+
+<h1 class="page-title">
+
+${title}
+
+</h1>
 
 <div class="card">
 
 <h2>
 
-⏳ ${message}
-
-</h2>
-
-</div>
-
-`;
-
-}
-
-
-
-// ================================
-// ERROR SCREEN
-// ================================
-
-export function showError(error){
-
-mainContent.innerHTML = `
-
-<div class="card">
-
-<h2>
-
-❌ Something went wrong
+${title}
 
 </h2>
 
 <p>
 
-${error}
+This module is under development.
 
 </p>
 
@@ -601,136 +1036,39 @@ ${error}
 
 
 // ================================
-// UPDATE INITIALIZATION
+// CURRENT SUBJECT
 // ================================
 
-const oldInitializeApp = initializeApp;
+export function getSelectedSubject(){
 
-initializeApp = async function(){
+return selectedSubject;
 
-initializeNavigation();
+}
 
-initializeSidebar();
 
-initializeLogout();
 
-await loadPage("dashboard");
-
-};
 // ================================
-// APPLICATION STARTUP
+// RESET SUBJECT
 // ================================
 
-async function startApplication(){
+export function clearSelectedSubject(){
 
-try{
+selectedSubject = null;
 
-initializeNavigation();
+}
 
-initializeSidebar();
 
-initializeLogout();
 
-await loadPage("dashboard");
+// ================================
+// APPLICATION START
+// ================================
+
+console.clear();
 
 console.log(
 
-"✅ Attendance Checker Started"
+"🚀 ATTENDANCE CHECKER VERSION 7.0 READY"
 
 );
 
-}
-
-catch(error){
-
-console.error(
-
-"Application Startup:",
-
-error
-
-);
-
-showError(
-
-error.message
-
-);
-
-}
-
-}
-
-
-
-// ================================
-// DOM READY
-// ================================
-
-document.addEventListener(
-
-"DOMContentLoaded",
-
-()=>{
-
-startApplication();
-
-});
-
-
-
-// ================================
-// GLOBAL HELPERS
-// ================================
-
-window.addEventListener(
-
-"resize",
-
-()=>{
-
-if(
-
-window.innerWidth > 768
-
-){
-
-sidebar.classList.remove("show");
-
-}
-
-});
-
-
-
-// ================================
-// EXPORTS
-// ================================
-
-export {
-
-loadPage,
-
-reloadCurrentPage,
-
-goDashboard,
-
-showLoading,
-
-showError,
-
-setPageTitle
-
-};
-
-
-
-// ================================
-// MODULE READY
-// ================================
-
-console.log(
-
-"🚀 app.js v8.0 Ready"
-
-);
+loadPage("dashboard");
