@@ -133,11 +133,11 @@ function loadPage(page){
         break;
 
         case "reports":
-            placeholder("Reports");
+            placeholder();
         break;
 
         case "settings":
-            placeholder("Settings");
+            placeholder();
         break;
 
         default:
