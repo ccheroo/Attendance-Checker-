@@ -1,8 +1,8 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // REPORTS MODULE
-// VERSION 7.0 FINAL
-// PART 1 OF 6
+// VERSION 8.0 FINAL
+// PART 1 OF 3
 // ======================================================
 
 // ================================
@@ -23,8 +23,11 @@ orderBy
 
 
 // ================================
-// REPORT DATA
+// GLOBAL VARIABLES
 // ================================
+
+const mainContent =
+document.getElementById("mainContent");
 
 let reportData = [];
 
@@ -48,7 +51,7 @@ Attendance Reports
 
 <h2>
 
-Generate Attendance Report
+Filters
 
 </h2>
 
@@ -82,9 +85,11 @@ placeholder="Search Student...">
 <br>
 
 <div
-style="display:flex;
+style="
+display:flex;
 gap:10px;
-flex-wrap:wrap;">
+flex-wrap:wrap;
+">
 
 <button
 class="button"
@@ -106,7 +111,7 @@ Print
 class="button"
 id="excelReportBtn">
 
-Export Excel
+Export CSV
 
 </button>
 
@@ -116,20 +121,9 @@ Export Excel
 
 
 
-<div class="card">
-
-<h2>
-
-Attendance Summary
-
-</h2>
-
 <div
-id="reportSummary">
-
-Loading...
-
-</div>
+id="reportSummary"
+class="dashboard-grid">
 
 </div>
 
@@ -154,16 +148,21 @@ Loading...
 
 `;
 
-await loadSubjectsToFilter();
+await loadSubjects();
 
-initializeReportEvents();
+initializeEvents();
+
+await generateReport();
 
 }
+
+
+
 // ================================
-// LOAD SUBJECTS TO FILTER
+// LOAD SUBJECTS
 // ================================
 
-async function loadSubjectsToFilter(){
+async function loadSubjects(){
 
 const select =
 
@@ -178,22 +177,27 @@ try{
 const snapshot =
 
 await getDocs(
-collection(db,"subjects")
+
+collection(
+db,
+"subjects"
+)
+
 );
 
 snapshot.forEach(doc=>{
 
-const subject =
+const data =
 doc.data();
 
 const option =
 document.createElement("option");
 
 option.value =
-subject.name;
+data.name;
 
 option.textContent =
-subject.name;
+data.name;
 
 select.appendChild(option);
 
@@ -205,7 +209,7 @@ catch(error){
 
 console.error(
 
-"Load Subjects:",
+"Reports:",
 
 error
 
@@ -221,65 +225,49 @@ error
 // INITIALIZE EVENTS
 // ================================
 
-function initializeReportEvents(){
+function initializeEvents(){
 
-const generateButton =
+document
 
-document.getElementById(
-"generateReportBtn"
-);
+.getElementById("generateReportBtn")
 
-const printButton =
-
-document.getElementById(
-"printReportBtn"
-);
-
-const excelButton =
-
-document.getElementById(
-"excelReportBtn"
-);
-
-const searchBox =
-
-document.getElementById(
-"reportSearch"
-);
-
-if(generateButton){
-
-generateButton.onclick = ()=>{
+.onclick = ()=>{
 
 generateReport();
 
 };
 
-}
 
-if(printButton){
 
-printButton.onclick = ()=>{
+document
+
+.getElementById("printReportBtn")
+
+.onclick = ()=>{
 
 window.print();
 
 };
 
-}
 
-if(excelButton){
 
-excelButton.onclick = ()=>{
+document
 
-exportExcel();
+.getElementById("excelReportBtn")
+
+.onclick = ()=>{
+
+exportCSV();
 
 };
 
-}
 
-if(searchBox){
 
-searchBox.addEventListener(
+document
+
+.getElementById("reportSearch")
+
+.addEventListener(
 
 "input",
 
@@ -287,15 +275,53 @@ searchBox.addEventListener(
 
 displayReports();
 
+updateSummary();
+
+}
+
+);
+
+
+
+document
+
+.getElementById("reportSubject")
+
+.addEventListener(
+
+"change",
+
+()=>{
+
+displayReports();
+
+updateSummary();
+
+}
+
+);
+
+
+
+document
+
+.getElementById("reportDate")
+
+.addEventListener(
+
+"change",
+
+()=>{
+
+displayReports();
+
+updateSummary();
+
 }
 
 );
 
 }
-
-}
-
-
 
 // ================================
 // GENERATE REPORT
@@ -305,24 +331,15 @@ async function generateReport(){
 
 try{
 
-const attendanceQuery =
-
-query(
+const attendanceQuery = query(
 
 collection(db,"attendance"),
 
-orderBy(
-"createdAt",
-"desc"
-)
+orderBy("createdAt","desc")
 
 );
 
-const snapshot =
-
-await getDocs(
-attendanceQuery
-);
+const snapshot = await getDocs(attendanceQuery);
 
 reportData = [];
 
@@ -354,9 +371,42 @@ error
 
 );
 
+const container =
+
+document.getElementById(
+"reportContainer"
+);
+
+if(container){
+
+container.innerHTML = `
+
+<div class="card">
+
+<h2>
+
+Unable to load reports
+
+</h2>
+
+<p>
+
+${error.message}
+
+</p>
+
+</div>
+
+`;
+
 }
 
 }
+
+}
+
+
+
 // ================================
 // DISPLAY REPORTS
 // ================================
@@ -390,9 +440,7 @@ document
 .getElementById("reportDate")
 .value;
 
-let filtered =
-
-reportData.filter(record=>{
+const filtered = reportData.filter(record=>{
 
 const matchSearch =
 
@@ -424,13 +472,9 @@ record.date === date;
 
 return (
 
-matchSearch
+matchSearch &&
 
-&&
-
-matchSubject
-
-&&
+matchSubject &&
 
 matchDate
 
@@ -440,19 +484,19 @@ matchDate
 
 if(filtered.length===0){
 
-container.innerHTML=`
+container.innerHTML = `
 
 <div class="card">
 
-<h3>
+<h2>
 
-No Attendance Records
+No Records Found
 
-</h3>
+</h2>
 
 <p>
 
-No matching attendance records found.
+There are no attendance records that match your filters.
 
 </p>
 
@@ -472,41 +516,17 @@ let html = `
 
 <tr>
 
-<th>
+<th>Student ID</th>
 
-Student ID
+<th>Name</th>
 
-</th>
+<th>Subject</th>
 
-<th>
+<th>Date</th>
 
-Student Name
+<th>Time</th>
 
-</th>
-
-<th>
-
-Subject
-
-</th>
-
-<th>
-
-Date
-
-</th>
-
-<th>
-
-Time
-
-</th>
-
-<th>
-
-Status
-
-</th>
+<th>Status</th>
 
 </tr>
 
@@ -522,41 +542,17 @@ html += `
 
 <tr>
 
-<td>
+<td>${record.studentID || "-"}</td>
 
-${record.studentID || "-"}
+<td>${record.fullName || "-"}</td>
 
-</td>
+<td>${record.subjectName || "-"}</td>
 
-<td>
+<td>${record.date || "-"}</td>
 
-${record.fullName || "-"}
+<td>${record.time || "-"}</td>
 
-</td>
-
-<td>
-
-${record.subjectName || "-"}
-
-</td>
-
-<td>
-
-${record.date || "-"}
-
-</td>
-
-<td>
-
-${record.time || "-"}
-
-</td>
-
-<td>
-
-${record.status || "Present"}
-
-</td>
+<td>${record.status || "Present"}</td>
 
 </tr>
 
@@ -575,135 +571,65 @@ html += `
 container.innerHTML = html;
 
 }
+
+
+
 // ================================
 // UPDATE SUMMARY
 // ================================
 
 function updateSummary(){
 
-const container =
+const summary =
 
 document.getElementById(
 "reportSummary"
 );
 
-if(!container) return;
+if(!summary) return;
 
-const search =
+const total = reportData.length;
 
-document
-.getElementById("reportSearch")
-.value
-.toLowerCase();
+const present = reportData.filter(r=>
 
-const subject =
-
-document
-.getElementById("reportSubject")
-.value;
-
-const date =
-
-document
-.getElementById("reportDate")
-.value;
-
-const filtered =
-
-reportData.filter(record=>{
-
-const matchSearch =
-
-(record.fullName || "")
-.toLowerCase()
-.includes(search)
-
-||
-
-(record.studentID || "")
-.toLowerCase()
-.includes(search);
-
-const matchSubject =
-
-subject === ""
-
-||
-
-record.subjectName === subject;
-
-const matchDate =
-
-date === ""
-
-||
-
-record.date === date;
-
-return (
-
-matchSearch
-
-&&
-
-matchSubject
-
-&&
-
-matchDate
-
-);
-
-});
-
-const totalRecords =
-filtered.length;
-
-const totalPresent =
-filtered.filter(record=>
-
-(record.status || "Present")
-.toLowerCase() === "present"
+(r.status || "Present")
+.toLowerCase()==="present"
 
 ).length;
 
-const totalLate =
-filtered.filter(record=>
+const late = reportData.filter(r=>
 
-(record.status || "")
-.toLowerCase() === "late"
-
-).length;
-
-const totalAbsent =
-filtered.filter(record=>
-
-(record.status || "")
-.toLowerCase() === "absent"
+(r.status || "")
+.toLowerCase()==="late"
 
 ).length;
 
-const attendanceRate =
+const absent = reportData.filter(r=>
 
-totalRecords === 0
+(r.status || "")
+.toLowerCase()==="absent"
+
+).length;
+
+const rate =
+
+total===0
 
 ? 0
 
 : Math.round(
 
-(totalPresent / totalRecords) * 100
+(present/total)*100
 
 );
 
-container.innerHTML = `
-
-<div class="dashboard-grid">
+summary.innerHTML = `
 
 <div class="card dashboard-card">
 
 <h3>Total Records</h3>
 
-<h1>${totalRecords}</h1>
+<h1>${total}</h1>
 
 </div>
 
@@ -711,7 +637,7 @@ container.innerHTML = `
 
 <h3>Present</h3>
 
-<h1>${totalPresent}</h1>
+<h1>${present}</h1>
 
 </div>
 
@@ -719,7 +645,7 @@ container.innerHTML = `
 
 <h3>Late</h3>
 
-<h1>${totalLate}</h1>
+<h1>${late}</h1>
 
 </div>
 
@@ -727,7 +653,7 @@ container.innerHTML = `
 
 <h3>Absent</h3>
 
-<h1>${totalAbsent}</h1>
+<h1>${absent}</h1>
 
 </div>
 
@@ -735,103 +661,33 @@ container.innerHTML = `
 
 <h3>Attendance Rate</h3>
 
-<h1>${attendanceRate}%</h1>
-
-</div>
+<h1>${rate}%</h1>
 
 </div>
 
 `;
 
 }
-// ================================
-// EXPORT REPORT (CSV)
-// ================================
 
-function exportExcel(){
+// ======================================================
+// EXPORT CSV
+// ======================================================
+
+function exportCSV(){
 
 if(reportData.length===0){
 
-alert(
-"No report data available."
-);
+alert("No attendance data found.");
 
 return;
 
 }
 
-const search =
-
-document
-.getElementById("reportSearch")
-.value
-.toLowerCase();
-
-const subject =
-
-document
-.getElementById("reportSubject")
-.value;
-
-const date =
-
-document
-.getElementById("reportDate")
-.value;
-
-const filtered =
-
-reportData.filter(record=>{
-
-const matchSearch =
-
-(record.fullName || "")
-.toLowerCase()
-.includes(search)
-
-||
-
-(record.studentID || "")
-.toLowerCase()
-.includes(search);
-
-const matchSubject =
-
-subject === ""
-
-||
-
-record.subjectName === subject;
-
-const matchDate =
-
-date === ""
-
-||
-
-record.date === date;
-
-return (
-
-matchSearch
-
-&&
-
-matchSubject
-
-&&
-
-matchDate
-
-);
-
-});
-
 let csv =
 
 "Student ID,Student Name,Subject,Date,Time,Status\n";
 
-filtered.forEach(record=>{
+reportData.forEach(record=>{
 
 csv += `"${record.studentID || ""}",`;
 
@@ -861,22 +717,19 @@ type:"text/csv;charset=utf-8;"
 
 );
 
-const url =
-URL.createObjectURL(blob);
+const url = URL.createObjectURL(blob);
 
 const link =
-document.createElement("a");
 
-const today =
-new Date()
-.toISOString()
-.split("T")[0];
+document.createElement("a");
 
 link.href = url;
 
 link.download =
 
-`Attendance_Report_${today}.csv`;
+`Attendance_Report_${
+new Date().toISOString().split("T")[0]
+}.csv`;
 
 document.body.appendChild(link);
 
@@ -885,84 +738,6 @@ link.click();
 document.body.removeChild(link);
 
 URL.revokeObjectURL(url);
-
-alert(
-"Report exported successfully!"
-);
-
-}
-
-
-
-// ================================
-// PRINT REPORT
-// ================================
-
-function printReport(){
-
-window.print();
-
-}
-
-// ======================================================
-// FINAL INITIALIZATION
-// ======================================================
-
-// Auto-update summary kapag nagbago ang filters
-
-document.addEventListener(
-
-"change",
-
-(event)=>{
-
-if(
-
-event.target.id==="reportSubject"
-
-||
-
-event.target.id==="reportDate"
-
-){
-
-displayReports();
-
-updateSummary();
-
-}
-
-}
-
-);
-
-
-
-// ================================
-// AUTO LOAD REPORTS
-// ================================
-
-export async function initializeReports(){
-
-try{
-
-await loadReports();
-
-await generateReport();
-
-}
-
-catch(error){
-
-console.error(
-
-"Reports Initialization:",
-
-error
-
-);
-
-}
 
 }
 
@@ -974,23 +749,7 @@ error
 
 export async function refreshReports(){
 
-try{
-
 await generateReport();
-
-}
-
-catch(error){
-
-console.error(
-
-"Refresh Reports:",
-
-error
-
-);
-
-}
 
 }
 
@@ -1002,19 +761,7 @@ error
 
 export function clearReports(){
 
-reportData = [];
-
-const container =
-
-document.getElementById(
-"reportContainer"
-);
-
-if(container){
-
-container.innerHTML = "";
-
-}
+reportData=[];
 
 const summary =
 
@@ -1022,11 +769,35 @@ document.getElementById(
 "reportSummary"
 );
 
+const container =
+
+document.getElementById(
+"reportContainer"
+);
+
 if(summary){
 
-summary.innerHTML = "";
+summary.innerHTML="";
 
 }
+
+if(container){
+
+container.innerHTML="";
+
+}
+
+}
+
+
+
+// ================================
+// INITIALIZER
+// ================================
+
+export async function initializeReports(){
+
+await loadReports();
 
 }
 
@@ -1036,10 +807,8 @@ summary.innerHTML = "";
 // MODULE READY
 // ================================
 
-console.clear();
-
 console.log(
 
-"📄 Reports Module v7.0 Ready"
+"📄 Reports Module v8 Ready"
 
 );
