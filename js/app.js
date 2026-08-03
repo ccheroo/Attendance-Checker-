@@ -41,6 +41,14 @@ import {
     loadAttendance
 } from "./attendance.js";
 
+import {
+    loadReports
+} from "./reports.js";
+
+import {
+    loadSettings
+}from "./settings.js";
+
 import { db } from "./firebase.js";
 
 import {
@@ -133,11 +141,11 @@ function loadPage(page){
         break;
 
         case "reports":
-    await loadReports();
+    reports();
     break;
 
 case "settings":
-    await loadSettings();
+    settings();
     break;
             
         default:
