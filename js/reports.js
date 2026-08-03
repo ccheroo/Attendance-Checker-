@@ -1,7 +1,7 @@
 // ======================================================
 // ATTENDANCE CHECKER
 // REPORTS MODULE
-// VERSION 11.0 FINAL
+// VERSION 12.0 FINAL
 // PART 1 OF 6
 // ======================================================
 
@@ -11,18 +11,13 @@
 // IMPORTS
 // ================================
 
-import { db }
-
-from "./firebase.js";
+import { db } from "./firebase.js";
 
 import {
 
 collection,
-
 getDocs,
-
 query,
-
 orderBy
 
 }
@@ -50,18 +45,26 @@ export async function loadReports(){
 const mainContent =
 
 document.getElementById(
-
 "mainContent"
+);
+
+if(!mainContent){
+
+console.error(
+
+"mainContent not found."
 
 );
 
-if(!mainContent) return;
+return;
+
+}
 
 mainContent.innerHTML = `
 
 <div class="reports-page">
 
-<div class="reports-header">
+<div class="page-header">
 
 <h1>
 
@@ -71,7 +74,7 @@ Attendance Reports
 
 <p>
 
-Generate professional attendance reports.
+Generate, print, and export attendance records.
 
 </p>
 
@@ -91,6 +94,8 @@ id="reportDate"
 
 class="input">
 
+
+
 <select
 
 id="reportSubject"
@@ -105,6 +110,8 @@ All Subjects
 
 </select>
 
+
+
 <input
 
 type="text"
@@ -115,13 +122,15 @@ class="input"
 
 placeholder="Search Student">
 
+
+
 <button
 
 class="button"
 
 id="generatePDFBtn">
 
-Generate PDF
+Export PDF
 
 </button>
 
@@ -137,11 +146,11 @@ id="pdfReport"
 
 class="pdf-report">
 
-
-
 <div
 
 id="reportSummary">
+
+Loading summary...
 
 </div>
 
@@ -151,9 +160,9 @@ id="reportSummary">
 
 id="reportContainer">
 
+Loading attendance records...
+
 </div>
-
-
 
 </div>
 
@@ -163,7 +172,7 @@ id="reportContainer">
 
 await loadSubjectFilter();
 
-initializeReportEvents();
+initializeEvents();
 
 await generateReport();
 
@@ -202,7 +211,9 @@ const subject = doc.data();
 
 const option =
 
-document.createElement("option");
+document.createElement(
+"option"
+);
 
 option.value =
 
@@ -210,7 +221,11 @@ subject.name || "";
 
 option.textContent =
 
-subject.name || "Unknown Subject";
+subject.code
+
+? `${subject.code} - ${subject.name}`
+
+: subject.name;
 
 select.appendChild(option);
 
@@ -238,7 +253,7 @@ error
 // INITIALIZE EVENTS
 // ================================
 
-function initializeReportEvents(){
+function initializeEvents(){
 
 const pdfButton =
 
@@ -263,24 +278,6 @@ const dateFilter =
 document.getElementById(
 "reportDate"
 );
-
-
-
-if(pdfButton){
-
-pdfButton.addEventListener(
-
-"click",
-
-async()=>{
-
-await exportReportPDF();
-
-}
-
-);
-
-}
 
 
 
@@ -335,6 +332,24 @@ dateFilter.addEventListener(
 displayReports();
 
 updateSummary();
+
+}
+
+);
+
+}
+
+
+
+if(pdfButton){
+
+pdfButton.addEventListener(
+
+"click",
+
+async()=>{
+
+await exportPDF();
 
 }
 
@@ -405,6 +420,36 @@ error
 
 );
 
+const container =
+
+document.getElementById(
+"reportContainer"
+);
+
+if(container){
+
+container.innerHTML = `
+
+<div class="card">
+
+<h3>
+
+Unable to load attendance records
+
+</h3>
+
+<p>
+
+${error.message}
+
+</p>
+
+</div>
+
+`;
+
+}
+
 }
 
 }
@@ -426,6 +471,8 @@ document
 )
 
 .value
+
+.trim()
 
 .toLowerCase();
 
@@ -451,49 +498,55 @@ document
 
 return reportData.filter(record=>{
 
-const studentName =
+const fullName =
 
 (record.fullName || "")
-
 .toLowerCase();
 
 const studentID =
 
 (record.studentID || "")
-
 .toLowerCase();
 
-const matchKeyword =
+const subjectName =
 
-studentName.includes(keyword)
+(record.subjectName || "");
+
+const recordDate =
+
+(record.date || "");
+
+const matchesSearch =
+
+fullName.includes(keyword)
 
 ||
 
 studentID.includes(keyword);
 
-const matchSubject =
+const matchesSubject =
 
 subject === ""
 
 ||
 
-record.subjectName === subject;
+subjectName === subject;
 
-const matchDate =
+const matchesDate =
 
 date === ""
 
 ||
 
-record.date === date;
+recordDate === date;
 
-return(
+return (
 
-matchKeyword &&
+matchesSearch &&
 
-matchSubject &&
+matchesSubject &&
 
-matchDate
+matchesDate
 
 );
 
@@ -501,10 +554,8 @@ matchDate
 
 }
 
-
-
 // ================================
-// DISPLAY REPORT
+// DISPLAY REPORTS
 // ================================
 
 function displayReports(){
@@ -523,7 +574,7 @@ getFilteredReports();
 
 if(records.length===0){
 
-container.innerHTML=`
+container.innerHTML = `
 
 <div class="card">
 
@@ -535,7 +586,7 @@ No Attendance Records Found
 
 <p>
 
-Try changing your filters.
+There are no attendance records matching your filters.
 
 </p>
 
@@ -547,7 +598,7 @@ return;
 
 }
 
-let html=`
+let html = `
 
 <table class="report-table">
 
@@ -579,23 +630,35 @@ let html=`
 
 records.forEach((record,index)=>{
 
-html+=`
+const status =
+
+record.status || "Present";
+
+html += `
 
 <tr>
 
 <td>${index+1}</td>
 
-<td>${record.studentID||"-"}</td>
+<td>${record.studentID || "-"}</td>
 
-<td>${record.fullName||"-"}</td>
+<td>${record.fullName || "-"}</td>
 
-<td>${record.subjectName||"-"}</td>
+<td>${record.subjectName || "-"}</td>
 
-<td>${record.date||"-"}</td>
+<td>${record.date || "-"}</td>
 
-<td>${record.time||"-"}</td>
+<td>${record.time || "-"}</td>
 
-<td>${record.status||"Present"}</td>
+<td>
+
+<span class="status ${status.toLowerCase()}">
+
+${status}
+
+</span>
+
+</td>
 
 </tr>
 
@@ -603,7 +666,7 @@ html+=`
 
 });
 
-html+=`
+html += `
 
 </tbody>
 
@@ -611,9 +674,11 @@ html+=`
 
 `;
 
-container.innerHTML=html;
+container.innerHTML = html;
 
 }
+
+
 
 // ================================
 // UPDATE SUMMARY
@@ -621,27 +686,25 @@ container.innerHTML=html;
 
 function updateSummary(){
 
-const container =
+const summary =
 
 document.getElementById(
 "reportSummary"
 );
 
-if(!container) return;
+if(!summary) return;
 
 const records =
 
 getFilteredReports();
 
-const total =
-
-records.length;
+const total = records.length;
 
 const present =
 
 records.filter(record=>
 
-(record.status||"Present")
+(record.status || "Present")
 .toLowerCase()==="present"
 
 ).length;
@@ -650,7 +713,7 @@ const late =
 
 records.filter(record=>
 
-(record.status||"")
+(record.status || "")
 .toLowerCase()==="late"
 
 ).length;
@@ -659,7 +722,7 @@ const absent =
 
 records.filter(record=>
 
-(record.status||"")
+(record.status || "")
 .toLowerCase()==="absent"
 
 ).length;
@@ -676,19 +739,7 @@ total===0
 
 );
 
-const subject =
-
-document.getElementById(
-"reportSubject"
-)?.value || "All Subjects";
-
-const date =
-
-document.getElementById(
-"reportDate"
-)?.value || "All Dates";
-
-container.innerHTML = `
+summary.innerHTML = `
 
 <div class="report-header">
 
@@ -700,31 +751,13 @@ ATTENDANCE REPORT
 
 <p>
 
-Generated:
+Generated on
 
 ${new Date().toLocaleString()}
 
 </p>
 
-<p>
-
-Subject:
-
-<strong>${subject}</strong>
-
-</p>
-
-<p>
-
-Date Filter:
-
-<strong>${date}</strong>
-
-</p>
-
 </div>
-
-
 
 <div class="summary-grid">
 
@@ -773,11 +806,12 @@ Date Filter:
 `;
 
 }
+
 // ================================
-// EXPORT REPORT TO PDF
+// EXPORT PDF
 // ================================
 
-async function exportReportPDF(){
+async function exportPDF(){
 
 const report =
 
@@ -789,7 +823,7 @@ if(!report){
 
 alert(
 
-"Report not found."
+"Report container not found."
 
 );
 
@@ -797,21 +831,25 @@ return;
 
 }
 
-const today =
+const originalBackground =
 
+report.style.background;
+
+report.style.background = "#ffffff";
+
+const filename =
+
+`Attendance_Report_${
 new Date()
-
 .toISOString()
-
-.split("T")[0];
+.split("T")[0]
+}.pdf`;
 
 const options = {
 
-margin:10,
+margin:[10,10,10,10],
 
-filename:
-
-`Attendance_Report_${today}.pdf`,
+filename:filename,
 
 image:{
 
@@ -827,7 +865,7 @@ scale:2,
 
 useCORS:true,
 
-scrollY:0
+backgroundColor:"#ffffff"
 
 },
 
@@ -843,19 +881,49 @@ orientation:"landscape"
 
 pagebreak:{
 
-mode:["avoid-all","css","legacy"]
+mode:["css","legacy"]
 
 }
 
 };
 
-await html2pdf()
+try{
+
+await window.html2pdf()
 
 .set(options)
 
 .from(report)
 
 .save();
+
+}
+
+catch(error){
+
+console.error(
+
+"Export PDF:",
+
+error
+
+);
+
+alert(
+
+"Failed to export PDF."
+
+);
+
+}
+
+finally{
+
+report.style.background =
+
+originalBackground;
+
+}
 
 }
 // ================================
@@ -865,54 +933,6 @@ await html2pdf()
 export async function refreshReports(){
 
 await generateReport();
-
-}
-
-
-
-// ================================
-// RELOAD REPORTS
-// ================================
-
-export async function reloadReports(){
-
-await generateReport();
-
-}
-
-
-
-// ================================
-// CLEAR REPORTS
-// ================================
-
-export function clearReports(){
-
-reportData = [];
-
-const reportContainer =
-
-document.getElementById(
-"reportContainer"
-);
-
-const summaryContainer =
-
-document.getElementById(
-"reportSummary"
-);
-
-if(reportContainer){
-
-reportContainer.innerHTML = "";
-
-}
-
-if(summaryContainer){
-
-summaryContainer.innerHTML = "";
-
-}
 
 }
 
@@ -931,11 +951,47 @@ await loadReports();
 
 
 // ================================
+// CLEAR REPORT CACHE
+// ================================
+
+export function clearReports(){
+
+reportData = [];
+
+const summary =
+
+document.getElementById(
+"reportSummary"
+);
+
+const container =
+
+document.getElementById(
+"reportContainer"
+);
+
+if(summary){
+
+summary.innerHTML = "";
+
+}
+
+if(container){
+
+container.innerHTML = "";
+
+}
+
+}
+
+
+
+// ================================
 // MODULE READY
 // ================================
 
 console.log(
 
-"📄 Reports Module v11.0 Final Ready"
+"📄 Reports Module v12.0 Final Loaded"
 
 );
